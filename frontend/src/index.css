@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+/* Shared palette: ocean blue, muted teal, and cool neutral surfaces. */
+@theme {
+  --color-blue-50: #eff6fa;
+  --color-blue-100: #dcecf5;
+  --color-blue-200: #bdd9e9;
+  --color-blue-300: #91bfd7;
+  --color-blue-400: #5b9dbf;
+  --color-blue-500: #327da4;
+  --color-blue-600: #216387;
+  --color-blue-700: #1c506e;
+  --color-blue-800: #1b435b;
+  --color-blue-900: #19384c;
+  --color-blue-950: #102635;
+
+  --color-cyan-50: #effaf9;
+  --color-cyan-100: #d6f0ec;
+  --color-cyan-200: #afe0d9;
+  --color-cyan-300: #7ac7be;
+  --color-cyan-400: #48a99f;
+  --color-cyan-500: #267e77;
+  --color-cyan-600: #206e68;
+  --color-cyan-700: #1e5854;
+  --color-cyan-800: #1c4744;
+  --color-cyan-900: #193c3a;
+  --color-cyan-950: #0b2423;
+
+  --color-slate-50: #f6f8fa;
+  --color-slate-100: #edf1f5;
+  --color-slate-200: #dce3eb;
+  --color-slate-300: #c2cdd9;
+  --color-slate-400: #8292a6;
+  --color-slate-500: #5e7086;
+  --color-slate-600: #495b71;
+  --color-slate-700: #36485e;
+  --color-slate-800: #24354a;
+  --color-slate-900: #172639;
+  --color-slate-950: #0e1929;
+
+  --color-green-50: #eff9f3;
+  --color-green-100: #d9efe2;
+  --color-green-200: #b6dec8;
+  --color-green-300: #87c5a6;
+  --color-green-400: #58a881;
+  --color-green-500: #34885f;
+  --color-green-600: #26704c;
+  --color-green-700: #215a3f;
+  --color-green-800: #1e4835;
+  --color-green-900: #1a3c2d;
+  --color-green-950: #0c2218;
+
+  --color-emerald-500: #34885f;
+  --color-emerald-600: #26704c;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background: var(--color-slate-50);
+  color: var(--color-slate-900);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}

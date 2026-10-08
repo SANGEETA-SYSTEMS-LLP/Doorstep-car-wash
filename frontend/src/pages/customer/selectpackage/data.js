@@ -1,0 +1,46 @@
+export const packages = [
+  {
+    id: 1,
+    name: "Basic Wash",
+    price: 299,
+    duration: "45 min",
+    description: "Quick exterior care for your vehicle.",
+    features: [
+      "Exterior body wash",
+      "Tyre cleaning",
+      "Window cleaning",
+      "Exterior drying",
+    ],
+  },
+  {
+    id: 2,
+    name: "Premium Wash",
+    price: 499,
+    duration: "60 min",
+    popular: true,
+    description: "Complete inside and outside cleaning.",
+    features: [
+      "Exterior body wash",
+      "Interior vacuum",
+      "Dashboard cleaning",
+      "Tyre cleaning",
+      "Window cleaning",
+      "Interior dusting",
+    ],
+  },
+  {
+    id: 3,
+    name: "Complete Detailing",
+    price: 1499,
+    duration: "180 min",
+    description: "Deep care for a showroom-like finish.",
+    features: [
+      "Complete exterior wash",
+      "Deep interior cleaning",
+      "Dashboard detailing",
+      "Tyre dressing",
+      "Interior vacuum",
+      "Premium finishing",
+    ],
+  },
+];
