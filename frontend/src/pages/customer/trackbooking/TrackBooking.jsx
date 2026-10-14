@@ -1,77 +1,124 @@
+import useDrivingRoute from "../../../hooks/useDrivingRoute";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Navigation } from "lucide-react";
 import { useBooking } from "../../../context/BookingContext";
+import { supabase } from "../../../services/supabase";
+import { getWasherLocation } from "../../../services/washerService";
 import TrackBookingLiveMap from "./TrackBookingLiveMap";
 import TrackingSidebar from "./TrackingSidebar";
+import TrackingHeader from "./TrackingHeader";
+import LiveLocationInfo from "./LiveLocationInfo";
 
 function TrackBooking() {
   const { booking, updateStatus } = useBooking();
   const washer = booking.washer;
   const navigate = useNavigate();
 
-  const [distance, setDistance] = useState(1.8);
-  const [eta, setEta] = useState(12);
-  const [progress, setProgress] = useState(22);
+  const [currentStatus, setCurrentStatus] = useState(booking.status);
+  const [washerLocation, setWasherLocation] = useState(null);
 
-  // Mock washer movement
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDistance((previous) =>
-        Math.max(0.2, Number((previous - 0.1).toFixed(1)))
-      );
+    const bookingId = booking.databaseBookingId;
+    if (!bookingId) return;
 
-      setEta((previous) => Math.max(2, previous - 1));
+    let cancelled = false;
+    const channel = supabase
+      .channel(`tracking-booking-${bookingId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "bookings",
+          filter: `id=eq.${bookingId}`,
+        },
+        (payload) => {
+          if (cancelled) return;
+          const status = payload.new.status;
+          setCurrentStatus(status);
+          updateStatus(status);
+          if (status === "washer_arrived") {
+            navigate("/customer/washer-arrived");
+          }
+        }
+      )
+      .subscribe();
 
-      setProgress((previous) =>
-        Math.min(75, previous + 4)
-      );
-    }, 3000);
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, [booking.databaseBookingId]);
 
-    return () => clearInterval(interval);
-  }, []);
+  useEffect(() => {
+    const washerId = booking.washer?.id;
+    let active = true;
+
+    if (!washerId) {
+      return () => {
+        active = false;
+      };
+    }
+
+    const loadLocation = async () => {
+      try {
+        const location = await getWasherLocation(washerId);
+
+        if (active) {
+          setWasherLocation(location);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadLocation();
+    const locationPoll = setInterval(loadLocation, 15000);
+
+    const channel = supabase
+      .channel(`washer-location-${washerId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "washer_locations",
+          filter: `washer_id=eq.${washerId}`,
+        },
+        (payload) => {
+          if (active) {
+            setWasherLocation(payload.new);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      active = false;
+      clearInterval(locationPoll);
+      supabase.removeChannel(channel);
+    };
+  }, [booking.washer?.id]);
+
+  const { distance, eta, path, error: routeError } = useDrivingRoute(washerLocation, booking.location);
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* HEADER */}
 
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate("/customer")}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-500"
-            >
-              <ArrowLeft size={19} />
-            </button>
-
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                {booking.bookingId || "Booking"}
-              </p>
-
-              <h1 className="text-xl font-bold">
-                Track Your Washer
-              </h1>
-            </div>
-          </div>
-
-          <div className="hidden items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 sm:flex">
-            <Navigation size={16} />
-            On the way
-          </div>
-        </div>
-      </header>
+      <TrackingHeader booking={booking} currentStatus={currentStatus} navigate={navigate} />
 
       <main className="mx-auto max-w-7xl p-6 lg:p-8">
+        <LiveLocationInfo location={washerLocation} />
+
         <div className="grid gap-6 xl:grid-cols-[1.5fr_0.7fr]">
           {/* LIVE MAP */}
 
-          <TrackBookingLiveMap booking={booking} washer={washer} distance={distance} eta={eta} progress={progress} />
+          <TrackBookingLiveMap booking={booking} washerLocation={washerLocation} distance={distance} eta={eta} path={path} error={routeError} />
 
           {/* RIGHT */}
 
-          <TrackingSidebar updateStatus={updateStatus} washer={washer} navigate={navigate} distance={distance} eta={eta} />
+          <TrackingSidebar currentStatus={currentStatus} updateStatus={updateStatus} washer={washer} navigate={navigate} distance={distance} eta={eta} />
         </div>
       </main>
     </div>

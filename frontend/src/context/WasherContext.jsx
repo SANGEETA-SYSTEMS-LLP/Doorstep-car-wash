@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 const WasherContext = createContext(null);
 
@@ -23,6 +23,11 @@ export function WasherProvider({ children }) {
       return {
         ...initialWasherState,
         ...(saved && typeof saved === "object" ? saved : {}),
+        activeJob:
+          saved?.activeJob &&
+          typeof saved.activeJob === "object"
+          ? { ...saved.activeJob, earning: null }
+          : null,
         completedTasks: Array.isArray(saved?.completedTasks)
           ? saved.completedTasks.filter((task) => typeof task === "string")
           : [],
@@ -42,6 +47,23 @@ export function WasherProvider({ children }) {
       console.error("Unable to save washer availability:", error);
     }
   }, [washerState]);
+
+  const restoreJob = useCallback((job) => {
+    const completed = ["service_completed", "completed"].includes(job.status);
+    const serviceStarted = ["service_started", "service_completed", "completed"].includes(job.status);
+    const otpVerified = ["otp_verified", "service_started", "service_completed", "completed"].includes(job.status);
+    setWasherState(previous => ({
+      ...(previous.activeJob?.databaseId === job.databaseId ? previous : initialWasherState),
+      online: previous.online,
+      activeJob: job,
+      jobStatus: job.status,
+      otpVerified,
+      beforePhotosAdded: serviceStarted || completed,
+      serviceStarted,
+      afterPhotosAdded: completed,
+      serviceCompleted: completed,
+    }));
+  }, []);
 
   const setOnline = (online) => {
     setWasherState((previous) => ({ ...previous, online }));
@@ -108,7 +130,6 @@ export function WasherProvider({ children }) {
         serviceCompleted: true,
         jobStatus: "service_completed",
         todayJobs: previous.todayJobs + 1,
-        todayEarnings: previous.todayEarnings + (previous.activeJob.earning || 0),
       };
     });
   };
@@ -136,7 +157,7 @@ export function WasherProvider({ children }) {
 
   return (
     <WasherContext.Provider
-      value={{ washerState, setOnline, acceptJob, rejectJob, updateJobStatus, setCompletedTasks, startService, verifyOtp, markBeforePhotosAdded, markAfterPhotosAdded, completeService, closeActiveJob }}
+      value={{ restoreJob, washerState, setOnline, acceptJob, rejectJob, updateJobStatus, setCompletedTasks, startService, verifyOtp, markBeforePhotosAdded, markAfterPhotosAdded, completeService, closeActiveJob }}
     >
       {children}
     </WasherContext.Provider>

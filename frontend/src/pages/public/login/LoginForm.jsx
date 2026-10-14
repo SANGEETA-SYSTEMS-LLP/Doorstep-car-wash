@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Car, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { ArrowLeft, Car } from "lucide-react";
+import LoginCredentialsForm from "./LoginCredentialsForm";
 
-function LoginForm({ showPassword, setShowPassword, form, handleChange, handleSubmit }) {
+function LoginForm({ showPassword, setShowPassword, email, setEmail, password, setPassword, handleSubmit, loading, error }) {
   return (
     <div className="flex min-h-screen items-center justify-center p-5 sm:p-8">
         <div className="w-full max-w-md">
@@ -43,90 +44,17 @@ function LoginForm({ showPassword, setShowPassword, form, handleChange, handleSu
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                Email address
-              </label>
-
-              <div className="relative">
-                <Mail
-                  size={19}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="you@example.com"
-                  className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-2 flex items-center justify-between">
-                <label className="text-sm font-semibold text-slate-700">
-                  Password
-                </label>
-
-                <Link
-                  to="/forgot-password"
-                  className="text-sm font-semibold text-blue-600 hover:text-blue-700"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-
-              <div className="relative">
-                <LockKeyhole
-                  size={19}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter your password"
-                  className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-12 pr-12 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                />
-
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
-                >
-                  {showPassword ? (
-                    <EyeOff size={19} />
-                  ) : (
-                    <Eye size={19} />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <label className="flex items-center gap-3 text-sm text-slate-600">
-              <input
-                type="checkbox"
-                className="h-4 w-4 rounded border-slate-300"
-              />
-
-              Remember me
-            </label>
-
-            <button
-              type="submit"
-              className="w-full rounded-xl bg-blue-600 py-3.5 font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              Login
-            </button>
-          </form>
+          <LoginCredentialsForm
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            handleSubmit={handleSubmit}
+            loading={loading}
+            error={error}
+          />
 
           <div className="mt-8 border-t border-slate-200 pt-6 text-center">
             <p className="text-sm text-slate-500">

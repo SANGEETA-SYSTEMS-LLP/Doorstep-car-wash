@@ -1,9 +1,9 @@
 import { Car, Clock3, Droplets, Image, ShieldCheck, Sparkles, UserRound } from "lucide-react";
-import ServiceStep from "./ServiceStep";
-import PhotoPlaceholder from "./PhotoPlaceholder";
-import { serviceSteps } from "./data";
 
-function ServiceProgressContent({ booking, washer, currentStep, nextStep, progress }) {
+import PhotoPlaceholder from "./PhotoPlaceholder";
+
+
+function ServiceProgressContent({ booking, washer }) {
   return (
     <main className="mx-auto max-w-7xl p-6 lg:p-8">
         {/* PROGRESS HERO */}
@@ -31,30 +31,17 @@ function ServiceProgressContent({ booking, washer, currentStep, nextStep, progre
 
                 <div>
                   <p className="text-xs text-blue-100">
-                    Estimated remaining
+                    Booking status
                   </p>
 
                   <p className="text-2xl font-bold">
-                    28 min
+                    {(booking.status || "service_started").replaceAll("_", " ")}
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-8">
-            <div className="flex justify-between text-sm">
-              <span>Service progress</span>
-              <span>{Math.round(progress)}%</span>
-            </div>
-
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/20">
-              <div
-                className="h-full rounded-full bg-white transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
         </section>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
@@ -75,26 +62,7 @@ function ServiceProgressContent({ booking, washer, currentStep, nextStep, progre
               <Sparkles className="text-blue-600" />
             </div>
 
-            <div className="mt-8">
-              {serviceSteps.map((step, index) => (
-                <ServiceStep
-                  key={step.title}
-                  {...step}
-                  completed={index < currentStep}
-                  active={index === currentStep}
-                  last={index === serviceSteps.length - 1}
-                />
-              ))}
-            </div>
-
-            {/* Mock only */}
-
-            <button
-              onClick={nextStep}
-              className="mt-4 w-full rounded-xl border border-blue-200 bg-blue-50 py-3 text-sm font-semibold text-blue-700"
-            >
-              Demo: Advance Service Status
-            </button>
+            <p className="mt-8 text-slate-500">Your washer is completing the service checklist and uploading photos. This page will update when the service is completed.</p>
           </section>
 
           <aside className="space-y-5">

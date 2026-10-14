@@ -6,6 +6,7 @@ function ProfileInput({
   type = "text",
   value,
   onChange,
+  readOnly = false,
 }) {
   return (
     <div>
@@ -24,7 +25,8 @@ function ProfileInput({
           name={name}
           value={value}
           onChange={onChange}
-          className="w-full rounded-xl border border-slate-300 py-3.5 pl-12 pr-4 outline-none focus:border-blue-500"
+          readOnly={readOnly}
+          className="w-full rounded-xl border border-slate-300 py-3.5 pl-12 pr-4 outline-none focus:border-blue-500 read-only:bg-slate-50 read-only:text-slate-500"
         />
       </div>
     </div>

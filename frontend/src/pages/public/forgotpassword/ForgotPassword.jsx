@@ -1,3 +1,4 @@
+import { supabase } from "../../../services/supabase";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -11,12 +12,25 @@ function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log(email);
-
-    setSent(true);
+    if (loading) return;
+    setLoading(true);
+    setError("");
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: window.location.origin + "/reset-password",
+      });
+      if (resetError) throw resetError;
+      setSent(true);
+    } catch (err) {
+      setError(err.message || "Unable to send the reset link. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,6 +60,7 @@ function ForgotPassword() {
             </p>
 
             <form onSubmit={handleSubmit} className="mt-7">
+              {error && <p role="alert" className="mb-4 text-red-700">{error}</p>}
               <label className="mb-2 block text-sm font-semibold">
                 Email address
               </label>
@@ -66,8 +81,8 @@ function ForgotPassword() {
                 />
               </div>
 
-              <button className="mt-5 w-full rounded-xl bg-blue-600 py-3.5 font-semibold text-white">
-                Send Reset Link
+              <button disabled={loading} className="mt-5 w-full rounded-xl bg-blue-600 py-3.5 font-semibold text-white disabled:opacity-50">
+                {loading ? "Sending..." : "Send Reset Link"}
               </button>
             </form>
           </>
@@ -82,7 +97,7 @@ function ForgotPassword() {
             </h2>
 
             <p className="mt-3 text-slate-500">
-              We've sent password reset instructions to
+              If an account exists for this address, you’ll receive reset instructions at
             </p>
 
             <p className="mt-1 font-semibold">{email}</p>

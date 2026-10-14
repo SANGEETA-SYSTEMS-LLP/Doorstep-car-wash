@@ -1,6 +1,6 @@
 import { LockKeyhole, ShieldCheck } from "lucide-react";
 
-function OtpVerification({ otp, setOtp, verifyOtp }) {
+function OtpVerification({ otp, setOtp, verifyOtp, error }) {
   return (
     <section className="mx-auto mt-8 max-w-xl rounded-3xl border border-slate-200 bg-white p-7 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-blue-600">
@@ -12,14 +12,14 @@ function OtpVerification({ otp, setOtp, verifyOtp }) {
             </h2>
 
             <p className="mt-2 leading-6 text-slate-500">
-              Ask the customer for the 4-digit service
+              Ask the customer for the 6-digit service
               verification OTP before starting the wash.
             </p>
 
             <input
               type="text"
               inputMode="numeric"
-              maxLength={4}
+              maxLength={6}
               value={otp}
               onChange={(e) =>
                 setOtp(
@@ -29,16 +29,18 @@ function OtpVerification({ otp, setOtp, verifyOtp }) {
                   )
                 )
               }
-              placeholder="••••"
+              placeholder="••••••"
               className="mx-auto mt-7 block w-48 rounded-2xl border border-slate-300 px-5 py-4 text-center text-3xl font-bold tracking-[0.4em] outline-none focus:border-blue-500"
             />
 
-            <p className="mt-3 text-xs text-slate-400">
-              Demo OTP: 4826
-            </p>
+            {error && (
+              <p role="alert" className="mt-3 text-sm text-red-600">
+                {error}
+              </p>
+            )}
 
             <button
-              disabled={otp.length !== 4}
+              disabled={otp.length !== 6}
               onClick={verifyOtp}
               className="mt-6 w-full rounded-xl bg-blue-600 py-4 font-semibold text-white disabled:opacity-40"
             >

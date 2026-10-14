@@ -1,61 +1,118 @@
+import { referenceId } from "../../../services/referenceId";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
-import { searchMessages } from "./data";
-import { mockWasher } from "./data";
+import { supabase } from "../../../services/supabase";
+import { getBookingById } from "../../../services/bookingService";
+import { getWasherByUserId } from "../../../services/washerService";
 import FindingWasherMap from "./FindingWasherMap";
 import FindingWasherStatus from "./FindingWasherStatus";
+import FindingWasherHeader from "./FindingWasherHeader";
 
 function FindingWasher() {
   const { booking, setWasher, updateStatus } = useBooking();
   const navigate = useNavigate();
 
-  const [searchStep, setSearchStep] = useState(0);
-  const [washerFound, setWasherFound] = useState(false);
+  const [databaseBooking, setDatabaseBooking] = useState(null);
+  const [error, setError] = useState("");
+
+  const washerFound = databaseBooking?.status === "washer_assigned";
+
 
   useEffect(() => {
-    let step = 0;
-    const interval = setInterval(() => {
-      if (step >= searchMessages.length - 1) {
-        clearInterval(interval);
-        setWasherFound(true);
-        setWasher(mockWasher);
+    const bookingId = booking.databaseBookingId;
+    if (!bookingId) return;
+
+    let cancelled = false;
+    let receivedUpdate = false;
+    setError("");
+    setDatabaseBooking(null);
+
+    const loadAssignedWasher = async (updated) => {
+      try {
+        const assignedWasher = await getWasherByUserId(updated.assigned_washer_id);
+        if (cancelled) return;
+        if (!assignedWasher) {
+          throw new Error("Assigned washer not found.");
+        }
+
+        setWasher({
+          id: assignedWasher.id,
+          referenceId: referenceId("WSH", assignedWasher.user_id),
+          userId: assignedWasher.user_id,
+          name: assignedWasher.profile?.full_name || "Washer Partner",
+          phone: assignedWasher.profile?.phone,
+          rating: assignedWasher.rating,
+          totalJobs: assignedWasher.total_jobs,
+        });
         updateStatus("washer_assigned");
-        return;
+        navigate("/customer/track-booking");
+      } catch (error) {
+        console.error("Load assigned washer error:", error);
+        if (!cancelled) setError("Unable to load assigned washer details.");
       }
+    };
 
-      step += 1;
-      setSearchStep(step);
-    }, 1300);
+    const loadBooking = async () => {
+      try {
+        const data = await getBookingById(bookingId);
+        if (!cancelled && !receivedUpdate) {
+          setDatabaseBooking(data);
+          if (data?.status === "washer_assigned") {
+            await loadAssignedWasher(data);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+        if (!cancelled && !receivedUpdate) setError("Unable to load booking.");
+      }
+    };
 
-    return () => clearInterval(interval);
-  }, []);
+    loadBooking();
+
+    const channel = supabase
+      .channel(`customer-booking-${bookingId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "bookings",
+          filter: `id=eq.${bookingId}`,
+        },
+        async (payload) => {
+          if (cancelled) return;
+          receivedUpdate = true;
+          const updated = payload.new;
+          setDatabaseBooking(updated);
+          setError("");
+          updateStatus(updated.status);
+
+          if (updated.status === "washer_assigned") {
+            await loadAssignedWasher(updated);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, [booking.databaseBookingId]);
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* HEADER */}
 
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
-              Booking {booking.bookingId || "Pending"}
-            </p>
-
-            <h1 className="mt-1 text-xl font-bold">
-              {washerFound
-                ? "Washer Assigned"
-                : "Finding Your Washer"}
-            </h1>
-          </div>
-
-          <div className="rounded-full bg-green-50 px-4 py-2 text-sm font-semibold text-green-700">
-            Booking Confirmed
-          </div>
-        </div>
-      </header>
+      <FindingWasherHeader booking={booking} washerFound={washerFound} />
 
       <main className="mx-auto max-w-7xl p-6 lg:p-8">
+        {error && (
+          <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+            {error}
+          </div>
+        )}
         <div className="grid gap-6 xl:grid-cols-[1.5fr_0.7fr]">
           {/* MAP */}
 
@@ -63,7 +120,7 @@ function FindingWasher() {
 
           {/* STATUS */}
 
-          <FindingWasherStatus booking={booking} navigate={navigate} searchStep={searchStep} washerFound={washerFound} />
+          <FindingWasherStatus booking={booking} databaseBooking={databaseBooking} navigate={navigate} washerFound={washerFound} />
         </div>
       </main>
     </div>

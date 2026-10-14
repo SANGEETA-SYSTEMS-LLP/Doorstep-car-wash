@@ -1,7 +1,8 @@
 import { Check, Clock3, Sparkles } from "lucide-react";
-import { serviceTasks } from "./data";
+import ExtraChargeRequest from "./ExtraChargeRequest";
 
-function ServiceChecklist({ activeJob, completedTasks, toggleTask, allTasksCompleted, moveToAfterPhotos }) {
+function ServiceChecklist({ activeJob, checklist, loading, saving, retry, toggleTask, allTasksCompleted, moveToAfterPhotos }) {
+  const completedTasks = checklist.filter((item) => item.completed);
   return (
     <section className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 lg:p-7">
@@ -22,15 +23,16 @@ function ServiceChecklist({ activeJob, completedTasks, toggleTask, allTasksCompl
               </div>
 
               <div className="mt-7 space-y-3">
-                {serviceTasks.map((task) => {
+                {loading && <p>Loading checklist...</p>}
+                {!loading && !checklist.length && <p>No checklist available. <button onClick={retry}>Retry</button></p>}
+                {checklist.map((task) => {
                   const completed =
-                    completedTasks.includes(
-                      task
-                    );
+                    task.completed;
 
                   return (
                     <button
-                      key={task}
+                      key={task.id}
+                      disabled={saving}
                       onClick={() =>
                         toggleTask(task)
                       }
@@ -61,7 +63,7 @@ function ServiceChecklist({ activeJob, completedTasks, toggleTask, allTasksCompl
                             : "text-slate-700"
                         }`}
                       >
-                        {task}
+                        {(Array.isArray(task.item) ? task.item[0] : task.item)?.title || "Checklist item"}
                       </span>
                     </button>
                   );
@@ -82,11 +84,11 @@ function ServiceChecklist({ activeJob, completedTasks, toggleTask, allTasksCompl
                 <Clock3 />
 
                 <p className="mt-4 text-sm text-blue-100">
-                  Service timer
+                  Service status
                 </p>
 
                 <p className="mt-1 text-3xl font-bold">
-                  32:18
+                  In progress
                 </p>
 
                 <p className="mt-2 text-xs text-blue-100">
@@ -101,7 +103,7 @@ function ServiceChecklist({ activeJob, completedTasks, toggleTask, allTasksCompl
 
                 <p className="mt-2 text-3xl font-bold">
                   {completedTasks.length}/
-                  {serviceTasks.length}
+                  {checklist.length}
                 </p>
 
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
@@ -110,7 +112,7 @@ function ServiceChecklist({ activeJob, completedTasks, toggleTask, allTasksCompl
                     style={{
                       width: `${
                         (completedTasks.length /
-                          serviceTasks.length) *
+                          (checklist.length || 1)) *
                         100
                       }%`,
                     }}
@@ -118,20 +120,7 @@ function ServiceChecklist({ activeJob, completedTasks, toggleTask, allTasksCompl
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-amber-200 bg-amber-50 p-6">
-                <p className="font-bold text-amber-800">
-                  Need an extra charge?
-                </p>
-
-                <p className="mt-2 text-sm leading-6 text-amber-700">
-                  Additional work must be approved by the
-                  supervisor and customer.
-                </p>
-
-                <button className="mt-4 w-full rounded-xl border border-amber-300 bg-white py-3 text-sm font-bold text-amber-700">
-                  Request Extra Charge
-                </button>
-              </div>
+              <ExtraChargeRequest bookingId={activeJob.databaseId} />
             </aside>
           </section>
   );

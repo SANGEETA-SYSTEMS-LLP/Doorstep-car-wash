@@ -1,9 +1,8 @@
-import { Car, CheckCircle2, Clock3, MapPin, Search, ShieldCheck } from "lucide-react";
+import { Car, Clock3, MapPin, Search, ShieldCheck } from "lucide-react";
 import WasherFound from "./WasherFound";
 import BookingDetail from "./BookingDetail";
-import { searchMessages } from "./data";
 
-function FindingWasherStatus({ booking, navigate, searchStep, washerFound }) {
+function FindingWasherStatus({ booking, databaseBooking, navigate, washerFound }) {
   return (
     <aside className="space-y-5">
             <div className="rounded-3xl border border-slate-200 bg-white p-6">
@@ -17,58 +16,19 @@ function FindingWasherStatus({ booking, navigate, searchStep, washerFound }) {
                   </div>
 
                   <div className="mt-5 text-center">
-                    <h2 className="text-xl font-bold">
-                      Finding a professional
+                    <h2 className="text-2xl font-bold">
+                      {databaseBooking?.status === "finding_washer"
+                        ? "Finding your washer..."
+                        : databaseBooking
+                          ? "Booking status: " + (databaseBooking.status || "pending").split("_").join(" ")
+                          : "Loading booking..."}
                     </h2>
-
-                    <p className="mt-2 text-sm leading-6 text-slate-500">
-                      Please wait while we find an available washer
-                      near you.
-                    </p>
-                  </div>
-
-                  <div className="mt-7 space-y-3">
-                    {searchMessages
-                      .slice(0, 4)
-                      .map((message, index) => {
-                        const completed = index < searchStep;
-                        const current = index === searchStep;
-
-                        return (
-                          <div
-                            key={message}
-                            className="flex items-center gap-3"
-                          >
-                            <div
-                              className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                                completed
-                                  ? "bg-green-50 text-green-600"
-                                  : current
-                                  ? "bg-blue-50 text-blue-600"
-                                  : "bg-slate-100 text-slate-400"
-                              }`}
-                            >
-                              {completed ? (
-                                <CheckCircle2 size={17} />
-                              ) : current ? (
-                                <span className="h-3 w-3 animate-pulse rounded-full bg-blue-600" />
-                              ) : (
-                                <span className="h-2 w-2 rounded-full bg-slate-300" />
-                              )}
-                            </div>
-
-                            <span
-                              className={`text-sm ${
-                                completed || current
-                                  ? "font-medium text-slate-700"
-                                  : "text-slate-400"
-                              }`}
-                            >
-                              {message}
-                            </span>
-                          </div>
-                        );
-                      })}
+                    {databaseBooking?.status === "finding_washer" && (
+                      <p className="mt-2 text-slate-500">
+                        We're looking for an available car wash
+                        professional near your location.
+                      </p>
+                    )}
                   </div>
                 </>
               ) : (
@@ -79,6 +39,12 @@ function FindingWasherStatus({ booking, navigate, searchStep, washerFound }) {
                 />
               )}
             </div>
+
+            {databaseBooking && (
+              <p className="mt-3 text-sm font-semibold text-blue-600">
+                {databaseBooking.booking_number}
+              </p>
+            )}
 
             {/* BOOKING */}
 

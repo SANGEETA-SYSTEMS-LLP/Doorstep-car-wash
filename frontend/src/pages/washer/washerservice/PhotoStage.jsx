@@ -38,13 +38,13 @@ function PhotoStage({
         </p>
 
         <p className="mt-1 text-xs text-slate-400">
-          JPG, PNG or camera images
+          JPG, PNG or WEBP images
         </p>
 
         <input
           type="file"
           multiple
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp"
           capture="environment"
           onChange={onChange}
           className="hidden"

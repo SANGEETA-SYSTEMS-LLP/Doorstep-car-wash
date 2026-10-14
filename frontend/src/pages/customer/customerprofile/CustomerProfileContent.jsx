@@ -2,7 +2,7 @@ import { Bell, Camera, CheckCircle2, Mail, MapPin, Phone, Save, UserRound } from
 import ProfileInput from "./ProfileInput";
 import Preference from "./Preference";
 
-function CustomerProfileContent({ saved, profile, handleChange, saveProfile }) {
+function CustomerProfileContent({ saved, saving, error, emailVerified, profile, handleChange, saveProfile }) {
   return (
     <div className="min-h-screen bg-slate-50 p-6 lg:p-8">
       <div className="mx-auto max-w-5xl">
@@ -39,8 +39,8 @@ function CustomerProfileContent({ saved, profile, handleChange, saveProfile }) {
                 Customer
               </p>
 
-              <div className="mt-6 rounded-xl bg-green-50 p-3 text-sm font-semibold text-green-700">
-                ✓ Account Verified
+              <div className={`mt-6 rounded-xl p-3 text-sm font-semibold ${emailVerified ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"}`}>
+                {emailVerified ? "✓ Email verified" : "Email verification pending"}
               </div>
             </div>
           </aside>
@@ -60,6 +60,11 @@ function CustomerProfileContent({ saved, profile, handleChange, saveProfile }) {
                   Profile updated successfully.
                 </div>
               )}
+              {error && (
+                <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700">
+                  {error}
+                </p>
+              )}
 
               <div className="mt-6 space-y-5">
                 <ProfileInput
@@ -77,6 +82,7 @@ function CustomerProfileContent({ saved, profile, handleChange, saveProfile }) {
                   type="email"
                   value={profile.email}
                   onChange={handleChange}
+                  readOnly
                 />
 
                 <ProfileInput
@@ -90,10 +96,11 @@ function CustomerProfileContent({ saved, profile, handleChange, saveProfile }) {
 
               <button
                 type="submit"
-                className="mt-7 flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 font-semibold text-white"
+                disabled={saving}
+                className="mt-7 flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 font-semibold text-white disabled:cursor-wait disabled:opacity-60"
               >
                 <Save size={17} />
-                Save Changes
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </form>
 

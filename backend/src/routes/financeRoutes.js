@@ -1,0 +1,15 @@
+import express from "express";
+import { requireAuth } from "../middleware/authMiddleware.js";
+import { cancelDraft, requireFinanceRole, listOperations, createOperation, reconcileOperation, savePayoutAccount } from "../controllers/financeController.js";
+import { getInvoice, getReport } from "../controllers/financeDocumentsController.js";
+const router=express.Router();
+router.use(requireAuth);
+router.get("/invoices/:bookingId",getInvoice);
+router.use(requireFinanceRole);
+router.get("/operations",listOperations);
+router.post("/operations",createOperation);
+router.post("/operations/:id/reconcile",reconcileOperation);
+router.post("/operations/:id/cancel",cancelDraft);
+router.put("/payout-account",savePayoutAccount);
+router.get("/reports",getReport);
+export default router;

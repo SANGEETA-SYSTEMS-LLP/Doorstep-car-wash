@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import {
   Banknote,
   BriefcaseBusiness,
@@ -33,6 +34,20 @@ const menuItems = [
 ];
 
 function WasherSidebar() {
+  const navigate = useNavigate();
+  const { logout, profile } = useAuth();
+  const displayName = profile?.full_name || "Washer Partner";
+  const initials = displayName.trim().split(/\s+/).slice(0, 2).map((name) => name[0]).join("").toUpperCase();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   return (
     <aside className="hidden min-h-screen w-64 shrink-0 border-r border-slate-200 bg-white lg:flex lg:flex-col">
       {/* LOGO */}
@@ -85,12 +100,12 @@ function WasherSidebar() {
       <div className="border-t border-slate-200 p-4">
         <div className="mb-4 flex items-center gap-3 rounded-xl bg-slate-50 p-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">
-            RK
+            {initials}
           </div>
 
           <div className="min-w-0">
             <p className="truncate text-sm font-bold">
-              Rahul Kumar
+              {displayName}
             </p>
 
             <p className="text-xs text-green-600">
@@ -99,7 +114,10 @@ function WasherSidebar() {
           </div>
         </div>
 
-        <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-red-500 hover:bg-red-50">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-red-500 hover:bg-red-50"
+        >
           <LogOut size={18} />
           Logout
         </button>

@@ -25,8 +25,8 @@ function Navbar() {
             Home
           </Link>
 
-          <a href="#services" className="text-sm font-medium text-slate-600">
-            Services
+          <a href="#about" className="text-sm font-medium text-slate-600">
+            About
           </a>
 
           <a href="#how-it-works" className="text-sm font-medium text-slate-600">

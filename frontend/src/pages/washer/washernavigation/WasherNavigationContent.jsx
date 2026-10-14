@@ -1,7 +1,13 @@
-import { ArrowLeft, Clock3, MapPin, MessageCircle, Navigation, Phone, UserRound } from "lucide-react";
-import MapInfo from "./MapInfo";
+import { ContactButtons } from "../../../components/washer/WasherBookingCard";
+import ServiceMap from "../../../components/map/ServiceMap";
+import useDrivingRoute from "../../../hooks/useDrivingRoute";
+import { coordinates } from "../../../services/maps";
+import { ArrowLeft, Clock3, MapPin, UserRound } from "lucide-react";
 
-function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived }) {
+
+function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived, currentLocation }) {
+  const route = useDrivingRoute(currentLocation, activeJob?.location);
+  const destination = coordinates(activeJob?.location);
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
@@ -35,67 +41,12 @@ function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived }) 
         <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
           {/* MAP */}
 
-          <section className="relative min-h-[620px] overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
-            <div
-              className="absolute inset-0 opacity-40"
-              style={{
-                backgroundImage:
-                  "linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px)",
-                backgroundSize: "45px 45px",
-              }}
-            />
-
-            {/* Roads */}
-
-            <div className="absolute left-0 top-[44%] h-14 w-full -rotate-6 bg-white shadow-sm" />
-
-            <div className="absolute left-[45%] top-0 h-full w-16 rotate-12 bg-white shadow-sm" />
-
-            {/* ROUTE */}
-
-            <div className="absolute left-[25%] top-[65%] h-2 w-[47%] -rotate-[28deg] rounded-full bg-blue-500" />
-
-            {/* WASHER */}
-
-            <div className="absolute bottom-[18%] left-[19%]">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border-4 border-white bg-blue-600 text-white shadow-xl">
-                <Navigation size={21} />
-              </div>
-
-              <div className="mt-2 rounded-lg bg-white px-3 py-1 text-xs font-bold shadow">
-                You
-              </div>
-            </div>
-
-            {/* CUSTOMER */}
-
-            <div className="absolute right-[22%] top-[25%]">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-white bg-red-500 text-white shadow-xl">
-                <MapPin size={24} />
-              </div>
-
-              <div className="mt-2 whitespace-nowrap rounded-lg bg-white px-3 py-1 text-xs font-bold shadow">
-                Customer
-              </div>
-            </div>
-
-            <div className="absolute bottom-5 left-5 right-5 rounded-2xl bg-white/95 p-5 shadow-xl backdrop-blur">
-              <div className="grid gap-4 sm:grid-cols-3">
-                <MapInfo
-                  label="Distance"
-                  value={`${activeJob?.distance || 0} km`}
-                />
-
-                <MapInfo
-                  label="ETA"
-                  value="12 min"
-                />
-
-                <MapInfo
-                  label="Scheduled"
-                  value={activeJob?.time || "Not available"}
-                />
-              </div>
+          <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+            <ServiceMap location={activeJob?.location} washerLocation={currentLocation} path={route.path} className="h-[520px]" />
+            <div className="space-y-3 p-5">
+              <p>Driving distance: {route.distance} km · ETA: {route.eta} min</p>
+              {route.error && <p role="status" className="text-sm text-amber-800">Driving route unavailable.</p>}
+              {destination ? <a className="inline-block rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white" target="_blank" rel="noreferrer" href={"https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=" + encodeURIComponent(destination.lat + "," + destination.lng)}>Open Google Maps navigation</a> : <p role="alert">This booking is missing destination coordinates.</p>}
             </div>
           </section>
 
@@ -123,17 +74,7 @@ function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived }) 
                 </div>
               </div>
 
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                <button className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-3 text-sm font-semibold">
-                  <Phone size={17} />
-                  Call
-                </button>
-
-                <button className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-3 text-sm font-semibold">
-                  <MessageCircle size={17} />
-                  Message
-                </button>
-              </div>
+              <div className="mt-5"><ContactButtons phone={activeJob?.customer?.phone} /></div>
             </section>
 
             <section className="rounded-3xl border border-slate-200 bg-white p-6">

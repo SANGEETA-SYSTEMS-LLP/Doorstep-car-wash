@@ -1,0 +1,27 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "node --experimental-test-module-mocks --test tests/*.test.js",
+    "dev": "nodemon dev-server.js",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.6",
+    "express": "^5.2.1",
+    "multer": "^2.4.0",
+    "razorpay": "^2.9.8"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.9",
+    "nodemon": "^3.1.14"
+  }
+}

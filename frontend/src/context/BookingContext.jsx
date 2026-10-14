@@ -27,6 +27,8 @@ const initialBooking = {
 
   paymentMethod: null,
 
+  databaseBookingId: null,
+
   bookingId: null,
 
   washer: null,

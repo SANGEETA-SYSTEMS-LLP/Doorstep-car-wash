@@ -28,9 +28,10 @@ function BookingSuccess() {
           Your car wash is booked!
         </h1>
 
-        <p className="mx-auto mt-3 max-w-lg leading-7 text-slate-500">
-          We're now looking for the best available car-wash
-          professional near your location.
+        <p className="mt-2 text-sm text-slate-500">
+          Your booking has been created successfully.
+          We're preparing to find an available washer near
+          your service location.
         </p>
 
         <div className="mt-7 rounded-2xl bg-slate-50 p-5">

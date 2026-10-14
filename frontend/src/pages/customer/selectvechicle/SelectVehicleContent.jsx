@@ -1,9 +1,7 @@
 import { ArrowLeft, ArrowRight, Car, Check, Plus } from "lucide-react";
 import BookingSteps from "../../../components/booking/BookingSteps";
-import AddVehicleModal from "./AddVehicleModal";
-import { vehicles } from "./data";
 
-function SelectVehicleContent({ navigate, selected, setSelected, showAddVehicle, setShowAddVehicle, handleContinue }) {
+function SelectVehicleContent({ navigate, selected, setSelected, vehicles, loading, error, handleContinue }) {
   return (
     <div className="min-h-screen bg-slate-50">
       <BookingSteps currentStep={2} />
@@ -32,6 +30,18 @@ function SelectVehicleContent({ navigate, selected, setSelected, showAddVehicle,
             Package pricing will depend on your vehicle type.
           </p>
         </div>
+
+        {loading && (
+          <p role="status" className="mt-8 text-slate-500">Loading vehicles...</p>
+        )}
+        {error && (
+          <div role="alert" className="mt-8 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+            {error}
+          </div>
+        )}
+        {!loading && !error && vehicles.length === 0 && (
+          <p className="mt-8 text-slate-500">No vehicles added. Add a vehicle to continue.</p>
+        )}
 
         <div className="mt-8 grid gap-5 md:grid-cols-2">
           {vehicles.map((vehicle) => {
@@ -64,28 +74,23 @@ function SelectVehicleContent({ navigate, selected, setSelected, showAddVehicle,
                 </div>
 
                 <h2 className="mt-5 text-xl font-bold">
-                  {vehicle.name}
+                  {vehicle.brand}{" "}{vehicle.model}
                 </h2>
 
-                <p className="mt-1 text-sm font-medium text-slate-500">
-                  {vehicle.number}
+                <p className="mt-1 text-sm text-slate-500">
+                  {vehicle.vehicle_number}
                 </p>
 
-                <div className="mt-5 flex gap-3">
-                  <span className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600">
-                    {vehicle.type}
-                  </span>
-
-                  <span className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600">
-                    {vehicle.colour}
-                  </span>
-                </div>
+                <p className="mt-1 text-xs text-slate-400">
+                  {vehicle.vehicle_type}
+                  {vehicle.colour && ` • ${vehicle.colour}`}
+                </p>
               </button>
             );
           })}
 
           <button
-            onClick={() => setShowAddVehicle(true)}
+            onClick={() => navigate("/customer/vehicles/add")}
             className="flex min-h-56 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-white p-6 text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
@@ -104,7 +109,7 @@ function SelectVehicleContent({ navigate, selected, setSelected, showAddVehicle,
 
         <div className="mt-8 flex justify-end">
           <button
-            disabled={!selected}
+            disabled={loading || Boolean(error) || !vehicles.some((vehicle) => vehicle.id === selected)}
             onClick={handleContinue}
             className="flex items-center gap-2 rounded-xl bg-blue-600 px-7 py-3.5 font-semibold text-white disabled:opacity-50"
           >
@@ -114,11 +119,6 @@ function SelectVehicleContent({ navigate, selected, setSelected, showAddVehicle,
         </div>
       </div>
 
-      {showAddVehicle && (
-        <AddVehicleModal
-          onClose={() => setShowAddVehicle(false)}
-        />
-      )}
     </div>
   );
 }
