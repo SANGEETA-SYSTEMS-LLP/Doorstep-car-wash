@@ -7,12 +7,12 @@ mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: { from
   for (const name of ["select", "eq", "maybeSingle", "upsert", "limit"]) q[name] = (...args) => { call.steps.push([name, ...args]); return q; };
   return q;
 } } } });
-mock.module("../src/services/financeProvider.js", { namedExports: { providerRequest: async (path, options) => {
+mock.module("../src/services/finance/financeProvider.js", { namedExports: { providerRequest: async (path, options) => {
   providerCalls.push({ path, options });
   return path === "contacts" ? { id: "cont_test" } : { id: "fa_test", active: true, contact_id: "cont_test", account_type: "bank_account" };
 } } });
-const { saveWasherPayout, getWasherPayout } = await import("../src/controllers/washerPayoutController.js");
-const { getCustomerPaymentOptions } = await import("../src/controllers/customerPaymentOptionsController.js");
+const { saveWasherPayout, getWasherPayout } = await import("../src/controllers/washer/washerPayoutController.js");
+const { getCustomerPaymentOptions } = await import("../src/controllers/customers/customerPaymentOptionsController.js");
 function reset() { calls = []; providerCalls = []; fixtures = { washers: { data: { id: "own-washer", is_active: true, user_id: "washer-user" } } }; }
 async function run(handler, extra = {}) {
   let status = 200, result, error;

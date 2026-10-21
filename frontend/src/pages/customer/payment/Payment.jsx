@@ -3,7 +3,7 @@ import { LockKeyhole } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import usePaymentWorkflow from "./usePaymentWorkflow";
 import PaymentSummary from "./PaymentSummary";
-import { getCheckoutPriceBreakdown } from "../../../services/checkoutPricing";
+import { getCheckoutPriceBreakdown } from "../../../services/payments/checkoutPricing";
 
 function Payment() {
   const navigate = useNavigate();

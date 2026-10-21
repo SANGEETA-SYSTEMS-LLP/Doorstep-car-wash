@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getWasherWorkspace } from "../services/washerWorkspaceService";
-import { supabase } from "../services/supabase";
+import { getWasherWorkspace } from "../services/washer/washerWorkspaceService";
+import { supabase } from "../services/auth/supabase";
 
 export default function useWasherWorkspace() {
   const { user } = useAuth();

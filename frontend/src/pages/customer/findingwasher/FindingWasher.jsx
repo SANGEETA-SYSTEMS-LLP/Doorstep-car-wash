@@ -1,9 +1,9 @@
-import { referenceId } from "../../../services/referenceId";
+import { referenceId } from "../../../services/shared/referenceId";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
-import { supabase } from "../../../services/supabase";
-import { getBookingById } from "../../../services/bookingService";
+import { supabase } from "../../../services/auth/supabase";
+import { getBookingById } from "../../../services/booking/bookingService";
 import FindingWasherMap from "./FindingWasherMap";
 import FindingWasherStatus from "./FindingWasherStatus";
 import FindingWasherHeader from "./FindingWasherHeader";

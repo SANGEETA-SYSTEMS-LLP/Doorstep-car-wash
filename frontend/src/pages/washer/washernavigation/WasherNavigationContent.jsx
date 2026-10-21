@@ -1,7 +1,7 @@
 import { ContactButtons } from "../../../components/washer/WasherBookingCard";
 import ServiceMap from "../../../components/map/ServiceMap";
 import useDrivingRoute from "../../../hooks/useDrivingRoute";
-import { coordinates } from "../../../services/maps";
+import { coordinates } from "../../../services/locations/maps";
 import { ArrowLeft, Clock3, MapPin, UserRound } from "lucide-react";
 
 

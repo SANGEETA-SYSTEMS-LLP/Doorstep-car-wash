@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Car, Plus } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
-import { getSavedAddresses } from "../../../services/locationService";
-import { getMyVehicles } from "../../../services/vehicleService";
+import { getSavedAddresses } from "../../../services/locations/locationService";
+import { getMyVehicles } from "../../../services/customer/vehicleService";
 
 export default function SavedCustomerDetails() {
   const { user } = useAuth();

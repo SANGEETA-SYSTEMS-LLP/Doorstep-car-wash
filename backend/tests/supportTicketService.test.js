@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validateTicketInput, validateTicketUpdate } from "../src/services/supportTicketService.js";
-import { validateCustomerProfileInput } from "../src/services/customerProfileService.js";
+import { validateTicketInput, validateTicketUpdate } from "../src/services/support/supportTicketService.js";
+import { validateCustomerProfileInput } from "../src/services/customer/customerProfileService.js";
 
 test("support ticket validation trims bounded customer input", () => {
   assert.deepEqual(validateTicketInput({

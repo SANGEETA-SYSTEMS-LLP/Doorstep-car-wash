@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import { supabase } from "../../../services/supabase";
+import { supabase } from "../../../services/auth/supabase";
 
 export default function ResetPassword() {
   const { user, loading } = useAuth();

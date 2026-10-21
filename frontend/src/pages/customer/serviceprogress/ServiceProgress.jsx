@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
-import { supabase } from "../../../services/supabase";
-import { getBookingById } from "../../../services/bookingService";
+import { supabase } from "../../../services/auth/supabase";
+import { getBookingById } from "../../../services/booking/bookingService";
 import ExtraChargeRequests from "./ExtraChargeRequests";
 import ServiceProgressContent from "./ServiceProgressContent";
 

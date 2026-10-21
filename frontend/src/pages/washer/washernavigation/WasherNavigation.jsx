@@ -1,6 +1,6 @@
-import { getWasherJob, toActiveJob } from "../../../services/washerWorkspaceService";
+import { getWasherJob, toActiveJob } from "../../../services/washer/washerWorkspaceService";
 import { useEffect, useRef, useState } from "react";
-import { sendWasherLocation, markWasherArrived } from "../../../services/washerJobService";
+import { sendWasherLocation, markWasherArrived } from "../../../services/washer/washerJobService";
 import { useNavigate, useParams } from "react-router-dom";
 import { Navigation } from "lucide-react";
 import { useWasher } from "../../../context/WasherContext";

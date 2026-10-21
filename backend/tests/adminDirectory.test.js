@@ -14,7 +14,7 @@ const db = {
   auth: { admin: { async getUserById(id) { return { data: { user: { email: `${id}@example.test` } }, error: null }; } } },
 };
 mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: db } });
-const { listResource } = await import("../src/controllers/adminController.js");
+const { listResource } = await import("../src/controllers/admin/adminController.js");
 
 async function load(resource, role = "super_admin") {
   let body;

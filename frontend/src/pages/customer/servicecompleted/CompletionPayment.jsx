@@ -1,6 +1,6 @@
 import { useState } from "react";
 import useApi from "../../../hooks/useApi";
-import { getBookingById } from "../../../services/bookingService";
+import { getBookingById } from "../../../services/booking/bookingService";
 import { openRazorpayPayment } from "../payment/paymentHelpers";
 
 export default function CompletionPayment({ bookingId, onPaid }) {

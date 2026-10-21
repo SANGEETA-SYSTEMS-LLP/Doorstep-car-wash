@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useWasher } from "../../../context/WasherContext";
-import { getWasherJob, toActiveJob } from "../../../services/washerWorkspaceService";
-import { startWasherJourney } from "../../../services/washerJobService";
+import { getWasherJob, toActiveJob } from "../../../services/washer/washerWorkspaceService";
+import { startWasherJourney } from "../../../services/washer/washerJobService";
 import WasherJobDetailsContent from "./WasherJobDetailsContent";
 
 export default function WasherJobDetails() {

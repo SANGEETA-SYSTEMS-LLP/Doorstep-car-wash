@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { MapPin, LocateFixed } from "lucide-react";
 import AddressSearch from "../../../components/map/AddressSearch";
 import ServiceMap from "../../../components/map/ServiceMap";
-import { currentPosition, reverseGeocode } from "../../../services/maps";
+import { currentPosition, reverseGeocode } from "../../../services/locations/maps";
 
 export default function SignupAddress({ value, onChange, disabled, onBusy, accountType = "customer" }) {
   const [busy, setBusy] = useState(false);

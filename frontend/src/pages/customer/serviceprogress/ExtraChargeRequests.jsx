@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getCustomerExtraCharges, respondToExtraCharge } from "../../../services/extraChargeService";
+import { getCustomerExtraCharges, respondToExtraCharge } from "../../../services/booking/extraChargeService";
 
 function ExtraChargeRequests({ bookingId }) {
   const [requests, setRequests] = useState([]);

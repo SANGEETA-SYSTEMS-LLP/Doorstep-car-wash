@@ -1,6 +1,6 @@
 import { apiRequest } from "../api/apiClient";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { coordinates } from "../services/maps";
+import { coordinates } from "../services/locations/maps";
 
 export default function useDrivingRoute(origin, destination) {
   const [route, setRoute] = useState(null);

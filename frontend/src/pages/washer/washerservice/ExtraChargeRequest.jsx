@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { requestWasherExtraCharge } from "../../../services/extraChargeService";
+import { requestWasherExtraCharge } from "../../../services/booking/extraChargeService";
 
 export default function ExtraChargeRequest({ bookingId }) {
   const [reason, setReason] = useState("");

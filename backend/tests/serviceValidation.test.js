@@ -45,7 +45,7 @@ const db = {
 mock.module("../src/config/supabase.js", {
   namedExports: { supabaseAdmin: db },
 });
-mock.module("../src/services/earningService.js", {
+mock.module("../src/services/finance/earningService.js", {
   namedExports: {
     createWasherEarning: async () => {
       earningCalls += 1;
@@ -53,7 +53,7 @@ mock.module("../src/services/earningService.js", {
     },
   },
 });
-const { validateServiceCompletion } = await import("../src/services/serviceValidationService.js");
+const { validateServiceCompletion } = await import("../src/services/operations/serviceValidationService.js");
 
 function reset() {
   booking = {

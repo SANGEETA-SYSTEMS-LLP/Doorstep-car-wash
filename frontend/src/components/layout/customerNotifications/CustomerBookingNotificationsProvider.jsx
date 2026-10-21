@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import { supabase } from "../../../services/supabase";
+import { supabase } from "../../../services/auth/supabase";
 import { NotificationContext, MAX_NOTIFICATIONS, sortNotifications } from "./notificationContext";
 import BookingNotificationToast from "./BookingNotificationToast";
 import { showDesktopNotification } from "./notificationUtilities";

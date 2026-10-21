@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import LoginBenefits from "./LoginBenefits";
 import LoginForm from "./LoginForm";
-import { loginErrorMessage } from "../../../services/authTransport";
+import { loginErrorMessage } from "../../../services/auth/authTransport";
 
 function Login() {
   const navigate = useNavigate();

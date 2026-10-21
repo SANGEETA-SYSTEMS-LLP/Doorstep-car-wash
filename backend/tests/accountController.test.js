@@ -10,7 +10,7 @@ const db = { from(table) {
   return query;
 } };
 mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: db } });
-const { getAccount, updateAccount, myEarnings, myEarningsSummary, getCustomerResources, getMyBookings } = await import("../src/controllers/accountController.js");
+const { getAccount, updateAccount, myEarnings, myEarningsSummary, getCustomerResources, getMyBookings } = await import("../src/controllers/accounts/accountController.js");
 async function run(handler, extra = {}) {
   calls = []; let result; let error;
   await handler({ user: { id: "own-user", email: "test@example.com" }, query: {}, ...extra }, { json(value) { result = value; } }, value => { error = value; });

@@ -1,6 +1,6 @@
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import Price from "./Price";
-import { GST_RATE_PERCENT, formatRupees } from "../../../services/checkoutPricing";
+import { GST_RATE_PERCENT, formatRupees } from "../../../services/payments/checkoutPricing";
 
 function PriceSummary({
   booking,

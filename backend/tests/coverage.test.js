@@ -1,7 +1,7 @@
 import { test, mock } from "node:test";
 import assert from "node:assert/strict";
 mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: {} } });
-const { findCoverage } = await import("../src/services/coverageService.js");
+const { findCoverage } = await import("../src/services/coverage/coverageService.js");
 const { calculateDistanceKm } = await import("../src/utils/distance.js");
 const society = { id: "s1", is_active: true, latitude: 17, longitude: 78, service_radius_km: 1 };
 const zone = { id: "z1", is_active: true, society_id: "s1", latitude: 17, longitude: 78, radius_km: 2 };

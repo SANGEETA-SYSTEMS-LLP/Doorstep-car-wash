@@ -7,37 +7,14 @@ const plans = [
   { name: "Premium", washes: 12, key: "premium" },
 ];
 
-const vehiclePrices = {
-  hatchback: { basic: 399, standard: 699, premium: 999 },
-  sedan: { basic: 449, standard: 799, premium: 1099 },
-  suv: { basic: 499, standard: 899, premium: 1299 },
-  "suv / muv": { basic: 499, standard: 899, premium: 1299 },
-  muv: { basic: 499, standard: 899, premium: 1299 },
-  "luxury / large suv": { basic: 599, standard: 1099, premium: 1499 },
-  luxury: { basic: 599, standard: 1099, premium: 1499 },
-  "luxury suv": { basic: 599, standard: 1099, premium: 1499 },
-  "large suv": { basic: 599, standard: 1099, premium: 1499 },
-};
-
 const money = value => new Intl.NumberFormat("en-IN", {
   style: "currency",
   currency: "INR",
   maximumFractionDigits: 0,
 }).format(value);
 
-function getVehicleKey(type = "") {
-  const normalized = type.trim().toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ");
-  if (normalized.includes("luxury") || normalized.includes("large")) return "luxury / large suv";
-  if (normalized.includes("muv")) return "suv / muv";
-  if (normalized.includes("suv")) return "suv";
-  if (normalized.includes("sedan")) return "sedan";
-  if (normalized.includes("hatch")) return "hatchback";
-  return normalized;
-}
-
 export default function MonthlyPackageCards({ packages = [], loading, error, vehicleType, checking, onContinue }) {
   const [selected, setSelected] = useState("standard");
-  const prices = vehiclePrices[getVehicleKey(vehicleType)];
   const selectedPlan = plans.find(plan => plan.key === selected);
   const selectedPackage = packages.find(pkg => pkg.name?.toLowerCase().startsWith(`${selectedPlan?.name} monthly plan`.toLowerCase()));
 
@@ -58,24 +35,25 @@ export default function MonthlyPackageCards({ packages = [], loading, error, veh
     </div>
 
     {error && <p role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</p>}
-    {!prices ? <p className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">Monthly prices are not configured for {vehicleType || "this vehicle category"} yet.</p> : <>
+    {!packages.length ? <p className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">Monthly plans are not configured for {vehicleType || "this vehicle category"} yet. Please contact support.</p> : <>
       <div className="mt-5 grid items-stretch gap-4 md:grid-cols-3">
         {plans.map(plan => {
           const active = selected === plan.key;
+          const planPackage = packages.find(pkg => pkg.name?.toLowerCase().startsWith(`${plan.name} monthly plan`.toLowerCase()));
           return <article key={plan.key} className={`relative flex flex-col overflow-hidden rounded-2xl border bg-white transition ${active ? "border-slate-900 ring-2 ring-slate-900/10" : "border-slate-200 hover:border-slate-400"}`}>
             {plan.featured && <div className="flex items-center justify-center gap-1.5 bg-slate-900 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-white"><BadgeCheck size={14} />Most popular</div>}
             <div className="flex flex-1 flex-col p-5 sm:p-6">
-              <div className="flex items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{plan.name} plan</p><p className="mt-2 text-3xl font-bold tracking-tight text-slate-950">{money(prices[plan.key])}<span className="ml-1 text-sm font-medium text-slate-500">/ month</span></p></div><span className={`flex h-8 w-8 items-center justify-center rounded-full border ${active ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 text-transparent"}`}><Check size={16} /></span></div>
+              <div className="flex items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{plan.name} plan</p><p className="mt-2 text-3xl font-bold tracking-tight text-slate-950">{planPackage ? money(Number(planPackage.price)) : "Unavailable"}{planPackage && <span className="ml-1 text-sm font-medium text-slate-500">/ month</span>}</p></div><span className={`flex h-8 w-8 items-center justify-center rounded-full border ${active ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 text-transparent"}`}><Check size={16} /></span></div>
               <div className="mt-5 rounded-xl bg-slate-50 px-4 py-3"><p className="text-lg font-bold text-slate-900">{plan.washes} exterior washes</p><p className="mt-0.5 text-xs text-slate-500">per billing month</p></div>
               <ul className="mt-5 space-y-3 text-sm text-slate-600"><li className="flex gap-2"><Check size={17} className="shrink-0 text-slate-700" />For one registered {vehicleType || "vehicle"}</li><li className="flex gap-2"><Check size={17} className="shrink-0 text-slate-700" />One wash cleans the vehicle exterior</li></ul>
-              <button type="button" aria-pressed={active} onClick={() => setSelected(plan.key)} className={`mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${active ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}>{active && <Check size={16} />}{active ? "Selected plan" : `Choose ${plan.name}`}</button>
+              <button type="button" disabled={!planPackage} aria-pressed={active} onClick={() => setSelected(plan.key)} className={`mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${active ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}>{active && <Check size={16} />}{planPackage ? active ? "Selected plan" : `Choose ${plan.name}` : "Unavailable"}</button>
             </div>
           </article>;
         })}
       </div>
       <aside className="mt-5 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
         <h3 className="text-sm font-bold text-slate-900">Plan details</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-600">Basic includes 4 washes, Standard includes 8 washes, and Premium includes 12 exterior washes per billing month. Interior cleaning, vacuuming, polishing, and detailing are not included. Each wash is for one registered vehicle.</p>
+        <p className="mt-2 text-sm leading-6 text-slate-600">Plan wash allowances are shown above. Each wash covers the exterior of one registered vehicle. Interior cleaning, vacuuming, polishing, and detailing are not included.</p>
         <p className="mt-3 border-t border-slate-100 pt-3 text-xs leading-5 text-slate-500">Prices are proposed retail prices and may vary after local market validation. GST extra; applicable tax will be shown according to the business tax configuration.</p>
         <button type="button" onClick={() => onContinue?.(selectedPackage)} disabled={!selectedPackage || checking} className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-56">{checking ? "Checking plan…" : `Continue with ${selectedPlan?.name || "plan"}`}</button>
       </aside>

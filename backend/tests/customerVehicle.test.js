@@ -10,7 +10,7 @@ mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: { from
   }
   return query;
 } } } });
-const { createCustomerVehicle: create, deleteCustomerVehicle: remove } = await import("../src/controllers/customerVehicleController.js");
+const { createCustomerVehicle: create, deleteCustomerVehicle: remove } = await import("../src/controllers/customers/customerVehicleController.js");
 const id = "11111111-1111-4111-8111-111111111111";
 const body = { vehicle_number: " od 02 ab 1234 ", vehicle_type: " Pickup truck ", brand: "TATA", model: "Test", colour: "black", seating_capacity: 7 };
 async function run(handler, input = body, fixtures = [{ data: { id: "owned-customer" } }, { data: { id } }]) {

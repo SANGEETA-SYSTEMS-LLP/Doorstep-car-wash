@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 let calls=[];
 const db={from(table){const call={table,steps:[]};calls.push(call);const q={};for(const m of ['select','eq','maybeSingle'])q[m]=(...args)=>{call.steps.push([m,...args]);return q;};q.then=(resolve,reject)=>Promise.resolve({data:table==='customers'?{id:'customer-record'}:null}).then(resolve,reject);return q;}};
 mock.module('../src/config/supabase.js',{namedExports:{supabaseAdmin:db}});
-const {createReview}=await import('../src/controllers/reviewController.js');
+const {createReview}=await import('../src/controllers/reviews/reviewController.js');
 test('review lookup scopes booking by customer record rather than auth ID',async()=>{
  const res={code:200,status(c){this.code=c;return this;},json(b){this.body=b;return this;}};
  await createReview({user:{id:'auth-user'},params:{bookingId:'booking'},body:{rating:5}},res);

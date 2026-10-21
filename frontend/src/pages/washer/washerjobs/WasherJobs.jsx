@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BriefcaseBusiness, CheckCircle2, Clock3, RefreshCw } from "lucide-react";
 import useWasherWorkspace from "../../../hooks/useWasherWorkspace";
 import WasherBookingCard from "../../../components/washer/WasherBookingCard";
-import { ACTIVE_STATUSES } from "../../../services/washerWorkspaceService";
+import { ACTIVE_STATUSES } from "../../../services/washer/washerWorkspaceService";
 
 const completedStatuses = ["completed", "customer_confirmed", "payment_completed", "closed"];
 const filters = [

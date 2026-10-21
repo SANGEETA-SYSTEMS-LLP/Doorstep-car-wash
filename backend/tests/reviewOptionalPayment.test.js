@@ -39,7 +39,7 @@ function result(query) {
 }
 
 mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: db } });
-const { createReview, skipReview } = await import("../src/controllers/reviewController.js");
+const { createReview, skipReview } = await import("../src/controllers/reviews/reviewController.js");
 
 function resetBooking() {
   booking = { id: "booking", status: "customer_confirmed" };

@@ -1,6 +1,6 @@
 import CustomerProfileCompletion from "./CustomerProfileCompletion";
 import { useAuth } from "../../context/AuthContext";
-import { referenceId } from "../../services/referenceId";
+import { referenceId } from "../../services/shared/referenceId";
 import { Outlet, useLocation } from "react-router-dom";
 import CustomerSidebar from "./CustomerSidebar";
 import CustomerBookingNotifications from "./CustomerBookingNotifications";

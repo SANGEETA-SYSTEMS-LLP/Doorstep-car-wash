@@ -8,7 +8,7 @@ mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: { from
   for (const method of ["select", "eq", "in", "ilike", "order", "limit", "maybeSingle", "single", "update", "insert"]) query[method] = (...args) => { call.steps.push([method, ...args]); return query; };
   return query;
 } } } });
-const { ensureOneTimeWashPackages, listPackages, validatePackage } = await import("../src/controllers/packageController.js");
+const { ensureOneTimeWashPackages, listPackages, validatePackage } = await import("../src/controllers/packages/packageController.js");
 const id = "11111111-1111-4111-8111-111111111111";
 const pack = { id, vehicle_type: "suv", price: 499, is_active: true };
 async function run(handler, results, extra = {}) {

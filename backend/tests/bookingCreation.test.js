@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 let calls=[],fixtures={},covered=true;
 const db={from(table){const call={table,steps:[]};calls.push(call);const q={};for(const method of ["select","eq","single","maybeSingle","insert"])q[method]=(...args)=>{call.steps.push([method,...args]);return q;};q.then=(resolve,reject)=>Promise.resolve(typeof fixtures[table]==="function"?fixtures[table](call):fixtures[table]).then(resolve,reject);return q;}};
 mock.module("../src/config/supabase.js",{namedExports:{supabaseAdmin:db}});
-mock.module("../src/services/coverageService.js",{namedExports:{getCoverage:async()=>({available:covered})}});
-const {createBooking,validateSchedule}=await import("../src/controllers/bookingController.js");
+mock.module("../src/services/coverage/coverageService.js",{namedExports:{getCoverage:async()=>({available:covered})}});
+const {createBooking,validateSchedule}=await import("../src/controllers/bookings/bookingController.js");
 const id="11111111-1111-4111-8111-111111111111";
 function reset(){calls=[];covered=true;fixtures={customers:{data:{id:"customer-record"}},bookings:c=>({data:c.steps.some(s=>s[0]==="insert")?{id}:null}),customer_addresses:{data:{address_line:"Test road",latitude:17,longitude:78}},vehicles:{data:{vehicle_type:"sedan"}},service_packages:{data:{vehicle_type:"sedan",price:600}}};}
 async function run(paymentMethod="cod",promoCode=null){let result,status=200,error;await createBooking({user:{id:"auth-user"},body:{requestId:id,addressId:id,vehicleId:id,packageId:id,date:new Date(Date.now()+86400000).toISOString().slice(0,10),time:"12:00",paymentMethod,promoCode,total_amount:1}}, {status(code){status=code;return this;},json(value){result=value;}},err=>{error=err;});return {result,status,error};}

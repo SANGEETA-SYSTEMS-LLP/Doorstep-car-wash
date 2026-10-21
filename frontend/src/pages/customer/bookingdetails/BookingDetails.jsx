@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getBookingById } from "../../../services/bookingService";
+import { getBookingById } from "../../../services/booking/bookingService";
 import BookingDetailsContent from "./BookingDetailsContent";
 import { useBooking } from "../../../context/BookingContext";
 

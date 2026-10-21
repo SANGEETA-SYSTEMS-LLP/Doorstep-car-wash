@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MapPin, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { getSavedAddresses, saveServiceAddress } from "../../services/locationService";
-import { validServiceAddress } from "../../services/locationSelection";
+import { getSavedAddresses, saveServiceAddress } from "../../services/locations/locationService";
+import { validServiceAddress } from "../../services/locations/locationSelection";
 import SignupAddress from "../../pages/public/register/SignupAddress";
 
 export default function CustomerProfileCompletion({ embedded = false }) {

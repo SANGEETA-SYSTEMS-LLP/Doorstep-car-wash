@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {normalizeAddress,searchPlaces,drivingRoute} from '../src/services/openMapService.js';
+import {normalizeAddress,searchPlaces,drivingRoute} from '../src/services/maps/openMapService.js';
 test('OSM address normalization preserves coordinates and village fallback',()=>{
  const result=normalizeAddress({lat:'20.2',lon:'85.1',display_name:'Tower A, Street, Odisha',namedetails:{name:'Tower A'},address:{village:'Test village',state:'Odisha',postcode:'751001'}});
  assert.equal(result.latitude,20.2);assert.equal(result.city,'Test village');assert.equal(result.name,'Tower A');assert.equal(result.address,'Tower A, Street, Odisha');

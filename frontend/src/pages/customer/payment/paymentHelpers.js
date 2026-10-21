@@ -1,4 +1,4 @@
-import { createPaymentOrder, verifyOnlinePayment } from "../../../services/paymentService";
+import { createPaymentOrder, verifyOnlinePayment } from "../../../services/payments/paymentService";
 
 function loadRazorpayScript() {
   return new Promise((resolve) => {

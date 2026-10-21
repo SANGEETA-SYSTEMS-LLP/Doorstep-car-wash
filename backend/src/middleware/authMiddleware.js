@@ -2,7 +2,7 @@ import {
   supabaseAuth,
   supabaseAdmin,
 } from "../config/supabase.js";
-import { reconcileWasherSignup } from "../services/washerSignupService.js";
+import { reconcileWasherSignup } from "../services/washer/washerSignupService.js";
 
 export async function requireAuth(
   req,

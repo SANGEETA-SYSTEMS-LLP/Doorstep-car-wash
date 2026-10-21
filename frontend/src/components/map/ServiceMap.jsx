@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { coordinates } from "../../services/maps";
+import { coordinates } from "../../services/locations/maps";
 export default function ServiceMap({location, washerLocation, onSelect, path, points, className="h-96"}) {
  const container=useRef(null), map=useRef(null), callback=useRef(onSelect);
  useEffect(()=>{callback.current=onSelect;},[onSelect]);

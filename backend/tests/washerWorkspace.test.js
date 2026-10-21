@@ -11,7 +11,7 @@ const db = { from(table) {
   return query;
 } };
 mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: db } });
-const { washerBooking, washerWorkspace, washerForUser } = await import("../src/services/washerWorkspaceService.js");
+const { washerBooking, washerWorkspace, washerForUser } = await import("../src/services/washer/washerWorkspaceService.js");
 const user = "11111111-1111-4111-8111-111111111111";
 const customerUser = "22222222-2222-4222-8222-222222222222";
 const washer = { id: "washer-record", user_id: user, is_active: true, status: "available" };

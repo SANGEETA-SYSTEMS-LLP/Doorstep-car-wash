@@ -17,7 +17,7 @@ mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: { from
   return query;
 } } } });
 
-const { listWasherPayouts } = await import("../src/controllers/financeController.js");
+const { listWasherPayouts } = await import("../src/controllers/finance/financeController.js");
 
 test("pending payout list includes washer payment details and only exposes masked payout information", async () => {
   let result;

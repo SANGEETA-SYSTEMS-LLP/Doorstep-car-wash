@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 
-import { supabase } from "../services/supabase";
+import { supabase } from "../services/auth/supabase";
 import { apiRequest } from "../api/apiClient";
 
 const AuthContext = createContext(null);

@@ -21,7 +21,7 @@ const db = { from(table) {
   return query;
 } };
 mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: db } });
-const { assignWasherToBooking } = await import("../src/services/bookingAssignmentService.js");
+const { assignWasherToBooking } = await import("../src/services/booking/bookingAssignmentService.js");
 test("eligible washer receives an offer using actual schema columns and record IDs", async () => {
   calls = []; assigned = false;
   const result = await assignWasherToBooking("booking");

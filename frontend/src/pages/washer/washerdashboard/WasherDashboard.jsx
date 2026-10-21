@@ -1,5 +1,5 @@
-import { currentPosition } from "../../../services/maps";
-import { sendWasherLocation } from "../../../services/washerJobService";
+import { currentPosition } from "../../../services/locations/maps";
+import { sendWasherLocation } from "../../../services/washer/washerJobService";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Banknote, BriefcaseBusiness, CalendarDays, CheckCircle2, Clock3, Power, RefreshCw, Sparkles } from "lucide-react";
@@ -7,8 +7,8 @@ import { useAuth } from "../../../context/AuthContext";
 import { useWasher } from "../../../context/WasherContext";
 import useApi from "../../../hooks/useApi";
 import useWasherWorkspace from "../../../hooks/useWasherWorkspace";
-import { ACTIVE_STATUSES, getWasherJob, setWasherAvailability, toActiveJob } from "../../../services/washerWorkspaceService";
-import { acceptAssignment, rejectAssignment } from "../../../services/assignmentService";
+import { ACTIVE_STATUSES, getWasherJob, setWasherAvailability, toActiveJob } from "../../../services/washer/washerWorkspaceService";
+import { acceptAssignment, rejectAssignment } from "../../../services/booking/assignmentService";
 import WasherBookingCard from "../../../components/washer/WasherBookingCard";
 
 const inProgressStatuses = ["washer_on_the_way", "washer_arrived", "otp_verified", "service_started"];

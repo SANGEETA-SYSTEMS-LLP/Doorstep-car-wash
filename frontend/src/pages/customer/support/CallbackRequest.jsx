@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PhoneCall } from "lucide-react";
-import { createSupportTicket } from "../../../services/customerSupportService";
+import { createSupportTicket } from "../../../services/customer/customerSupportService";
 
 const callbackWindows = [
   ["anytime", "Any time"],

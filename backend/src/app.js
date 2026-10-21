@@ -1,26 +1,26 @@
-import financeRoutes from "./routes/financeRoutes.js";
-import washerSignupRoutes from "./routes/washerSignupRoutes.js";
-import locationRoutes from "./routes/locationRoutes.js";
+import financeRoutes from "./routes/finance/financeRoutes.js";
+import washerSignupRoutes from "./routes/washer/washerSignupRoutes.js";
+import locationRoutes from "./routes/locations/locationRoutes.js";
 import express from "express";
-import accountRoutes from "./routes/accountRoutes.js";
+import accountRoutes from "./routes/accounts/accountRoutes.js";
 import cors from "cors";
 
-import assignmentRoutes from "./routes/assignmentRoutes.js";
-import washerJobRoutes from "./routes/washerJobRoutes.js";
-import customerBookingRoutes from "./routes/customerBookingRoutes.js";
-import customerProfileRoutes from "./routes/customerProfileRoutes.js";
-import supervisorRoutes from "./routes/supervisorRoutes.js";
+import assignmentRoutes from "./routes/assignments/assignmentRoutes.js";
+import washerJobRoutes from "./routes/washer/washerJobRoutes.js";
+import customerBookingRoutes from "./routes/bookings/customerBookingRoutes.js";
+import customerProfileRoutes from "./routes/customers/customerProfileRoutes.js";
+import supervisorRoutes from "./routes/supervisor/supervisorRoutes.js";
 import paymentRoutes
-  from "./routes/paymentRoutes.js";
+  from "./routes/payments/paymentRoutes.js";
 import reviewRoutes
-  from "./routes/reviewRoutes.js";
-import adminRoutes from "./routes/adminRoutes.js";
-import accountantRoutes from "./routes/accountantRoutes.js";
-import supportTicketRoutes from "./routes/supportTicketRoutes.js";
+  from "./routes/reviews/reviewRoutes.js";
+import adminRoutes from "./routes/admin/adminRoutes.js";
+import accountantRoutes from "./routes/accounts/accountantRoutes.js";
+import supportTicketRoutes from "./routes/support/supportTicketRoutes.js";
 import { errorMiddleware } from "./middleware/errorMiddleware.js";
 import {
   razorpayWebhook,
-} from "./controllers/paymentController.js";
+} from "./controllers/payments/paymentController.js";
 const app =
   express();
 

@@ -1,1 +1,1 @@
-export * from "../services/washerWorkspaceService";
+export * from "../services/washer/washerWorkspaceService";

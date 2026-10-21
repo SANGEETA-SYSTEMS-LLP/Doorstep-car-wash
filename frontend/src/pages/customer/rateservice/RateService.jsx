@@ -4,7 +4,7 @@ import { useBooking } from "../../../context/BookingContext";
 import {
   createReview,
   skipReview,
-} from "../../../services/reviewService";
+} from "../../../services/reviews/reviewService";
 import ReviewForm from "./ReviewForm";
 import ReviewThankYou from "./ReviewThankYou";
 

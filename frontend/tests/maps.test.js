@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { coordinates, locationFromPlace, reverseGeocode } from "../src/services/maps.js";
+import { coordinates, locationFromPlace, reverseGeocode } from "../src/services/locations/maps.js";
 test("map coordinates reject missing and out-of-range values without losing zero", () => {
   assert.deepEqual(coordinates({ latitude: 0, longitude: 0 }), { lat: 0, lng: 0 });
   assert.deepEqual(coordinates({ latitude: "17.4", longitude: "78.3" }), { lat: 17.4, lng: 78.3 });

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import useApi from "../../hooks/useApi";
-import { apiRequest } from "../../services/api";
+import { apiRequest } from "../../services/core/api";
 const statuses = ["open", "in_progress", "waiting_on_customer", "resolved", "closed"];
 function Ticket({ ticket, refresh }) {
   const [status, setStatus] = useState(ticket.status);

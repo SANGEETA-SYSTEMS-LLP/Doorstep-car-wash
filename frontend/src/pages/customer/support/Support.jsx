@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import useApi from "../../../hooks/useApi";
-import { createSupportTicket } from "../../../services/customerSupportService";
+import { createSupportTicket } from "../../../services/customer/customerSupportService";
 import CallbackRequest from "./CallbackRequest";
 import CustomerSupportAssistant from "./CustomerSupportAssistant";
 import TicketForm from "./TicketForm";

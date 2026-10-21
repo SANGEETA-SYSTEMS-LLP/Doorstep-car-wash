@@ -15,7 +15,7 @@ mock.module("../src/config/supabase.js", {
   },
 });
 
-const { getSupervisorWasherRoster } = await import("../src/controllers/supervisorWasherRosterController.js");
+const { getSupervisorWasherRoster } = await import("../src/controllers/supervisor/supervisorWasherRosterController.js");
 
 test("supervisor roster returns washer status, accepted work, and earnings summaries", async () => {
   dataByTable = {

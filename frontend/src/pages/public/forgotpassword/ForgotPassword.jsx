@@ -1,4 +1,4 @@
-import { supabase } from "../../../services/supabase";
+import { supabase } from "../../../services/auth/supabase";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {

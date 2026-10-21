@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
 import { useAuth } from "../../../context/AuthContext";
-import { createBooking } from "../../../services/bookingService";
+import { createBooking } from "../../../services/booking/bookingService";
 import { openRazorpayPayment } from "./paymentHelpers";
 
 function usePaymentWorkflow() {

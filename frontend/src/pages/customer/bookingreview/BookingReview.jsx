@@ -5,8 +5,8 @@ import BookingSteps from "../../../components/booking/BookingSteps";
 import BookingReviewContent from "./BookingReviewContent";
 import usePaymentWorkflow from "../payment/usePaymentWorkflow";
 import { useBooking } from "../../../context/BookingContext";
-import { validateCustomerOffer } from "../../../services/customerOfferService";
-import { getCheckoutPriceBreakdown } from "../../../services/checkoutPricing";
+import { validateCustomerOffer } from "../../../services/customer/customerOfferService";
+import { getCheckoutPriceBreakdown } from "../../../services/payments/checkoutPricing";
 
 function BookingReview() {
   const { booking, paymentError, processing, handlePayment } = usePaymentWorkflow();

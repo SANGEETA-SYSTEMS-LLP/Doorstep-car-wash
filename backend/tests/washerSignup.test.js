@@ -18,7 +18,7 @@ mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: { from
   for (const method of ["upsert", "update", "eq", "select"]) q[method] = (...args) => { call.steps.push([method, ...args]); return q; };
   return q;
 } } } });
-const { reconcileWasherSignup } = await import("../src/services/washerSignupService.js");
+const { reconcileWasherSignup } = await import("../src/services/washer/washerSignupService.js");
 const user = { id: "user", user_metadata: { requested_role: "washer" } };
 test("legacy washer signups get washer access but never automatic verification", async () => {
   calls = [];

@@ -10,7 +10,7 @@ mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: { from
   }
   return query;
 } } } });
-const { saveAddress, updateAddress, deleteAddress } = await import("../src/controllers/customerAddressController.js");
+const { saveAddress, updateAddress, deleteAddress } = await import("../src/controllers/customers/customerAddressController.js");
 const id = "11111111-1111-4111-8111-111111111111";
 const body = { address_line: "12 Main Street, Test City", latitude: 20.76435, longitude: 86.39586 };
 async function run(handler, input = body, fixtures = [{ data: { id: "owned-customer" } }, { data: { id } }]) {

@@ -28,7 +28,7 @@ mock.module("../src/config/supabase.js", {
 });
 
 const { getCustomerBookingDetails } =
-  await import("../src/controllers/customerBookingController.js");
+  await import("../src/controllers/customers/bookings/customerBookingController.js");
 
 const customerUserId = "11111111-1111-4111-8111-111111111111";
 const bookingId = "22222222-2222-4222-8222-222222222222";

@@ -1,9 +1,9 @@
-import { validateBookingPackage } from "../../../services/validateBookingPackage";
+import { validateBookingPackage } from "../../../services/packages/validateBookingPackage";
 import { isPackageForVehicle } from "../../../utils/packageCompatibility";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
-import { getMonthlyWashPackages, getOneTimeWashPackages } from "../../../services/packageService";
+import { getMonthlyWashPackages, getOneTimeWashPackages } from "../../../services/packages/packageService";
 import SelectPackageContent from "./SelectPackageContent";
 
 function SelectPackage() {

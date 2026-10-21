@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { pinLocation, resolveLocationSelection, validServiceAddress } from "../src/services/locationSelection.js";
+import { pinLocation, resolveLocationSelection, validServiceAddress } from "../src/services/locations/locationSelection.js";
 const position = { lat: 20.29, lng: 85.82 };
 test("denied geocoding retains exact coordinates and checks coverage", async () => {
   let checked;

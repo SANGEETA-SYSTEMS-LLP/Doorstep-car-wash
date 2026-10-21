@@ -3,7 +3,7 @@ import useApi from "../../../hooks/useApi";
 import { apiRequest } from "../../../api/apiClient";
 import ServiceMap from "../../../components/map/ServiceMap";
 import AddressSearch from "../../../components/map/AddressSearch";
-import { currentPosition } from "../../../services/maps";
+import { currentPosition } from "../../../services/locations/maps";
 export default function WasherLocation() {
   const {data,error,loading,refresh}=useApi("/account/washer-location");
   return <section className="mt-6 rounded-3xl border bg-white p-6">

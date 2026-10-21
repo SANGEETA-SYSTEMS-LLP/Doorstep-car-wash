@@ -24,9 +24,18 @@ export async function myEarnings(req, res, next) {
       if (result.error) throw result.error;
       const operationIds = [...new Set((result.data || []).map(row => row.operation_id).filter(Boolean))];
       if (operationIds.length) {
-        const operationsResult = await db.from("finance_operations").select("id,provider_id,provider_status,processed_at,status").in("id", operationIds);
+        const operationsResult = await db.from("finance_operations").select("id,provider_id,provider_status,processed_at,status,provider_request").in("id", operationIds);
         if (operationsResult.error) throw operationsResult.error;
-        payoutOperations = (result.data || []).map(item => ({ ...item, operation: (operationsResult.data || []).find(operation => operation.id === item.operation_id) || null }));
+        payoutOperations = (result.data || []).map(item => {
+          const operation = (operationsResult.data || []).find(row => row.id === item.operation_id);
+          return { ...item, operation: operation ? {
+            id: operation.id, provider_id: operation.provider_id, provider_status: operation.provider_status,
+            processed_at: operation.processed_at, status: operation.status,
+            payment_method: String(operation.provider_request?.mode || "IMPS").toUpperCase() === "UPI"
+              ? "UPI (RazorpayX)"
+              : `Bank transfer · ${String(operation.provider_request?.mode || "IMPS").toUpperCase()} (RazorpayX)`,
+          } : null };
+        });
       }
     }
     const paymentByBooking = new Map();
@@ -35,7 +44,7 @@ export async function myEarnings(req, res, next) {
       if (!previous || (payment.status === "paid" && previous.status !== "paid")) paymentByBooking.set(payment.booking_id, payment);
     }
     const operationByEarning = new Map(payoutOperations.map(item => [item.earning_id, item.operation]));
-    const rows = (data || []).map(row => ({ ...row, payment: paymentByBooking.get(row.booking_id) || null, payout: operationByEarning.get(row.id) || null, payout_method: row.status === "settled" ? "Bank transfer (RazorpayX)" : "Pending bank transfer" }));
+    const rows = (data || []).map(row => ({ ...row, payment: paymentByBooking.get(row.booking_id) || null, payout: operationByEarning.get(row.id) || null, payout_method: operationByEarning.get(row.id)?.payment_method || (row.status === "settled" ? "RazorpayX payout" : "Pending payout") }));
     res.json({ success: true, rows, count: count || 0, page, pageSize: 25 });
   } catch (err) { next(err); }
 }

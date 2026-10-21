@@ -6,9 +6,9 @@ import ServiceMap from "../../../components/map/ServiceMap";
 import AddressSearch from "../../../components/map/AddressSearch";
 import { useBooking } from "../../../context/BookingContext";
 import { useAuth } from "../../../context/AuthContext";
-import { coordinates, currentPosition, reverseGeocode } from "../../../services/maps";
-import { checkCoverage, getSavedAddresses, saveServiceAddress } from "../../../services/locationService";
-import { pinLocation, resolveLocationSelection, validServiceAddress } from "../../../services/locationSelection";
+import { coordinates, currentPosition, reverseGeocode } from "../../../services/locations/maps";
+import { checkCoverage, getSavedAddresses, saveServiceAddress } from "../../../services/locations/locationService";
+import { pinLocation, resolveLocationSelection, validServiceAddress } from "../../../services/locations/locationSelection";
 
 export default function SelectLocation() {
   const { booking, updateBooking, updateAddress } = useBooking();

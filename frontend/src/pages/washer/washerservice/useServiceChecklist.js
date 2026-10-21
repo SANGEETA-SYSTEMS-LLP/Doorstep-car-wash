@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getServiceChecklist, updateServiceChecklist } from "../../../services/checklistService";
+import { getServiceChecklist, updateServiceChecklist } from "../../../services/booking/checklistService";
 
 function useServiceChecklist(activeJob, serviceStarted, setError) {
   const [checklist, setChecklist] = useState([]);

@@ -5,8 +5,8 @@ let fixtures={},calls=[],captured={},orders=0,earnings=0;
 const db={from(table){const call={table,steps:[]};calls.push(call);const q={};for(const method of ["select","eq","in","maybeSingle","single","insert","update"])q[method]=(...args)=>{call.steps.push([method,...args]);return q;};q.then=(resolve,reject)=>Promise.resolve(typeof fixtures[table]==="function"?fixtures[table](call):fixtures[table]||{data:null}).then(resolve,reject);return q;},rpc:async()=>({data:{id:"cash-payment"}})};
 mock.module("../src/config/supabase.js",{namedExports:{supabaseAdmin:db}});
 mock.module("../src/config/razorpay.js",{namedExports:{razorpay:{payments:{fetch:async()=>captured},orders:{create:async()=>{orders++;return {id:"order_new",amount:50000,currency:"INR"};}}}}});
-mock.module("../src/services/earningService.js",{namedExports:{createWasherEarning:async()=>{earnings++;}}});
-const {createPaymentOrder,verifyPayment,razorpayWebhook}=await import("../src/controllers/paymentController.js");
+mock.module("../src/services/finance/earningService.js",{namedExports:{createWasherEarning:async()=>{earnings++;}}});
+const {createPaymentOrder,verifyPayment,razorpayWebhook}=await import("../src/controllers/payments/paymentController.js");
 process.env.RAZORPAY_KEY_SECRET="test-secret";process.env.RAZORPAY_WEBHOOK_SECRET="webhook-secret";
 function reset(){calls=[];orders=0;earnings=0;fixtures={customers:{data:{id:"customer-record"}},bookings:{data:{id:"booking",customer_id:"customer-record",status:"pending",payment_method:"upi",total_amount:500,booking_number:"CW-TEST"}},payments:{data:null}};captured={id:"pay_test",order_id:"order_test",amount:50000,currency:"INR",status:"captured"};}
 async function run(handler,extra={}){let status=200,result;await handler({user:{id:"user"},params:{bookingId:"booking"},body:{},...extra},{status(code){status=code;return this;},json(data){result=data;return this;},send(data){result=data;return this;}});return {status,result};}

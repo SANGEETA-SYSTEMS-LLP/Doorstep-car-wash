@@ -9,7 +9,7 @@ const { default: app } =
   await import("./app.js");
 
 const { processExpiredAssignments } =
-  await import("./services/assignmentTimeoutService.js");
+  await import("./services/booking/assignmentTimeoutService.js");
 
 const PORT =
   process.env.PORT || 5000;
@@ -41,7 +41,7 @@ setInterval(() => {
 }, 60 * 1000);
 
 // Reconcile asynchronous provider outcomes. Never initiates an unsubmitted transfer.
-const { reconcilePendingFinance } = await import("./services/financeReconciliationService.js");
+const { reconcilePendingFinance } = await import("./services/finance/financeReconciliationService.js");
 let reconcilingFinance = false;
 setInterval(async () => {
   if (reconcilingFinance || process.env.FINANCE_RECONCILIATION_ENABLED !== "true") return;

@@ -1,10 +1,10 @@
-import { getBookingById } from "../../../services/bookingService";
+import { getBookingById } from "../../../services/booking/bookingService";
 import useDrivingRoute from "../../../hooks/useDrivingRoute";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
-import { supabase } from "../../../services/supabase";
-import { getWasherLocation } from "../../../services/washerService";
+import { supabase } from "../../../services/auth/supabase";
+import { getWasherLocation } from "../../../services/washer/washerService";
 import TrackBookingLiveMap from "./TrackBookingLiveMap";
 import TrackingSidebar from "./TrackingSidebar";
 import TrackingHeader from "./TrackingHeader";

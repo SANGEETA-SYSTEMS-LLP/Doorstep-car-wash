@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import SignupAddress from "../../public/register/SignupAddress";
-import { updateSavedAddress, deleteSavedAddress } from "../../../services/locationService";
+import { updateSavedAddress, deleteSavedAddress } from "../../../services/locations/locationService";
 export default function AddressActions({ address, userId }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({});

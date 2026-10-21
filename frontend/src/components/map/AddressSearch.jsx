@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { searchAddresses } from "../../services/maps";
+import { searchAddresses } from "../../services/locations/maps";
 export default function AddressSearch({onSelect,onStart,onError,disabled=false}) {
  const [query,setQuery]=useState(""),[results,setResults]=useState([]),[busy,setBusy]=useState(false),[error,setError]=useState("");
  const sequence=useRef(0);

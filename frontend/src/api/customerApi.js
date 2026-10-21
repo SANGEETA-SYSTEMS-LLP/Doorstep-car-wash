@@ -1,1 +1,1 @@
-export * from "../services/customerBookingService";
+export * from "../services/booking/customerBookingService";

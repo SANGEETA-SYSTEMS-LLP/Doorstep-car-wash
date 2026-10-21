@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../../../context/AuthContext";
-import { getMyBookings } from "../../../services/bookingService";
+import { getMyBookings } from "../../../services/booking/bookingService";
 import BookingHistoryCard from "./BookingHistoryCard";
 import {
   cancelledStatuses,

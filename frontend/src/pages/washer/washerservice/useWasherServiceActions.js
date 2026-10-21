@@ -3,8 +3,8 @@ import {
   startBookingService,
   validateWasherService,
   verifyWasherOtp,
-} from "../../../services/washerJobService";
-import { uploadServicePhotos } from "../../../services/servicePhotoService";
+} from "../../../services/washer/washerJobService";
+import { uploadServicePhotos } from "../../../services/booking/servicePhotoService";
 
 function useWasherServiceActions({
   activeJob,

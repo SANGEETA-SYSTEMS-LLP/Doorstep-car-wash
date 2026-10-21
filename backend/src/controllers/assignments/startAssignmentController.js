@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "../../config/supabase.js";
-import { assignWasherToBooking, rejectAssignmentAndRetry } from "../../services/bookingAssignmentService.js";
-import { createWasherEarning } from "../../services/earningService.js";
+import { assignWasherToBooking, rejectAssignmentAndRetry } from "../../services/booking/bookingAssignmentService.js";
+import { createWasherEarning } from "../../services/finance/earningService.js";
 
 export async function startAssignment(
   req,

@@ -14,8 +14,8 @@ mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: {
     return q;
   },
 } } });
-mock.module("../src/services/washerSignupService.js", { namedExports: { provisionPendingWasher: async () => {} } });
-const { addSupervisorWasher } = await import("../src/controllers/supervisorWasherController.js");
+mock.module("../src/services/washer/washerSignupService.js", { namedExports: { provisionPendingWasher: async () => {} } });
+const { addSupervisorWasher } = await import("../src/controllers/supervisor/supervisorWasherController.js");
 const body = { name: "Washer One", password: "Test-password-123", phone: "9876543210", email: "washer@example.com", location: { address: "Bhubaneswar Odisha 751001", latitude: 20.27, longitude: 85.84 } };
 async function invoke(value = body, role = "supervisor") {
   const res = { status(code) { this.code = code; return this; }, json(data) { this.body = data; return this; } };

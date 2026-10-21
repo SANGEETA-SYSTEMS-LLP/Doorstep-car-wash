@@ -4,7 +4,7 @@ import CustomerProfileCompletion from "../../../components/layout/CustomerProfil
 import SavedCustomerDetails from "./SavedCustomerDetails";
 import { useAuth } from "../../../context/AuthContext";
 import useApi from "../../../hooks/useApi";
-import { referenceId } from "../../../services/referenceId";
+import { referenceId } from "../../../services/shared/referenceId";
 
 export default function CustomerProfile() {
   const { user, refreshProfile } = useAuth();

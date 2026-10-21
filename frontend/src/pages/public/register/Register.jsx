@@ -1,8 +1,8 @@
-import { validServiceAddress } from "../../../services/locationSelection";
+import { validServiceAddress } from "../../../services/locations/locationSelection";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import { apiRequest } from "../../../services/api";
+import { apiRequest } from "../../../services/core/api";
 import RegisterContent from "./RegisterContent";
 
 function Register() {

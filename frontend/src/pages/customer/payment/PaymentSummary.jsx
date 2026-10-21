@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { isPackageForVehicle } from "../../../utils/packageCompatibility";
 import { LockKeyhole, ShieldCheck } from "lucide-react";
 import SummaryRow from "./SummaryRow";
-import { GST_RATE_PERCENT, formatRupees } from "../../../services/checkoutPricing";
+import { GST_RATE_PERCENT, formatRupees } from "../../../services/payments/checkoutPricing";
 
 function PaymentSummary({ booking, servicePrice, platformFee, discount, offerDiscount = 0, appliedOffer, total, taxAmount, processing, paymentError, handlePayment }) {
   const compatible = isPackageForVehicle(booking.package, booking.vehicle);

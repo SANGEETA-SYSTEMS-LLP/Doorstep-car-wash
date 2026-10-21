@@ -1,8 +1,8 @@
 import { supabaseAdmin } from "../../config/supabase.js";
 import { calculateDistanceKm } from "../../utils/distance.js";
 import { referenceId } from "../../utils/referenceId.js";
-import { washerHasScheduleConflict } from "../../services/bookingAssignmentService.js";
-import { getSignedServicePhotos } from "../servicePhotoController.js";
+import { washerHasScheduleConflict } from "../../services/booking/bookingAssignmentService.js";
+import { getSignedServicePhotos } from "../serviceOperations/servicePhotoController.js";
 import { enrichSupervisorBookings, normalizeServiceAddress } from "./supervisorBookingEnrichment.js";
 
 export async function getSupervisorJobDetails(req, res) {

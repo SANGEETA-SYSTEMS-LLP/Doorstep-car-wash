@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { calculateOfferDiscount } from "../src/services/customerOfferService.js";
+import { calculateOfferDiscount } from "../src/services/customer/customerOfferService.js";
 
 test("FIRSTWASH grants a fixed discount only for a first booking over the minimum", () => {
   assert.deepEqual(calculateOfferDiscount({ code: " firstwash ", servicePrice: 499, firstBooking: true }), { code: "FIRSTWASH", discountAmount: 100 });

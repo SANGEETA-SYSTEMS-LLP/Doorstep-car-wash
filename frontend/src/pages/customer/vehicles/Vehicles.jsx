@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Car, Plus } from "lucide-react";
 
 import { useAuth } from "../../../context/AuthContext";
-import { deleteVehicle, getMyVehicles, getVehicleLoadErrorMessage } from "../../../services/vehicleService";
+import { deleteVehicle, getMyVehicles, getVehicleLoadErrorMessage } from "../../../services/customer/vehicleService";
 import VehicleCard from "./VehicleCard";
 
 function Vehicles() {

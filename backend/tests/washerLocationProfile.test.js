@@ -5,8 +5,8 @@ mock.module("../src/config/supabase.js",{namedExports:{supabaseAdmin:{from(table
  const call={table,steps:[]};calls.push(call);const q={then:resolve=>Promise.resolve(fixtures[table]||{data:null}).then(resolve)};
  for(const method of ["select","eq","is","in","order","range","maybeSingle","update","upsert"])q[method]=(...args)=>{call.steps.push([method,...args]);return q;};return q;
 }}}});
-const {validWasherLocation,nearbyWasherCards,saveSignupWasherLocation}=await import("../src/services/washerLocationService.js");
-const {saveProfileLocation,getNearbyWashers}=await import("../src/controllers/washerLocationProfileController.js");
+const {validWasherLocation,nearbyWasherCards,saveSignupWasherLocation}=await import("../src/services/washer/washerLocationService.js");
+const {saveProfileLocation,getNearbyWashers}=await import("../src/controllers/washer/washerLocationProfileController.js");
 const location={latitude:20,longitude:85,address:"123 Main Street, Test City"};
 const washer={id:"washer",user_id:"user",is_active:true,is_verified:true,service_radius_km:5,rating:4.5,jobs_completed:20,current_address:"Private home address",location:{latitude:20,longitude:85,updated_at:"2026-10-16T00:00:00Z"}};
 test("nearby results filter invalid, unverified and out-of-radius washers without exposing coordinates or addresses",()=>{

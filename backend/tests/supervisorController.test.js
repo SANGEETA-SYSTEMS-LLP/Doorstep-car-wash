@@ -16,11 +16,11 @@ const client = {
   },
 };
 mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: client } });
-mock.module("../src/services/bookingAssignmentService.js", {
+mock.module("../src/services/booking/bookingAssignmentService.js", {
   namedExports: { washerHasScheduleConflict: async () => false },
 });
 const { getEscalations, getActiveJobs, getSupervisorDashboard, acceptSupervisorBooking } =
-  await import("../src/controllers/supervisorController.js");
+  await import("../src/controllers/supervisor/supervisorController.js");
 
 async function invoke(handler, fixtures) {
   results = fixtures;

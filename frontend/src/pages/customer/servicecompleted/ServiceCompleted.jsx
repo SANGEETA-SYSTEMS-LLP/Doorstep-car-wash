@@ -1,10 +1,10 @@
-import { apiRequest } from "../../../services/api";
+import { apiRequest } from "../../../services/core/api";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useBooking } from "../../../context/BookingContext";
-import { supabase } from "../../../services/supabase";
-import { getBookingById } from "../../../services/bookingService";
-import { getCustomerServicePhotos } from "../../../services/customerBookingService";
+import { supabase } from "../../../services/auth/supabase";
+import { getBookingById } from "../../../services/booking/bookingService";
+import { getCustomerServicePhotos } from "../../../services/booking/customerBookingService";
 import ServiceSummary from "./ServiceSummary";
 import ServicePhotos from "./ServicePhotos";
 import ServiceCompletedHero from "./ServiceCompletedHero";

@@ -14,7 +14,7 @@ mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: {
     return q;
   },
 } } });
-const { linkSupervisorWasher } = await import("../src/controllers/supervisorWasherController.js");
+const { linkSupervisorWasher } = await import("../src/controllers/supervisor/supervisorWasherController.js");
 async function invoke(name = "Washer One", washerId = referenceId("WSH", id)) {
   const res = { status(code) { this.code = code; return this; }, json(body) { this.body = body; return this; } };
   await linkSupervisorWasher({ profile: { role: "supervisor" }, user: { id: "supervisor" }, body: { name, washerId } }, res);

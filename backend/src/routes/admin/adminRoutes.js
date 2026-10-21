@@ -1,0 +1,12 @@
+import express from "express";
+import { requireAuth } from "../../middleware/authMiddleware.js";
+import { allowRoles } from "../../middleware/roleMiddleware.js";
+import { deletePackage, getAdminDashboard, listResource, saveResource } from "../../controllers/admin/adminController.js";
+const router = express.Router();
+router.use(requireAuth, allowRoles("sub_admin", "super_admin"));
+router.get("/dashboard", getAdminDashboard);
+router.get("/:resource", listResource);
+router.post("/:resource", saveResource);
+router.patch("/:resource/:id", saveResource);
+router.delete("/packages/:id", deletePackage);
+export default router;

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createAuthFetch, loginErrorMessage } from "../src/services/authTransport.js";
+import { createAuthFetch, loginErrorMessage } from "../src/services/auth/authTransport.js";
 
 test("local proxy preserves login payload and leaves production and database calls unchanged", async () => {
   const calls = [];
