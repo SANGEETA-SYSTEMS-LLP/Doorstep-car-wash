@@ -40,32 +40,31 @@ export default function SupervisorEscalations() {
   }, []);
 
   if (loading) {
-    return (
-      <p>
-        Loading escalations...
-      </p>
-    );
+    return <div role="status" className="flex min-h-56 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-medium text-slate-500">Loading escalations...</div>;
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-black text-slate-900">
-        No-Washer Escalations
+    <div className="space-y-6">
+      <header className="rounded-3xl border border-amber-100 bg-gradient-to-r from-amber-50 to-white p-6 sm:p-8">
+      <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber-800">Operations attention</p>
+      <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+        No-washer escalations
       </h1>
 
-      <p className="mt-2 text-slate-500">
+      <p className="mt-3 max-w-2xl leading-7 text-slate-600">
         Bookings where automatic
         assignment could not find a
         suitable washer.
       </p>
+      </header>
 
-      <div className="mt-8 space-y-4">
+      <div className="space-y-4">
         {escalations.map((booking) => (
           <EscalationCard key={booking.id} booking={booking} />
         ))}
 
         {!escalations.length && (
-          <div className="rounded-2xl bg-white p-10 text-center text-slate-500">
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center text-slate-500">
             No assignment escalations.
           </div>
         )}

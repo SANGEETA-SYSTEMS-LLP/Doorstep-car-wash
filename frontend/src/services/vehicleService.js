@@ -1,123 +1,39 @@
-import { supabase } from "./supabase";
-
-async function getCustomerId(userId) {
-  if (!userId) {
-    throw new Error(
-      "You must be logged in to access vehicles."
-    );
-  }
-
-  const { data: customer, error } = await supabase
-    .from("customers")
-    .select("id")
-    .eq("user_id", userId)
-    .single();
-
-  if (error) {
-    console.error(
-      "Get customer for vehicles error:",
-      error
-    );
-
-    throw error;
-  }
-
-  return customer.id;
-}
-
+import { apiRequest } from "./api";
 export async function getMyVehicles(userId) {
   if (!userId) {
     return [];
   }
 
-  const customerId = await getCustomerId(userId);
-
-  const { data, error } = await supabase
-    .from("vehicles")
-    .select("*")
-    .eq("customer_id", customerId)
-    .order("is_default", {
-      ascending: false,
-    })
-    .order("created_at", {
-      ascending: false,
-    });
-
-  if (error) {
-    console.error(
-      "Get vehicles error:",
-      error
-    );
-
-    throw error;
-  }
-
-  return data || [];
+  const result = await apiRequest("/account/customer/vehicles");
+  return result.rows || [];
 }
 
-export async function createVehicle({
-  userId,
-  vehicleNumber,
-  vehicleType,
-  brand,
-  model,
-  colour,
-}) {
-  if (!userId) {
-    throw new Error(
-      "You must be logged in."
-    );
+export function getVehicleLoadErrorMessage(error) {
+  if (error?.status === 401) {
+    return "Your session has expired. Sign in again to load your vehicles.";
   }
-
-  const customerId = await getCustomerId(userId);
-
-  const payload = {
-    customer_id: customerId,
-
-    vehicle_number:
-      vehicleNumber.trim().toUpperCase(),
-
-    vehicle_type: vehicleType,
-
-    brand: brand.trim(),
-
-    model: model.trim(),
-
-    colour:
-      colour?.trim() || null,
-  };
-
-  const { data, error } = await supabase
-    .from("vehicles")
-    .insert(payload)
-    .select("*")
-    .single();
-
-  if (error) {
-    console.error(
-      "Create vehicle error:",
-      error
-    );
-
-    throw error;
+  if (error?.status === 403) {
+    return "Your customer profile is not available yet. Please contact support.";
   }
-
-  return data;
+  if (error instanceof TypeError) {
+    return "The vehicle service could not be reached. Start the backend, then try again.";
+  }
+  return error?.message || "Unable to load vehicles. Please try again.";
 }
 
-export async function deleteVehicle(
-  vehicleId,
-  userId
-) {
-  const customerId = await getCustomerId(userId);
+export async function createVehicle({ userId, vehicleNumber, vehicleType, brand, model, colour, seatingCapacity }) {
+  if (!userId) throw new Error("You must be logged in.");
+  return apiRequest("/account/vehicles", {
+    method: "POST",
+    body: JSON.stringify({
+      vehicle_number: vehicleNumber.trim().toUpperCase(), vehicle_type: vehicleType.trim(),
+      brand: brand.trim(), model: model.trim(), colour: colour?.trim() || null,
+      seating_capacity: Number(seatingCapacity),
+    }),
+  });
+}
 
-  const { error } = await supabase
-    .from("vehicles")
-    .delete()
-    .eq("id", vehicleId)
-    .eq("customer_id", customerId);
-
-  if (error) {
-    throw error;
-  }
+export async function deleteVehicle(vehicleId, userId) {
+  if (!userId) throw new Error("You must be logged in to manage vehicles.");
+  return apiRequest(`/account/vehicles/${encodeURIComponent(vehicleId)}`, { method: "DELETE" });
 }

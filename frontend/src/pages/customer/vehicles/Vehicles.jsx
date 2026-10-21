@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Car, Plus } from "lucide-react";
 
 import { useAuth } from "../../../context/AuthContext";
-import { deleteVehicle, getMyVehicles } from "../../../services/vehicleService";
+import { deleteVehicle, getMyVehicles, getVehicleLoadErrorMessage } from "../../../services/vehicleService";
 import VehicleCard from "./VehicleCard";
 
 function Vehicles() {
@@ -12,6 +12,7 @@ function Vehicles() {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [reloadCount, setReloadCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -28,14 +29,14 @@ function Vehicles() {
         if (!cancelled) setVehicles(data);
       } catch (error) {
         console.error(error);
-        if (!cancelled) setError("Unable to load vehicles.");
+        if (!cancelled) setError(getVehicleLoadErrorMessage(error));
       } finally {
         if (!cancelled) setLoading(false);
       }
     };
     loadVehicles();
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user, reloadCount]);
 
   const handleDelete = async (vehicleId) => {
     const confirmed = window.confirm("Remove this vehicle?");
@@ -90,8 +91,11 @@ function Vehicles() {
         </div>
 
         {error && (
-          <div role="alert" className="mt-8 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-            {error}
+          <div role="alert" className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            <span>{error}</span>
+            <button type="button" onClick={() => setReloadCount((count) => count + 1)} className="rounded-lg border border-red-200 bg-white px-3 py-2 font-semibold text-red-700 hover:bg-red-100">
+              Try again
+            </button>
           </div>
         )}
         {!loading && !error && vehicles.length === 0 && (

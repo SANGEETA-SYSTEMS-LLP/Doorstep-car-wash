@@ -1,4 +1,5 @@
 import financeRoutes from "./routes/financeRoutes.js";
+import washerSignupRoutes from "./routes/washerSignupRoutes.js";
 import locationRoutes from "./routes/locationRoutes.js";
 import express from "express";
 import accountRoutes from "./routes/accountRoutes.js";
@@ -23,11 +24,57 @@ import {
 const app =
   express();
 
+function configuredFrontendOrigins() {
+  const configured = (process.env.FRONTEND_URL || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  // Local development remains convenient, while production only trusts explicitly
+  // configured origins. Never interpret an absent setting as "allow every site".
+  if (process.env.NODE_ENV !== "production") {
+    configured.push("http://localhost:5173", "http://127.0.0.1:5173");
+  }
+
+  return new Set(configured.map((value) => {
+    const url = new URL(value);
+    if (!["http:", "https:"].includes(url.protocol) || url.username || url.password) {
+      throw new Error("FRONTEND_URL must contain trusted http(s) origins.");
+    }
+    if (url.pathname !== "/" || url.search || url.hash) {
+      throw new Error("FRONTEND_URL entries must be origins without a path, query, or fragment.");
+    }
+    return url.origin;
+  }));
+}
+
+const allowedFrontendOrigins = configuredFrontendOrigins();
+if (process.env.NODE_ENV === "production" && allowedFrontendOrigins.size === 0) {
+  throw new Error("Set FRONTEND_URL to the trusted production frontend origin before starting the API.");
+}
+
+app.disable("x-powered-by");
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=(self)");
+  res.setHeader("Cross-Origin-Resource-Policy", "same-site");
+  next();
+});
+
 app.use(
   cors({
-    origin:
-      process.env.FRONTEND_URL,
-
+    origin(origin, callback) {
+      if (!origin) return callback(null, false);
+      let normalized;
+      try {
+        const parsed = new URL(origin);
+        if (parsed.origin !== origin || parsed.username || parsed.password) return callback(null, false);
+        normalized = parsed.origin;
+      } catch { return callback(null, false); }
+      return callback(null, allowedFrontendOrigins.has(normalized));
+    },
     credentials: true,
   })
 );
@@ -36,12 +83,13 @@ app.post(
   "/api/payments/webhook",
   express.raw({
     type: "application/json",
+    limit: "1mb",
   }),
   razorpayWebhook
 );
 
 app.use(
-  express.json()
+  express.json({ limit: "100kb" })
 );
 
 app.get(
@@ -56,6 +104,7 @@ app.get(
 );
 
 app.use("/api/locations", locationRoutes);
+app.use("/api/auth", washerSignupRoutes);
 app.use( "/api", assignmentRoutes);
 app.use("/api/washer", washerJobRoutes);
 app.use("/api/customer", customerBookingRoutes);

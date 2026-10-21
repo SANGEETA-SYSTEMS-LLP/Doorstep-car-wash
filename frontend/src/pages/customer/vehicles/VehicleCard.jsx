@@ -12,7 +12,7 @@ function VehicleCard({ vehicle, onDelete, onBook }) {
             <h2 className="font-bold">{vehicle.brand} {vehicle.model}</h2>
             <p className="mt-1 text-sm text-slate-500">{vehicle.vehicle_number}</p>
             <p className="mt-1 text-xs text-slate-400">
-              {vehicle.vehicle_type}{vehicle.colour && ` • ${vehicle.colour}`}
+              {vehicle.vehicle_type}{vehicle.seating_capacity ? ` • ${vehicle.seating_capacity} seats` : ""}{vehicle.colour && ` • ${vehicle.colour}`}
             </p>
           </div>
         </div>

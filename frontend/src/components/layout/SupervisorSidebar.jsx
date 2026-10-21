@@ -1,10 +1,14 @@
+import ResponsiveNavigation from "./ResponsiveNavigation";
 import {
   LayoutDashboard,
   BriefcaseBusiness,
   CircleDollarSign,
   TriangleAlert,
   User,
+  BadgeCheck,
   LogOut,
+  CarFront,
+  ChevronRight,
 } from "lucide-react";
 
 import {
@@ -17,32 +21,15 @@ import {
 } from "../../context/AuthContext";
 
 const menuItems = [
+  { label: "Dashboard", path: "/supervisor", icon: LayoutDashboard },
+  { label: "Active Jobs", path: "/supervisor/jobs", icon: BriefcaseBusiness },
+  { label: "Washers by location", path: "/supervisor/washers", icon: User },
+  { label: "Washer verification", path: "/supervisor/washers/review", icon: BadgeCheck },
+  { label: "Add Washer", path: "/supervisor/washers/add", icon: User },
   { label: "Live operations", path: "/supervisor/operations", icon: LayoutDashboard },
-  {
-    label: "Dashboard",
-    path: "/supervisor",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Active Jobs",
-    path: "/supervisor/jobs",
-    icon: BriefcaseBusiness,
-  },
-  {
-    label: "Extra Charges",
-    path: "/supervisor/extra-charges",
-    icon: CircleDollarSign,
-  },
-  {
-    label: "Escalations",
-    path: "/supervisor/escalations",
-    icon: TriangleAlert,
-  },
-  {
-    label: "Profile",
-    path: "/supervisor/profile",
-    icon: User,
-  },
+  { label: "Extra Charges", path: "/supervisor/extra-charges", icon: CircleDollarSign },
+  { label: "Escalations", path: "/supervisor/escalations", icon: TriangleAlert },
+  { label: "Profile", path: "/supervisor/profile", icon: User },
 ];
 
 export default function SupervisorSidebar() {
@@ -74,19 +61,15 @@ export default function SupervisorSidebar() {
     };
 
   return (
-    <aside className="flex min-h-screen w-72 flex-col border-r border-slate-200 bg-white">
-      <div className="border-b border-slate-200 px-6 py-6">
-        <h1 className="text-xl font-black text-slate-900">
-          Car Wash
-        </h1>
-
-        <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-blue-600">
-          Supervisor Panel
-        </p>
+    <ResponsiveNavigation title="Supervisor workspace"><aside className="flex min-h-screen w-72 flex-col border-r border-slate-200/80 bg-white">
+      <div className="border-b border-slate-100 px-5 py-5">
+        <div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-700 to-cyan-700 text-white shadow-sm"><CarFront size={22} /></span><div><h1 className="text-lg font-black tracking-tight text-slate-950">WashNow</h1><p className="mt-0.5 text-xs text-slate-500">Supervisor workspace</p></div></div>
+        <div className="mt-4 flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-[11px] font-semibold text-slate-600"><span className="h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-100" />Operations access <span className="ml-auto text-slate-400">Secure</span></div>
       </div>
 
-      <nav className="flex-1 space-y-2 p-4">
-        {menuItems.map(
+      <nav aria-label="Supervisor navigation" className="flex-1 space-y-1 p-3">
+        <p className="px-3 pb-2 pt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Workspace</p>
+        {menuItems.filter(item => profile?.role !== "accountant").map(
           ({
             label,
             path,
@@ -96,46 +79,45 @@ export default function SupervisorSidebar() {
               key={path}
               to={path}
               end={
-                path ===
-                "/supervisor"
+                path === "/supervisor" || path === "/supervisor/washers"
               }
               className={({
                 isActive,
               }) =>
-                `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                `group flex items-center gap-3 rounded-xl border px-3.5 py-3 text-sm font-semibold transition ${
                   isActive
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    ? "border-blue-100 bg-blue-50 text-blue-800 shadow-sm shadow-blue-900/[0.03]"
+                    : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-950"
                 }`
               }
             >
               <Icon
                 size={19}
+                className="shrink-0"
               />
 
               {label}
+              <ChevronRight size={15} className="ml-auto opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-50" />
             </NavLink>
           )
         )}
       </nav>
 
-      <div className="border-t border-slate-200 p-4">
-        <div className="mb-4 rounded-xl bg-slate-50 p-4">
-          <p className="font-semibold text-slate-900">
+      <div className="border-t border-slate-100 p-4">
+        <div className="mb-3 flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-sm font-bold text-blue-900 shadow-sm ring-1 ring-slate-100">{profile?.full_name?.trim()?.[0]?.toUpperCase() || "S"}</span><div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-900">
             {profile?.full_name ||
               "Supervisor"}
-          </p>
-
-          <p className="mt-1 text-xs text-slate-500">
-            Supervisor
-          </p>
+          </p><p className="mt-0.5 text-xs text-slate-500">
+            {profile?.role === "accountant" ? "Accountant" : "Supervisor"}
+          </p></div>
         </div>
 
         <button
           onClick={
             handleLogout
           }
-          className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+          className="flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-500 transition hover:bg-red-50 hover:text-red-700"
         >
           <LogOut
             size={18}
@@ -144,6 +126,6 @@ export default function SupervisorSidebar() {
           Logout
         </button>
       </div>
-    </aside>
+    </aside></ResponsiveNavigation>
   );
 }

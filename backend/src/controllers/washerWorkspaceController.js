@@ -13,6 +13,7 @@ export async function setAvailability(req, res) {
   if (typeof req.body?.online !== "boolean") return res.status(400).json({ message: "Online status must be true or false." });
   try {
     const washer = await washerForUser(req.user.id);
+    if (req.body.online && !washer.is_verified) return res.status(403).json({ message: "Supervisor verification is required before you can go online and receive jobs." });
     const { data: active, error: checkError } = await supabaseAdmin.from("bookings").select("id").eq("assigned_washer_id", washer.id).in("status", activeJobStatuses).limit(1);
     if (checkError) throw checkError;
     if (active?.length || washer.status === "busy") return res.status(409).json({ message: "Complete your active job before changing availability." });

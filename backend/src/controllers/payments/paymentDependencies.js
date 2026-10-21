@@ -1,0 +1,10 @@
+import { supabaseAdmin } from "../../config/supabase.js";
+import { razorpay } from "../../config/razorpay.js";
+import { createWasherEarning } from "../../services/earningService.js";
+export { supabaseAdmin, razorpay, createWasherEarning };
+export async function customerIdForUser(userId) {
+  const { data, error } = await supabaseAdmin.from("customers").select("id").eq("user_id", userId).maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error("Customer profile not found.");
+  return data.id;
+}

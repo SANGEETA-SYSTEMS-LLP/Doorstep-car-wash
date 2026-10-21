@@ -9,24 +9,25 @@ const steps = [
 
 function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-20">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="text-center">
-          <p className="font-semibold text-blue-600">SIMPLE BOOKING</p>
-          <h2 className="mt-2 text-3xl font-bold text-slate-900">Get your car cleaned in four steps</h2>
+    <section id="how-it-works" className="scroll-mt-24 bg-white py-20 sm:py-24">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-700">Simple from the start</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">A better wash in four easy steps</h2>
+          <p className="mt-4 text-base leading-7 text-slate-600">Set up your booking in minutes. We’ll keep you updated along the way.</p>
         </div>
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map(({ icon: Icon, ...step }) => (
-            <div key={step.number} className="rounded-2xl border border-slate-200 p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                  <Icon />
+            <article key={step.number} className="group rounded-2xl border border-slate-200/90 bg-white p-6 transition duration-200 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-slate-900/[0.05]">
+              <div className="flex items-center justify-between">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-800 transition group-hover:bg-blue-800 group-hover:text-white">
+                  <Icon size={21} />
                 </div>
-                <span className="text-sm font-bold text-slate-300">{step.number}</span>
+                <span className="text-xs font-bold tracking-[0.12em] text-slate-300">{step.number}</span>
               </div>
-              <h3 className="mt-5 text-lg font-bold text-slate-900">{step.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-500">{step.description}</p>
-            </div>
+              <h3 className="mt-6 text-base font-bold text-slate-950">{step.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{step.description}</p>
+            </article>
           ))}
         </div>
       </div>

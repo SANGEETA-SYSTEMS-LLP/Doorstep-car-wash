@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
+import ProfileLoadError from "../../components/common/ProfileLoadError";
 
 function DashboardRedirect() {
   const {
@@ -27,20 +28,7 @@ function DashboardRedirect() {
   }
 
   if (!profile) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-6">
-        <div className="text-center">
-          <h2 className="text-xl font-bold">
-            Profile not found
-          </h2>
-
-          <p className="mt-2 text-sm text-slate-500">
-            Your account exists, but its application
-            profile could not be loaded.
-          </p>
-        </div>
-      </div>
-    );
+    return <ProfileLoadError />;
   }
 
   switch (profile.role) {
@@ -71,7 +59,7 @@ function DashboardRedirect() {
     case "support":
       return (
         <Navigate
-          to="/"
+          to="/support"
           replace
         />
       );
@@ -79,7 +67,7 @@ function DashboardRedirect() {
     case "accountant":
       return (
         <Navigate
-          to="/accountant"
+          to="/supervisor/accountant"
           replace
         />
       );

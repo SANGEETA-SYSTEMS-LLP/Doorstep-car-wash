@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
 import { useAuth } from "../../../context/AuthContext";
-import { getMyVehicles } from "../../../services/vehicleService";
+import { getMyVehicles, getVehicleLoadErrorMessage } from "../../../services/vehicleService";
 import SelectVehicleContent from "./SelectVehicleContent";
 
 function SelectVehicle() {
@@ -14,6 +14,7 @@ function SelectVehicle() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState(booking.vehicle?.id || "");
+  const [reloadCount, setReloadCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -39,7 +40,7 @@ function SelectVehicle() {
         );
       } catch (error) {
         console.error(error);
-        if (!cancelled) setError("Unable to load vehicles.");
+        if (!cancelled) setError(getVehicleLoadErrorMessage(error));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -47,7 +48,7 @@ function SelectVehicle() {
 
     loadVehicles();
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user, reloadCount]);
 
   const handleContinue = () => {
     const selectedVehicle = vehicles.find(
@@ -73,6 +74,7 @@ function SelectVehicle() {
         type: selectedVehicle.vehicle_type,
         number: selectedVehicle.vehicle_number,
         colour: selectedVehicle.colour,
+        seatingCapacity: selectedVehicle.seating_capacity,
       },
     });
 
@@ -80,7 +82,7 @@ function SelectVehicle() {
   };
 
   return (
-    <SelectVehicleContent navigate={navigate} selected={selected} setSelected={setSelected} vehicles={vehicles} loading={loading} error={error} handleContinue={handleContinue} />
+    <SelectVehicleContent navigate={navigate} selected={selected} setSelected={setSelected} vehicles={vehicles} loading={loading} error={error} onRetry={() => setReloadCount((count) => count + 1)} handleContinue={handleContinue} />
   );
 }
 

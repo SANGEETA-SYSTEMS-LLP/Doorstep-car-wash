@@ -1,6 +1,6 @@
 import { ArrowLeft, Navigation } from "lucide-react";
 
-function TrackingHeader({ booking, currentStatus, navigate }) {
+function TrackingHeader({ booking, washer, currentStatus, navigate }) {
   const statusLabel = currentStatus === "service_completed"
     ? "Awaiting validation"
     : currentStatus === "completed"
@@ -24,9 +24,9 @@ function TrackingHeader({ booking, currentStatus, navigate }) {
               {booking.bookingId || "Booking"}
             </p>
             <h1 className="text-xl font-bold">Track Your Washer</h1>
-            {booking.washer?.referenceId && (
+            {(washer?.referenceId || washer?.name) && (
               <p className="mt-1 break-all text-xs text-slate-500">
-                Washer ID: {booking.washer.referenceId}
+                {washer.name}{washer.referenceId ? ` · ${washer.referenceId}` : ""}
               </p>
             )}
           </div>

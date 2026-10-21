@@ -1,0 +1,455 @@
+
+> backend@1.0.0 test
+> node --experimental-test-module-mocks --test tests/*.test.js --test-name-pattern=profile loading|role permissions
+
+(node:26316) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ profile reads and writes remain scoped to authenticated identity (4.5829ms)
+✔ profile updates reject role escalation and invalid input before database access (0.4956ms)
+✔ earnings use the authenticated washer record and bounded pagination (1.7096ms)
+✔ earnings summary is scoped to the washer and a validated day range (0.7905ms)
+✔ customer resources are scoped to the signed-in customer and propagate failures (0.8154ms)
+✔ customer bookings do not depend on optional payment_method schema (0.924ms)
+✔ customer booking list contains only public contact details for its assigned washer (1.0629ms)
+(node:29856) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ Admin washer directory includes contact, service and masked bank payout method only (3.9344ms)
+✔ customer directory includes contact, saved addresses and vehicles (0.7847ms)
+✔ catalogue writes reject unknown fields and financial mutations (3.3462ms)
+✔ coverage coordinates and radius are validated before database writes (1.5309ms)
+✔ pricing rejects invalid values and preserves explicit deactivation (5.0326ms)
+✖ assignment migration replaces legacy signatures and denies nonexistent supervisors (7153.4472ms)
+(node:13892) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✖ eligible washer receives an offer using actual schema columns and record IDs (3.5011ms)
+✖ already assigned booking does not create another offer (3.6518ms)
+✖ pending bookings cannot bypass supervisor review through automatic assignment (0.8237ms)
+Profile lookup failed: 42P17 policy recursion
+(node:15424) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ profile loading verifies identity and distinguishes missing profiles from database errors (2.4476ms)
+Booking database schema is incomplete: Missing latitude
+Booking database schema is incomplete: Missing latitude
+Booking status trigger configuration is invalid: invalid input value for enum booking_status: "booking_update"
+(node:30484) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ booking uses trusted package price and scopes address/vehicle ownership (4.5598ms)
+✔ uncovered or mismatched vehicles cannot create bookings (1.2277ms)
+✔ invalid calendar dates and past service times are rejected (0.6919ms)
+✔ all displayed payment methods are accepted and preserved (1.4324ms)
+✔ unknown payment methods return a payment-specific error before database access (2.5721ms)
+✔ booking applies offer discounts from trusted package data (1.2782ms)
+✔ missing checkout columns produce an actionable service error (2.0425ms)
+✔ invalid booking status trigger produces an actionable service error (0.7486ms)
+✖ clean consolidated database installs and matches application contract (7351.6572ms)
+(node:11760) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ booking coverage accepts any valid location and optionally recognizes a society (4.1209ms)
+✔ standalone service zones do not invent a society (0.3447ms)
+✔ invalid coordinates cannot accidentally match a zone (0.3803ms)
+✔ cities across states can book without configured societies or zones (0.3185ms)
+(node:28200) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ address creation derives ownership from verified user (4.719ms)
+✔ address mutations reject invalid input and client-supplied ownership (1.1558ms)
+✔ updates and deletes restrict writes to the signed-in customer's addresses (2.4712ms)
+✔ booking confirmation reuses unchanged addresses and rejects another customer's address (1.2289ms)
+✔ linked booking addresses cannot be deleted (0.6236ms)
+(node:13480) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ customer booking details include only the assigned washer's public contact details (3.7518ms)
+✔ customers cannot load another customer's booking or washer contact information (0.5918ms)
+✖ customer confirmation enforces ownership and paid cash progression is idempotent (7086.5567ms)
+✔ FIRSTWASH grants a fixed discount only for a first booking over the minimum (6.2169ms)
+✔ CLEAN20 applies twenty percent on Premium Wash up to ₹150 (0.5626ms)
+✔ WEEKEND50 validates the chosen service date (0.4205ms)
+(node:20824) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ vehicle creation supports custom types and derives ownership from the session (3.3001ms)
+✔ vehicle creation accepts legacy camel-case form payloads without trusting client ownership (0.5902ms)
+✔ vehicle creation rejects unsupported and invalid fields (0.734ms)
+✔ vehicle deletion is scoped to the owner and reports missing vehicles (7.0093ms)
+✔ duplicates and vehicles linked to bookings return useful conflict errors (0.5454ms)
+(node:2912) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ only Accountant and Super Admin can manage money movement (1.7124ms)
+✔ refund and payout response binding rejects wrong amounts or recipients (2.8478ms)
+✔ reports validate real dates, bounded ranges and India timezone (5.425ms)
+✔ provider retries reuse the exact body and idempotency key; known transfers are fetched (2.9571ms)
+✖ finance SQL executes and protects refund/payout reservations (7553.5109ms)
+✖ supplied baseline and repository migrations apply in order (7740.9095ms)
+✔ OSM address normalization preserves coordinates and village fallback (1.7493ms)
+✔ provider configuration, caching and routing use compatible contracts (3.4753ms)
+(node:6292) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ operations flags stale washer positions and only delays unstarted jobs (1.6787ms)
+✔ operations also excludes legacy completed records without querying an unsupported enum (5.1169ms)
+(node:31372) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ package catalog includes matching category aliases and shared all-vehicle tiers (7.0516ms)
+✖ package validation scopes the vehicle to the signed-in customer (1.3701ms)
+✔ validation rejects incompatible, inactive or invalid-price packages (0.8737ms)
+✖ shared one-time wash tiers are valid for luxury vehicles (0.4974ms)
+✔ one-time tiers are provisioned at fixed prices and shared across vehicle types (1.0322ms)
+Verify payment: Error: Payment is not captured or does not match this order and amount.
+    at validateCapturedPayment (file:///E:/car-wash-platform/backend/src/services/paymentValidation.js:4:25)
+    at verifyPayment (file:///E:/car-wash-platform/backend/src/controllers/paymentController.js:297:5)
+    at async run (file:///E:/car-wash-platform/backend/tests/paymentWorkflow.test.js:12:60)
+    at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/paymentWorkflow.test.js:16:374)
+    at async Test.run (node:internal/test_runner/test:1113:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+  status: 400
+}
+Verify payment: Error: Payment is not captured or does not match this order and amount.
+    at validateCapturedPayment (file:///E:/car-wash-platform/backend/src/services/paymentValidation.js:4:25)
+    at verifyPayment (file:///E:/car-wash-platform/backend/src/controllers/paymentController.js:297:5)
+    at async run (file:///E:/car-wash-platform/backend/tests/paymentWorkflow.test.js:12:60)
+    at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/paymentWorkflow.test.js:16:374)
+    at async Test.run (node:internal/test_runner/test:1113:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+  status: 400
+}
+Verify payment: Error: Payment is not captured or does not match this order and amount.
+    at validateCapturedPayment (file:///E:/car-wash-platform/backend/src/services/paymentValidation.js:4:25)
+    at verifyPayment (file:///E:/car-wash-platform/backend/src/controllers/paymentController.js:297:5)
+    at async run (file:///E:/car-wash-platform/backend/tests/paymentWorkflow.test.js:12:60)
+    at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/paymentWorkflow.test.js:16:374)
+    at async Test.run (node:internal/test_runner/test:1113:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+  status: 400
+}
+Verify payment: Error: Payment is not captured or does not match this order and amount.
+    at validateCapturedPayment (file:///E:/car-wash-platform/backend/src/services/paymentValidation.js:4:25)
+    at verifyPayment (file:///E:/car-wash-platform/backend/src/controllers/paymentController.js:297:5)
+    at async run (file:///E:/car-wash-platform/backend/tests/paymentWorkflow.test.js:12:60)
+    at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/paymentWorkflow.test.js:16:374)
+    at async Test.run (node:internal/test_runner/test:1113:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+  status: 400
+}
+(node:19924) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ payment order amount comes from database and reuses an existing order (10.5679ms)
+✔ paid bookings cannot create another checkout order (0.5963ms)
+✔ a valid signature still requires captured matching currency, amount and order (21.5817ms)
+✔ captured checkout updates payment and triggers completion-aware earnings (8.5995ms)
+✔ verification rejects another customer before fetching or changing payment (0.5664ms)
+✔ webhook rejects tampered signatures without database writes (0.7717ms)
+✔ pay-after-service bookings can use Razorpay only after customer confirmation (0.9928ms)
+✖ profile security migration prevents self-promotion and recursive reads (6683.9991ms)
+(node:18644) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ review lookup scopes booking by customer record rather than auth ID (2.4101ms)
+(node:7984) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ customer can close a confirmed service without recording payment (11.3969ms)
+✔ customer can rate and close a confirmed service without recording payment (1.9061ms)
+✔ role permissions reject unauthorized profiles and allow permitted roles (1.3811ms)
+(node:29956) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ supervisor validates submitted after photos and completes the booking (9.9248ms)
+✔ only the assigned washer can validate as a washer (1.3497ms)
+✔ after-service photos are required before validation (0.334ms)
+✔ non-review roles cannot validate service completion (0.2612ms)
+✖ signup address persists for customer before verification and skips invalid/staff metadata (4155.7724ms)
+✖ supervisor adds opted-in washer once and cannot take another supervisor washer (3866.4453ms)
+(node:12992) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ escalations use schema columns, include support escalations, and preserve display fields (12.0722ms)
+✔ empty escalation results skip all related queries (0.5077ms)
+✔ missing related records retain bookings with an address fallback (0.7024ms)
+✔ active jobs sort by scheduled date and preserve related data (0.492ms)
+✔ booking and address errors return failures instead of misleading empty lists (5.3723ms)
+✔ dashboard counts pending extra charges and the same escalation criteria (6.749ms)
+✔ dashboard uses service completion timestamp and bounds the IST day (0.8471ms)
+✔ dashboard preserves database failures with a nonempty error (0.5499ms)
+✔ accept booking only confirms an unassigned pending booking (1.175ms)
+✔ booking snapshot address survives a missing saved address (0.6578ms)
+Create supervisor washer: write failed
+(node:25400) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ supervisor creates a pending washer and receives a generated ID without exposing a password (2.5858ms)
+✔ invalid coordinates and unauthorized roles cannot create accounts (0.4563ms)
+✔ failed provisioning cleans up only the newly created account (2.0975ms)
+✔ missing, short and oversized passwords are rejected before account creation (0.4226ms)
+(node:2776) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ links generated ID and returns full details without changing verification (3.1537ms)
+✔ rejects mismatched names, invalid IDs and washers owned by another supervisor (0.6324ms)
+(node:9396) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ supervisor roster returns washer status, accepted work, and earnings summaries (7.1804ms)
+✔ support ticket validation trims bounded customer input (3.2977ms)
+✔ support ticket validation rejects unknown issue types and short descriptions (0.7059ms)
+▶ support ticket updates accept only supported statuses and fields
+  ✔ customer profile updates accept only validated name and phone fields (1.8372ms)
+✔ support ticket updates accept only supported statuses and fields (2.4888ms)
+✖ washer assignment acceptance requires a verified online washer and confirms one booking atomically (3755.8258ms)
+(node:29772) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ nearby results filter invalid, unverified and out-of-radius washers without exposing coordinates or addresses (4.2974ms)
+✔ signup location is seeded once and never overwrites an edited profile (2.4309ms)
+✔ profile saving uses session ownership and rejects other roles (0.9682ms)
+✔ customer nearby responses contain public details only (0.7459ms)
+(node:13756) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ washer payout links only own provider account and stores no full bank number (3.4877ms)
+✔ customers cannot change payout destinations and invalid bank details never reach provider (0.7193ms)
+✔ washer reads only masked payout label (0.3972ms)
+✔ customer payment options require an owned confirmed booking and hide payout data (0.7611ms)
+✔ washer shifts require the complete service to fit on the correct day (7.6831ms)
+(node:31408) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ legacy washer signups get washer access but never automatic verification (2.2992ms)
+✔ normal customers, suspended profiles and privileged staff roles are unchanged (0.4586ms)
+(node:22104) ExperimentalWarning: Module mocking is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ reference IDs preserve UUID uniqueness and distinguish the two roles (4.2635ms)
+✔ job detail resolves customer profile and enforces assigned washer record ownership (1.9827ms)
+✔ unauthorized booking never loads customer contact records (1.3522ms)
+✔ missing or inactive washer accounts cannot access workspace (0.5054ms)
+✔ workspace filters stale booking offers and scopes all assignment reads (2.5908ms)
+✖ workflow grants block browser mutations and long booking numbers stay unique (3658.4873ms)
+ℹ tests 118
+ℹ suites 0
+ℹ pass 103
+ℹ fail 15
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12539.5605
+
+✖ failing tests:
+
+test at tests\assignmentMigration.test.js:5:1
+✖ assignment migration replaces legacy signatures and denies nonexistent supervisors (7153.4472ms)
+  Error: ENOENT: no such file or directory, open 'E:\car-wash-platform\database-history\supabase-before-cleanup-20261015\migrations\20261015110000_refresh_assignment_contract.sql'
+      at async open (node:internal/fs/promises:642:25)
+      at async readFile (node:internal/fs/promises:1279:14)
+      at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/assignmentMigration.test.js:19:12)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'E:\\car-wash-platform\\database-history\\supabase-before-cleanup-20261015\\migrations\\20261015110000_refresh_assignment_contract.sql'
+  }
+
+test at tests\assignmentSchema.test.js:25:1
+✖ eligible washer receives an offer using actual schema columns and record IDs (3.5011ms)
+  TypeError: supabaseAdmin.from(...).update(...).eq(...).is is not a function
+      at assignWasherToBooking (file:///E:/car-wash-platform/backend/src/services/bookingAssignmentService.js:11:26)
+      at TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/assignmentSchema.test.js:27:24)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17)
+
+test at tests\assignmentSchema.test.js:43:1
+✖ already assigned booking does not create another offer (3.6518ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /already has an assigned washer/. Input:
+  
+  'TypeError: supabaseAdmin.from(...).update(...).eq(...).is is not a function'
+  
+      at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/assignmentSchema.test.js:45:3)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: TypeError: supabaseAdmin.from(...).update(...).eq(...).is is not a function
+        at assignWasherToBooking (file:///E:/car-wash-platform/backend/src/services/bookingAssignmentService.js:11:26)
+        at TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/assignmentSchema.test.js:45:24)
+        at Test.runInAsyncScope (node:async_hooks:214:14)
+        at Test.run (node:internal/test_runner/test:1106:25)
+        at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+        at Test.postRun (node:internal/test_runner/test:1235:19)
+        at Test.run (node:internal/test_runner/test:1163:12)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3),
+    expected: /already has an assigned washer/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\assignmentSchema.test.js:49:1
+✖ pending bookings cannot bypass supervisor review through automatic assignment (0.8237ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /cannot be assigned/. Input:
+  
+  'TypeError: supabaseAdmin.from(...).update(...).eq(...).is is not a function'
+  
+      at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/assignmentSchema.test.js:51:8)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: TypeError: supabaseAdmin.from(...).update(...).eq(...).is is not a function
+        at assignWasherToBooking (file:///E:/car-wash-platform/backend/src/services/bookingAssignmentService.js:11:26)
+        at TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/assignmentSchema.test.js:51:29)
+        at Test.runInAsyncScope (node:async_hooks:214:14)
+        at Test.run (node:internal/test_runner/test:1106:25)
+        at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+        at Test.postRun (node:internal/test_runner/test:1235:19)
+        at Test.run (node:internal/test_runner/test:1163:12)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:788:7),
+    expected: /cannot be assigned/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\cleanDatabaseInstall.test.js:5:1
+✖ clean consolidated database installs and matches application contract (7351.6572ms)
+  Error: ENOENT: no such file or directory, scandir 'E:\car-wash-platform\supabase\setup\'
+      at async readdir (node:internal/fs/promises:958:18)
+      at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/cleanDatabaseInstall.test.js:15:21)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'scandir',
+    path: 'E:\\car-wash-platform\\supabase\\setup\\'
+  }
+
+test at tests\customerConfirmationDatabase.test.js:2:1
+✖ customer confirmation enforces ownership and paid cash progression is idempotent (7086.5567ms)
+  Error: ENOENT: no such file or directory, open 'E:\car-wash-platform\database-history\supabase-before-cleanup-20261015\migrations\20261015120000_customer_confirmation_lifecycle.sql'
+      at async open (node:internal/fs/promises:642:25)
+      at async readFile (node:internal/fs/promises:1279:14)
+      at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/customerConfirmationDatabase.test.js:9:15)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'E:\\car-wash-platform\\database-history\\supabase-before-cleanup-20261015\\migrations\\20261015120000_customer_confirmation_lifecycle.sql'
+  }
+
+test at tests\financeDatabase.test.js:6:1
+✖ finance SQL executes and protects refund/payout reservations (7553.5109ms)
+  Error: ENOENT: no such file or directory, open 'E:\car-wash-platform\database-history\supabase-before-cleanup-20261015\migrations\20261013150000_finance_operations.sql'
+      at async open (node:internal/fs/promises:642:25)
+      at async readFile (node:internal/fs/promises:1279:14)
+      at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/financeDatabase.test.js:16:16)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'E:\\car-wash-platform\\database-history\\supabase-before-cleanup-20261015\\migrations\\20261013150000_finance_operations.sql'
+  }
+
+test at tests\fullMigrationChain.test.js:5:1
+✖ supplied baseline and repository migrations apply in order (7740.9095ms)
+  Error: ENOENT: no such file or directory, scandir 'E:\car-wash-platform\database-history\supabase-before-cleanup-20261015\baseline\'
+      at async readdir (node:internal/fs/promises:958:18)
+      at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/fullMigrationChain.test.js:16:22)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'scandir',
+    path: 'E:\\car-wash-platform\\database-history\\supabase-before-cleanup-20261015\\baseline\\'
+  }
+
+test at tests\packageController.test.js:26:1
+✖ package validation scopes the vehicle to the signed-in customer (1.3701ms)
+  TypeError: Cannot read properties of undefined (reading 'package')
+      at TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/packageController.test.js:28:32)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7)
+
+test at tests\packageController.test.js:41:1
+✖ shared one-time wash tiers are valid for luxury vehicles (0.4974ms)
+  TypeError: Cannot read properties of undefined (reading 'package')
+      at TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/packageController.test.js:44:32)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7)
+
+test at tests\profileSecurityDatabase.test.js:5:1
+✖ profile security migration prevents self-promotion and recursive reads (6683.9991ms)
+  Error: ENOENT: no such file or directory, open 'E:\car-wash-platform\database-history\supabase-before-cleanup-20261015\migrations\20261015090000_harden_client_profile_updates.sql'
+      at async open (node:internal/fs/promises:642:25)
+      at async readFile (node:internal/fs/promises:1279:14)
+      at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/profileSecurityDatabase.test.js:22:14)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'E:\\car-wash-platform\\database-history\\supabase-before-cleanup-20261015\\migrations\\20261015090000_harden_client_profile_updates.sql'
+  }
+
+test at tests\signupAddressDatabase.test.js:5:1
+✖ signup address persists for customer before verification and skips invalid/staff metadata (4155.7724ms)
+  Error: ENOENT: no such file or directory, open 'E:\car-wash-platform\database-history\supabase-before-cleanup-20261015\migrations\20261015150000_customer_signup_address.sql'
+      at async open (node:internal/fs/promises:642:25)
+      at async readFile (node:internal/fs/promises:1279:14)
+      at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/signupAddressDatabase.test.js:13:13)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'E:\\car-wash-platform\\database-history\\supabase-before-cleanup-20261015\\migrations\\20261015150000_customer_signup_address.sql'
+  }
+
+test at tests\supervisorAddWasher.test.js:2:1
+✖ supervisor adds opted-in washer once and cannot take another supervisor washer (3866.4453ms)
+  Error: ENOENT: no such file or directory, open 'E:\car-wash-platform\database-history\supabase-before-cleanup-20261015\migrations\20261015130000_supervisor_add_washer.sql'
+      at async open (node:internal/fs/promises:642:25)
+      at async readFile (node:internal/fs/promises:1279:14)
+      at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/supervisorAddWasher.test.js:4:15)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'E:\\car-wash-platform\\database-history\\supabase-before-cleanup-20261015\\migrations\\20261015130000_supervisor_add_washer.sql'
+  }
+
+test at tests\washerAssignmentAcceptance.test.js:6:1
+✖ washer assignment acceptance requires a verified online washer and confirms one booking atomically (3755.8258ms)
+  error: function crypt(text, text) does not exist
+      at pe.Ue (file:///E:/car-wash-platform/backend/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:17959)
+      at pe.tt (file:///E:/car-wash-platform/backend/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:15347)
+      at pe.parse (file:///E:/car-wash-platform/backend/node_modules/@electric-sql/pglite/dist/chunk-2BOC2OMW.js:1:14021)
+      at D.Ne (file:///E:/car-wash-platform/backend/node_modules/@electric-sql/pglite/dist/index.js:5:1763)
+      at file:///E:/car-wash-platform/backend/node_modules/@electric-sql/pglite/dist/index.js:5:1155
+      at wasm://wasm/0269e01e:wasm-function[10979]:0x5ad057
+      at wasm://wasm/0269e01e:wasm-function[3598]:0x281dd2
+      at wasm://wasm/0269e01e:wasm-function[3640]:0x289ccf
+      at wasm://wasm/0269e01e:wasm-function[3650]:0x289f2b
+      at wasm://wasm/0269e01e:wasm-function[9956]:0x556968 {
+    length: 212,
+    severity: 'ERROR',
+    code: '42883',
+    detail: undefined,
+    hint: 'No function matches the given name and argument types. You might need to add explicit type casts.',
+    position: '1266',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_func.c',
+    line: '636',
+    routine: 'ParseFuncOrColumn',
+    query: "-- Washer assignments follow this lifecycle:\r\n-- signup -> complete profile -> supervisor verification -> washer goes online\r\n-- -> receives an eligible offer -> accepts and confirms that offer.\r\n-- Run in Supabase SQL Editor as database owner. Safe to re-run.\r\nBEGIN;\r\n\r\n-- Keep the registered service pin separate from the changing live GPS pin.\r\nALTER TABLE public.washer_locations\r\n  ADD COLUMN IF NOT EXISTS service_latitude double precision,\r\n  ADD COLUMN IF NOT EXISTS service_longitude double precision;\r\n\r\n\r\n-- OTPs are stored as bcrypt hashes; only the trusted backend can call these helpers.\r\nCREATE OR REPLACE FUNCTION public.hash_service_otp(p_otp text)\r\nRETURNS text\r\nLANGUAGE plpgsql\r\nSECURITY DEFINER\r\nSET search_path = public, extensions, pg_temp\r\nAS $function$\r\nBEGIN\r\n  IF p_otp IS NULL OR p_otp !~ '^[0-9]{6}$' THEN\r\n    RAISE EXCEPTION 'A valid 6-digit OTP is required.' USING errcode = '22023';\r\n  END IF;\r\n  RETURN crypt(p_otp, gen_salt('bf'));\r\nEND;\r\n$function$;\r\n\r\nCREATE OR REPLACE FUNCTION public.verify_service_otp_hash(p_otp text, p_hash text)\r\nRETURNS boolean\r\nLANGUAGE sql\r\nIMMUTABLE\r\nSECURITY DEFINER\r\nSET search_path = public, extensions, pg_temp\r\nAS $function$\r\n  SELECT p_otp ~ '^[0-9]{6}$'\r\n     AND p_hash IS NOT NULL\r\n     AND crypt(p_otp, p_hash) = p_hash\r\n$function$;\r\n\r\nREVOKE ALL ON FUNCTION public.hash_service_otp(text) FROM PUBLIC, anon, authenticated;\r\nREVOKE ALL ON FUNCTION public.verify_service_otp_hash(text, text) FROM PUBLIC, anon, authenticated;\r\nGRANT EXECUTE ON FUNCTION public.hash_service_otp(text) TO service_role;\r\nGRANT EXECUTE ON FUNCTION public.verify_service_otp_hash(text, text) TO service_role;\r\n\r\nCREATE OR REPLACE FUNCTION public.booking_washer_is_eligible(\r\n  p_booking_id uuid,\r\n  p_washer_id uuid\r\n)\r\nRETURNS boolean\r\nLANGUAGE plpgsql\r\nSECURITY DEFINER\r\nSET search_path = public, pg_temp\r\nAS $function$\r\nDECLARE\r\n  v_booking record;\r\n  v_washer record;\r\n  v_location record;\r\n  v_package record;\r\n  v_distance_km double precision;\r\n  v_washer_latitude double precision;\r\n  v_washer_longitude double precision;\r\n  v_conflict boolean;\r\nBEGIN\r\n  SELECT id, status, assigned_washer_id, package_id, scheduled_date,\r\n         scheduled_start_time, latitude, longitude, service_address\r\n    INTO v_booking\r\n    FROM public.bookings\r\n   WHERE id = p_booking_id;\r\n\r\n  IF NOT FOUND OR v_booking.assigned_washer_id IS NOT NULL\r\n     OR v_booking.status NOT IN ('pending', 'confirmed', 'finding_washer', 'support_escalated')\r\n     OR v_booking.scheduled_date IS NULL OR v_booking.scheduled_start_time IS NULL\r\n     OR v_booking.latitude IS NULL OR v_booking.longitude IS NULL THEN\r\n    RETURN false;\r\n  END IF;\r\n\r\n  SELECT id, status, is_active, is_verified, service_radius_km, current_address\r\n    INTO v_washer\r\n    FROM public.washers\r\n   WHERE id = p_washer_id;\r\n\r\n  IF NOT FOUND OR v_washer.is_active IS DISTINCT FROM true OR v_washer.is_verified IS DISTINCT FROM true\r\n     OR v_washer.status IS DISTINCT FROM 'available' THEN\r\n    RETURN false;\r\n  END IF;\r\n\r\n  SELECT latitude, longitude, updated_at, service_latitude, service_longitude\r\n    INTO v_location\r\n    FROM public.washer_locations\r\n   WHERE washer_id = p_washer_id;\r\n\r\n  IF NOT FOUND OR v_location.updated_at IS NULL OR v_location.latitude IS NULL\r\n     OR v_location.longitude IS NULL OR v_location.latitude NOT BETWEEN -90 AND 90\r\n     OR v_location.longitude NOT BETWEEN -180 AND 180\r\n     OR v_location.updated_at < now() - interval '15 minutes' THEN\r\n    RETURN false;\r\n  END IF;\r\n\r\n  v_washer_latitude := coalesce(v_location.service_latitude, v_location.latitude);\r\n  v_washer_longitude := coalesce(v_location.service_longitude, v_location.longitude);\r\n  v_distance_km := 2 * 6371 * asin(sqrt(least(1::double precision, greatest(0::double precision,\r\n    power(sin(radians((v_washer_latitude - v_booking.latitude) / 2)), 2) +\r\n    cos(radians(v_booking.latitude)) * cos(radians(v_washer_latitude)) *\r\n    power(sin(radians((v_washer_longitude - v_booking.longitude) / 2)), 2)\r\n  ))));\r\n\r\n  -- Identical saved street addresses are treated as the same service location;\r\n  -- this handles legacy GPS pins that were overwritten while a washer was online.\r\n  IF nullif(regexp_replace(lower(coalesce(v_booking.service_address, '')), '[^[:alnum:]]', '', 'g'), '')\r\n     = nullif(regexp_replace(lower(coalesce(v_washer.current_address, '')), '[^[:alnum:]]', '', 'g'), '') THEN\r\n    v_distance_km := 0;\r\n  END IF;\r\n\r\n  -- Supervisors may offer jobs within the normal radius or an extended 7 km cap.\r\n  IF v_distance_km > least(greatest(coalesce(nullif(v_washer.service_radius_km, 0), 5), 5), 7) THEN\r\n    RETURN false;\r\n  END IF;\r\n\r\n  SELECT duration_minutes INTO v_package\r\n    FROM public.service_packages WHERE id = v_booking.package_id;\r\n\r\n  SELECT EXISTS (\r\n    SELECT 1\r\n      FROM public.bookings existing\r\n      LEFT JOIN public.service_packages existing_package ON existing_package.id = existing.package_id\r\n     WHERE existing.assigned_washer_id = p_washer_id AND existing.id <> p_booking_id\r\n       AND existing.status IN ('washer_assigned', 'washer_on_the_way', 'washer_arrived',\r\n                               'otp_verified', 'service_started', 'service_completed')\r\n       AND existing.scheduled_date IS NOT NULL AND existing.scheduled_start_time IS NOT NULL\r\n       AND (v_booking.scheduled_date::date + v_booking.scheduled_start_time::time) <\r\n           (existing.scheduled_date::date + existing.scheduled_start_time::time\r\n             + make_interval(mins => coalesce(existing_package.duration_minutes, 60)))\r\n       AND (existing.scheduled_date::date + existing.scheduled_start_time::time) <\r\n           (v_booking.scheduled_date::date + v_booking.scheduled_start_time::time\r\n             + make_interval(mins => coalesce(v_package.duration_minutes, 60)))\r\n  ) INTO v_conflict;\r\n\r\n  RETURN NOT v_conflict;\r\nEND;\r\n$function$;\r\n\r\n-- Drop first so this repair also works when an older deployment returned UUID.\r\nDROP FUNCTION IF EXISTS public.accept_booking_assignment(uuid);\r\n\r\nCREATE FUNCTION public.accept_booking_assignment(p_assignment_id uuid)\r\nRETURNS jsonb\r\nLANGUAGE plpgsql\r\nSECURITY DEFINER\r\nSET search_path = public, pg_temp\r\nAS $function$\r\nDECLARE\r\n  v_user_id uuid := auth.uid();\r\n  v_washer public.washers%rowtype;\r\n  v_assignment public.booking_assignments%rowtype;\r\n  v_booking public.bookings%rowtype;\r\n  v_profile_role text;\r\nBEGIN\r\n  IF v_user_id IS NULL THEN\r\n    RAISE EXCEPTION 'Authentication required.' USING errcode = '28000';\r\n  END IF;\r\n\r\n  SELECT role INTO v_profile_role FROM public.profiles\r\n   WHERE id = v_user_id AND is_active = true;\r\n  IF NOT FOUND OR v_profile_role IS DISTINCT FROM 'washer' THEN\r\n    RAISE EXCEPTION 'Active washer account required.' USING errcode = '42501';\r\n  END IF;\r\n\r\n  SELECT * INTO v_washer FROM public.washers\r\n   WHERE user_id = v_user_id AND is_active = true\r\n   FOR UPDATE;\r\n  IF NOT FOUND OR v_washer.is_verified IS DISTINCT FROM true THEN\r\n    RAISE EXCEPTION 'Supervisor verification is required before accepting jobs.' USING errcode = '42501';\r\n  END IF;\r\n  IF v_washer.status IS DISTINCT FROM 'available' THEN\r\n    RAISE EXCEPTION 'Go online before accepting a booking.' USING errcode = '40001';\r\n  END IF;\r\n\r\n  SELECT * INTO v_assignment FROM public.booking_assignments\r\n   WHERE id = p_assignment_id;\r\n  IF NOT FOUND OR v_assignment.washer_id <> v_washer.id THEN\r\n    RAISE EXCEPTION 'Assignment not found.' USING errcode = '42501';\r\n  END IF;\r\n  IF v_assignment.status <> 'pending' OR v_assignment.expires_at IS NULL\r\n     OR v_assignment.expires_at <= now() THEN\r\n    RAISE EXCEPTION 'Assignment is no longer available.' USING errcode = '40001';\r\n  END IF;\r\n\r\n  SELECT * INTO v_booking FROM public.bookings\r\n   WHERE id = v_assignment.booking_id FOR UPDATE;\r\n  IF NOT FOUND OR NOT public.booking_washer_is_eligible(v_booking.id, v_washer.id) THEN\r\n    RAISE EXCEPTION 'Booking is no longer eligible for this washer.' USING errcode = '40001';\r\n  END IF;\r\n\r\n  SELECT * INTO v_assignment FROM public.booking_assignments\r\n   WHERE id = p_assignment_id FOR UPDATE;\r\n  IF NOT FOUND OR v_assignment.washer_id IS DISTINCT FROM v_washer.id\r\n     OR v_assignment.status IS DISTINCT FROM 'pending'\r\n     OR v_assignment.expires_at IS NULL OR v_assignment.expires_at <= now() THEN\r\n    RAISE EXCEPTION 'Assignment is no longer available.' USING errcode = '40001';\r\n  END IF;\r\n\r\n  UPDATE public.bookings\r\n     SET assigned_washer_id = v_washer.id,\r\n         status = 'washer_assigned',\r\n         requires_supervisor = false,\r\n         updated_at = now()\r\n   WHERE id = v_booking.id RETURNING * INTO v_booking;\r\n\r\n  UPDATE public.booking_assignments\r\n     SET status = 'accepted', responded_at = now()\r\n   WHERE id = v_assignment.id RETURNING * INTO v_assignment;\r\n\r\n  -- A booking has one confirmed washer; clear every other outstanding offer.\r\n  UPDATE public.booking_assignments\r\n     SET status = 'cancelled', responded_at = now(),\r\n         rejection_reason = 'Another washer accepted this booking.'\r\n   WHERE booking_id = v_booking.id AND id <> v_assignment.id AND status = 'pending';\r\n\r\n  UPDATE public.washers SET status = 'busy', updated_at = now()\r\n   WHERE id = v_washer.id;\r\n\r\n  RETURN jsonb_build_object('booking', to_jsonb(v_booking), 'assignment', to_jsonb(v_assignment));\r\nEND;\r\n$function$;\r\n\r\n-- Supervisor selection creates an offer only. Acceptance confirms the washer.\r\nDROP FUNCTION IF EXISTS public.supervisor_assign_washer(uuid, uuid, uuid);\r\nCREATE FUNCTION public.supervisor_assign_washer(\r\n  p_booking_id uuid, p_washer_id uuid, p_supervisor_id uuid\r\n) RETURNS jsonb\r\nLANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp\r\nAS $function$\r\nDECLARE\r\n  v_assignment public.booking_assignments%rowtype;\r\n  v_attempt integer;\r\nBEGIN\r\n  IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = p_supervisor_id\r\n    AND role = 'supervisor' AND is_active = true) THEN\r\n    RAISE EXCEPTION 'Active supervisor account required.' USING errcode = '42501';\r\n  END IF;\r\n  --"... 2702 more characters,
+    params: undefined,
+    queryOptions: undefined
+  }
+
+test at tests\workflowPermissions.test.js:5:1
+✖ workflow grants block browser mutations and long booking numbers stay unique (3658.4873ms)
+  Error: ENOENT: no such file or directory, open 'E:\car-wash-platform\database-history\supabase-before-cleanup-20261015\migrations\20261015100000_restrict_direct_workflow_writes.sql'
+      at async open (node:internal/fs/promises:642:25)
+      at async readFile (node:internal/fs/promises:1279:14)
+      at async TestContext.<anonymous> (file:///E:/car-wash-platform/backend/tests/workflowPermissions.test.js:10:12)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'E:\\car-wash-platform\\database-history\\supabase-before-cleanup-20261015\\migrations\\20261015100000_restrict_direct_workflow_writes.sql'
+  }

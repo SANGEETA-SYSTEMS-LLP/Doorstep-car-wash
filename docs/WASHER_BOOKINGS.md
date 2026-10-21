@@ -2,7 +2,7 @@
 
 Implemented screens: washer dashboard, incoming request cards, My Bookings list, booking detail and navigation contact actions.
 
-Incoming requests and assigned bookings come from authenticated Express endpoints. The backend resolves washers.user_id to washers.id, filters assignments by that record, excludes expired offers and only loads customer details for the resulting bookings. Direct detail URLs require assigned_washer_id to match the signed-in washer record. Inactive/missing washer accounts are rejected even in local role-test mode.
+Incoming requests and assigned bookings come from authenticated Express endpoints. The backend resolves washers.user_id to washers.id, filters assignments by that record, excludes expired offers and only loads customer details for the resulting bookings. Direct detail URLs require assigned_washer_id to match the signed-in washer record. Inactive/missing washer accounts are rejected.
 
 After a customer pays and schedules a booking, the washer receives an offer and the supervisor can accept by assigning an eligible washer. A washer can also accept their own offer. Both paths assign the booking through the existing assignment flow; arrival OTP verification is still required before service can start.
 

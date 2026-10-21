@@ -5,6 +5,94 @@ function specFor(req) {
   if (!spec) throw Object.assign(new Error("Resource not found."), { status: 404 });
   return spec;
 }
+
+async function loadProfileDetails(userIds) {
+  const ids = [...new Set(userIds.filter(Boolean))];
+  if (!ids.length) return { profiles: new Map(), emails: new Map() };
+  const { data, error } = await db.from("profiles").select("id,full_name,phone").in("id", ids);
+  if (error) throw error;
+  const profiles = new Map((data || []).map(profile => [profile.id, profile]));
+  const entries = await Promise.all(ids.map(async id => {
+    const { data: result, error: authError } = await db.auth.admin.getUserById(id);
+    if (authError) throw authError;
+    return [id, result?.user?.email || null];
+  }));
+  return { profiles, emails: new Map(entries) };
+}
+
+async function addDirectoryDetails(resource, rows, role) {
+  if (!["customers", "washers", "supervisors"].includes(resource)) return rows;
+  const userIds = rows.map(row => resource === "supervisors" ? row.id : row.user_id);
+  const { profiles, emails } = resource === "supervisors"
+    ? { profiles: new Map(rows.map(row => [row.id, row])), emails: new Map(await Promise.all(userIds.map(async id => {
+        const { data, error } = await db.auth.admin.getUserById(id);
+        if (error) throw error;
+        return [id, data?.user?.email || null];
+      }))) }
+    : await loadProfileDetails(userIds);
+
+  const payoutByWasher = new Map();
+  const addressesByCustomer = new Map();
+  const vehiclesByCustomer = new Map();
+  if (resource === "customers" && rows.length) {
+    const customerIds = rows.map(row => row.id);
+    const [addressResult, vehicleResult] = await Promise.all([
+      db.from("customer_addresses").select("customer_id,label,address_line,city,state,postal_code,tower,flat_number,landmark").in("customer_id", customerIds),
+      db.from("vehicles").select("customer_id,brand,model,vehicle_number,vehicle_type,colour,seating_capacity,is_active").in("customer_id", customerIds),
+    ]);
+    if (addressResult.error) throw addressResult.error;
+    if (vehicleResult.error) throw vehicleResult.error;
+    for (const address of addressResult.data || []) {
+      const list = addressesByCustomer.get(address.customer_id) || [];
+      list.push(address);
+      addressesByCustomer.set(address.customer_id, list);
+    }
+    for (const vehicle of vehicleResult.data || []) {
+      const list = vehiclesByCustomer.get(vehicle.customer_id) || [];
+      list.push(vehicle);
+      vehiclesByCustomer.set(vehicle.customer_id, list);
+    }
+  }
+  if (resource === "washers" && role === "super_admin" && rows.length) {
+    const { data, error } = await db.from("washer_payout_accounts")
+      .select("washer_id,account_label,updated_at")
+      .in("washer_id", rows.map(row => row.id));
+    if (error) throw error;
+    for (const payout of data || []) payoutByWasher.set(payout.washer_id, payout);
+  }
+
+  return rows.map(row => {
+    const userId = resource === "supervisors" ? row.id : row.user_id;
+    const profile = profiles.get(userId) || {};
+    const detail = { ...row, full_name: profile.full_name || null, email: emails.get(userId) || null, phone: profile.phone || row.phone || null };
+    if (resource === "customers") {
+      detail.saved_addresses = (addressesByCustomer.get(row.id) || []).map(address => [
+        address.label,
+        [address.address_line, address.tower, address.flat_number, address.landmark, address.city, address.state, address.postal_code].filter(Boolean).join(", "),
+      ].filter(Boolean).join(": ")).join(" | ") || "None saved";
+      detail.vehicles = (vehiclesByCustomer.get(row.id) || []).map(vehicle => [
+        [vehicle.brand, vehicle.model].filter(Boolean).join(" "),
+        vehicle.vehicle_number,
+        vehicle.vehicle_type,
+        vehicle.seating_capacity ? `${vehicle.seating_capacity} seats` : null,
+        vehicle.is_active === false ? "Inactive" : null,
+      ].filter(Boolean).join(" · ")).join(" | ") || "None saved";
+    }
+    // The current schema stores payout beneficiaries only for washers. Do not
+    // imply that supervisors can receive payouts until their payout workflow exists.
+    if (resource === "supervisors") detail.payout_method = "Not configured";
+    if (resource === "washers" && role === "super_admin") {
+      const payout = payoutByWasher.get(row.id);
+      detail.payout_method = payout ? "Bank transfer (RazorpayX)" : "Not configured";
+      detail.payout_destination = payout && /^Bank account •••• \d{4} \([A-Z]{4}0[A-Z0-9]{6}\)$/.test(payout.account_label || "")
+        ? payout.account_label
+        : payout ? "Bank account (linked)" : null;
+      detail.payout_updated_at = payout?.updated_at || null;
+    }
+    return detail;
+  });
+}
+
 export async function listResource(req, res, next) {
   try {
     const spec = specFor(req);
@@ -14,7 +102,11 @@ export async function listResource(req, res, next) {
     if (spec.filter) query = query.eq(...spec.filter);
     const { data, count, error } = await query;
     if (error) throw error;
-    res.json({ success: true, title: spec.title, columns: spec.columns, fields: spec.fields || null, rows: data || [], count: count || 0, page, pageSize: 25 });
+    const rows = await addDirectoryDetails(req.params.resource, data || [], req.profile?.role);
+    const detailColumns = (spec.detailColumns || []).filter(column => column !== "payout_method" || req.profile?.role === "super_admin");
+    const columns = [...spec.columns, ...detailColumns];
+    if (req.params.resource === "washers" && req.profile?.role === "super_admin") columns.push("payout_method", "payout_destination", "payout_updated_at");
+    res.json({ success: true, title: spec.title, columns, fields: spec.fields || null, rows, count: count || 0, page, pageSize: 25 });
   } catch (err) { next(err); }
 }
 export async function saveResource(req, res, next) {

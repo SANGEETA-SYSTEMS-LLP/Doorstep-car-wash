@@ -1,8 +1,10 @@
-import crypto from "crypto";
+import crypto from "node:crypto";
 
 import {
   supabaseAdmin,
 } from "../config/supabase.js";
+
+const SERVICE_PHOTO_BUCKET = "service-photos";
 
 async function getWasher(userId) {
   const {
@@ -10,7 +12,7 @@ async function getWasher(userId) {
     error,
   } = await supabaseAdmin
     .from("washers")
-    .select("id, user_id")
+    .select("id, user_id, is_active")
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -22,6 +24,9 @@ async function getWasher(userId) {
     throw new Error(
       "Washer profile not found."
     );
+  }
+  if (data.is_active === false) {
+    throw new Error("Washer account is inactive.");
   }
 
   return data;
@@ -50,17 +55,19 @@ export async function getSignedServicePhotos(bookingId) {
   if (error) throw error;
 
   return Promise.all((photos || []).map(async (photo) => {
-    if (/^https?:\/\//i.test(photo.photo_url || "")) {
-      return { ...photo, url: photo.photo_url };
+    // Only our generated booking-scoped object paths are eligible for signing.
+    // Never return a persisted arbitrary URL to the browser.
+    if (typeof photo.photo_url !== "string" || !/^[-\w]+\/(before|after)\/[\w.-]+\.(jpg|png|webp)$/i.test(photo.photo_url)) {
+      return null;
     }
 
     const { data, error: signedUrlError } = await supabaseAdmin.storage
-      .from("service-photos")
+      .from(SERVICE_PHOTO_BUCKET)
       .createSignedUrl(photo.photo_url, 60 * 10);
 
     if (signedUrlError) throw signedUrlError;
     return { ...photo, url: data.signedUrl };
-  }));
+  })).then((signedPhotos) => signedPhotos.filter(Boolean));
 }
 
 export async function uploadPhotos(req, res) {
@@ -77,7 +84,7 @@ export async function uploadPhotos(req, res) {
 
     const washer = await getWasher(req.user.id);
     const booking = await getAssignedBooking(bookingId, washer.id);
-    if (type === "before" && !["otp_verified", "service_started"].includes(booking.status)) {
+    if (type === "before" && !["washer_arrived", "otp_verified", "service_started"].includes(booking.status)) {
       return res.status(400).json({ message: "Before photos cannot be uploaded at this stage." });
     }
     if (type === "after" && booking.status !== "service_started") {
@@ -92,7 +99,7 @@ export async function uploadPhotos(req, res) {
       const storagePath = `${bookingId}/${type}/${fileName}`;
 
       const { error: uploadError } = await supabaseAdmin.storage
-        .from("service-photos")
+        .from(SERVICE_PHOTO_BUCKET)
         .upload(storagePath, file.buffer, {
           contentType: file.mimetype,
           upsert: false,
@@ -103,15 +110,15 @@ export async function uploadPhotos(req, res) {
         .from("booking_service_photos")
         .insert({
           booking_id: bookingId,
-          washer_id: washer.id,
           photo_type: type,
           photo_url: storagePath,
+          uploaded_by: req.user.id,
         })
         .select("*")
         .single();
 
       if (photoError) {
-        await supabaseAdmin.storage.from("service-photos").remove([storagePath]);
+        await supabaseAdmin.storage.from(SERVICE_PHOTO_BUCKET).remove([storagePath]);
         throw photoError;
       }
 
@@ -120,10 +127,13 @@ export async function uploadPhotos(req, res) {
 
     return res.json({ success: true, photos: uploadedPhotos });
   } catch (error) {
-    console.error("Service photo upload:", error);
+    console.error("Service photo upload failed", {
+      name: error?.name || "Error",
+      code: typeof error?.code === "string" ? error.code : undefined,
+    });
     return res.status(400).json({
       success: false,
-      message: error.message || "Unable to upload photos.",
+      message: "Unable to upload photos. Please check the booking and try again.",
     });
   }
 }

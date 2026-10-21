@@ -1,3 +1,5 @@
+import { apiRequest } from "../../../services/api";
+import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useBooking } from "../../../context/BookingContext";
 import { supabase } from "../../../services/supabase";
@@ -7,16 +9,25 @@ import ServiceSummary from "./ServiceSummary";
 import ServicePhotos from "./ServicePhotos";
 import ServiceCompletedHero from "./ServiceCompletedHero";
 import ValidationStatus from "./ValidationStatus";
+import CompletionPayment from "./CompletionPayment";
 
 function ServiceCompleted() {
-  const { booking, updateStatus } = useBooking();
+  const { booking, updateBooking, updateStatus } = useBooking();
   const washer = booking.washer;
   const servicePrice = booking.package?.price || 0;
   const [photos, setPhotos] = useState([]);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
   const [photoError, setPhotoError] = useState("");
   const [photoRefresh, setPhotoRefresh] = useState(0);
-  const completed = booking.status === "completed";
+  const completed = ["customer_confirmed", "payment_completed", "closed", "completed"].includes(booking.status);
+  const serviceValidated = Boolean(booking.service_validated_at);
+  const [confirming, setConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState("");
+  async function confirm() {
+    if (confirming) return; setConfirming(true); setConfirmError("");
+    try { const result = await apiRequest(`/customer/bookings/${booking.databaseBookingId}/confirm-service`, {method:"POST"}); updateStatus(result.booking.status); }
+    catch (err) { setConfirmError(err.message); } finally { setConfirming(false); }
+  }
   const updateStatusRef = useRef(updateStatus);
 
   useEffect(() => {
@@ -28,7 +39,14 @@ function ServiceCompleted() {
     let active = true;
     let revision = 0;
     const applyBooking = (updated) => {
-      if (active && updated?.status) updateStatusRef.current(updated.status);
+      if (active && updated?.status) {
+        updateStatusRef.current(updated.status);
+        updateBooking({
+          status: updated.status,
+          service_validated_at: updated.service_validated_at || null,
+          washer: updated.washer || booking.washer,
+        });
+      }
     };
     const refreshBooking = async () => {
       const version = revision;
@@ -114,6 +132,11 @@ function ServiceCompleted() {
         />
 
         <ValidationStatus completed={completed} />
+        {completed && booking.databaseBookingId && <CompletionPayment bookingId={booking.databaseBookingId} onPaid={updateStatus} />}
+        {confirmError && <p role="alert" className="mt-4 text-red-700">{confirmError}</p>}
+        {!completed && booking.databaseBookingId && (serviceValidated ? <button disabled={confirming} onClick={confirm} className="mt-5 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white disabled:opacity-50">{confirming ? "Confirming…" : "Confirm service received"}</button> : <p role="status" className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Your washer has uploaded the service photos. They will be available for confirmation after the washer completes the photo review.</p>)}
+        {booking.status === "customer_confirmed" && <p className="mt-4 text-slate-600">Payment is optional. You can pay now or rate and close your booking without paying.</p>}
+        {["customer_confirmed", "payment_completed", "closed", "completed"].includes(booking.status) && <Link to="/customer/rate-service" className="mt-5 inline-block rounded-xl bg-blue-600 px-6 py-3 text-white">Rate your service</Link>}
       </main>
     </div>
   );

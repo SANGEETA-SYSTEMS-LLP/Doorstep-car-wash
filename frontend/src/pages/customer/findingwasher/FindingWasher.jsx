@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
 import { supabase } from "../../../services/supabase";
 import { getBookingById } from "../../../services/bookingService";
-import { getWasherByUserId } from "../../../services/washerService";
 import FindingWasherMap from "./FindingWasherMap";
 import FindingWasherStatus from "./FindingWasherStatus";
 import FindingWasherHeader from "./FindingWasherHeader";
@@ -24,13 +23,16 @@ function FindingWasher() {
     if (!bookingId) return;
 
     let cancelled = false;
-    let receivedUpdate = false;
+    let revision = 0;
     setError("");
     setDatabaseBooking(null);
 
     const loadAssignedWasher = async (updated) => {
       try {
-        const assignedWasher = await getWasherByUserId(updated.assigned_washer_id);
+        const bookingWithWasher = updated.washer
+          ? updated
+          : await getBookingById(bookingId);
+        const assignedWasher = bookingWithWasher.washer;
         if (cancelled) return;
         if (!assignedWasher) {
           throw new Error("Assigned washer not found.");
@@ -38,12 +40,13 @@ function FindingWasher() {
 
         setWasher({
           id: assignedWasher.id,
-          referenceId: referenceId("WSH", assignedWasher.user_id),
+          referenceId: assignedWasher.referenceId ||
+            referenceId("WSH", assignedWasher.user_id),
           userId: assignedWasher.user_id,
-          name: assignedWasher.profile?.full_name || "Washer Partner",
-          phone: assignedWasher.profile?.phone,
+          name: assignedWasher.name || "Washer Partner",
+          phone: assignedWasher.phone,
           rating: assignedWasher.rating,
-          totalJobs: assignedWasher.total_jobs,
+          totalJobs: assignedWasher.totalJobs,
         });
         updateStatus("washer_assigned");
         navigate("/customer/track-booking");
@@ -54,9 +57,10 @@ function FindingWasher() {
     };
 
     const loadBooking = async () => {
+      const version = revision;
       try {
         const data = await getBookingById(bookingId);
-        if (!cancelled && !receivedUpdate) {
+        if (!cancelled && version === revision) {
           setDatabaseBooking(data);
           if (data?.status === "washer_assigned") {
             await loadAssignedWasher(data);
@@ -64,11 +68,12 @@ function FindingWasher() {
         }
       } catch (error) {
         console.error(error);
-        if (!cancelled && !receivedUpdate) setError("Unable to load booking.");
+        if (!cancelled && version === revision) setError("Unable to load booking.");
       }
     };
 
     loadBooking();
+    const timer = setInterval(loadBooking, 15000);
 
     const channel = supabase
       .channel(`customer-booking-${bookingId}`)
@@ -82,7 +87,7 @@ function FindingWasher() {
         },
         async (payload) => {
           if (cancelled) return;
-          receivedUpdate = true;
+          revision += 1;
           const updated = payload.new;
           setDatabaseBooking(updated);
           setError("");
@@ -97,6 +102,7 @@ function FindingWasher() {
 
     return () => {
       cancelled = true;
+      clearInterval(timer);
       supabase.removeChannel(channel);
     };
   }, [booking.databaseBookingId]);

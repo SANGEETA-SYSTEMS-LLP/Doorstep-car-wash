@@ -1,3 +1,4 @@
+import ResponsiveNavigation from "../components/layout/ResponsiveNavigation";
 import {
   Banknote,
   BriefcaseBusiness,
@@ -16,7 +17,11 @@ import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const adminLinks = [
-  { label: "Refunds and payouts", path: "/admin/finance", icon: Banknote },
+  { label: "Live operations map", path: "/admin/operations", icon: MapPinned },
+  { label: "Customer Support", path: "/admin/support", icon: Users },
+  { label: "Sub Admin", path: "/admin/sub-admin", icon: Users },
+  { label: "Accountant dashboard", path: "/admin/accountant", icon: CircleDollarSign },
+  { label: "Payment confirmations", path: "/admin/finance", icon: Banknote },
   { label: "Invoices", path: "/admin/invoices", icon: ClipboardList },
   { label: "Reports", path: "/admin/reports", icon: Gauge },
   { label: "Dashboard", path: "/admin", icon: Gauge, end: true },
@@ -34,7 +39,7 @@ const adminLinks = [
 ];
 
 const accountantLinks = [
-  { label: "Refunds and payouts", path: "/accountant/finance", icon: Banknote },
+  { label: "Payment confirmations", path: "/accountant/finance", icon: Banknote },
   { label: "Invoices", path: "/accountant/invoices", icon: ClipboardList },
   { label: "Reports", path: "/accountant/reports", icon: Gauge },
   { label: "Payments", path: "/accountant/payments", icon: Banknote },
@@ -47,8 +52,9 @@ export default function StaffConsoleLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const isAccountant = location.pathname.startsWith("/accountant");
-  const links = isAccountant ? accountantLinks : adminLinks;
-  const title = isAccountant ? "Finance Console" : "Admin Console";
+  const isSupport = location.pathname.startsWith("/support");
+  const links = isSupport ? [{ label: "Support tickets", path: "/support", icon: Users }] : isAccountant ? accountantLinks : adminLinks.filter(link => link.path !== "/admin/finance" || profile?.role === "super_admin");
+  const title = isSupport ? "Support Console" : isAccountant ? "Finance Console" : "Admin Console";
 
   async function handleLogout() {
     try {
@@ -60,8 +66,8 @@ export default function StaffConsoleLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <aside className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
+    <div className="flex min-h-screen flex-col bg-slate-50 lg:flex-row">
+      <ResponsiveNavigation title={title}><aside className="sticky top-0 flex h-dvh w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
         <div className="border-b border-slate-200 px-5 py-6">
           <h1 className="text-lg font-black text-slate-900">Doorstep Car Wash</h1>
           <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-blue-600">
@@ -69,7 +75,7 @@ export default function StaffConsoleLayout() {
           </p>
         </div>
         <nav aria-label={`${title} navigation`} className="flex-1 space-y-1 overflow-y-auto p-3">
-          {links.map(({ label, path, icon: Icon, end }) => (
+          {[...links].sort((a,b) => a.path === "/admin" ? -1 : b.path === "/admin" ? 1 : 0).map(({ label, path, icon: Icon, end }) => (
             <NavLink
               key={path}
               to={path}
@@ -99,8 +105,8 @@ export default function StaffConsoleLayout() {
             Logout
           </button>
         </div>
-      </aside>
-      <main className="min-w-0 flex-1 p-5 md:p-8">
+      </aside></ResponsiveNavigation>
+      <main className="min-w-0 flex-1 p-4 sm:p-6 xl:p-10">
         <Outlet />
       </main>
     </div>

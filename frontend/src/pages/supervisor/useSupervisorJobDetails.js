@@ -50,13 +50,13 @@ function useSupervisorJobDetails(bookingId) {
   }, [bookingId, loadJob]);
 
   const handleAssign = async (washerId) => {
-    if (!window.confirm("Accept this booking and assign it to the selected washer?")) return;
+    if (!window.confirm("Send this booking offer to the selected washer?")) return;
     setAssigningId(washerId);
     setError("");
     setSuccess("");
     try {
       await assignWasherToBooking(bookingId, washerId);
-      setSuccess("Booking accepted and washer assigned.");
+      setSuccess("Offer sent. Waiting for the washer to accept.");
       await loadJob();
     } catch (assignError) {
       setError(assignError.message || "Failed to assign washer.");

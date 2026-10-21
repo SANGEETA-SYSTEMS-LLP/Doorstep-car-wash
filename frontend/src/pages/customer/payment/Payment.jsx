@@ -1,25 +1,28 @@
-import { ArrowLeft, LockKeyhole } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { LockKeyhole } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import usePaymentWorkflow from "./usePaymentWorkflow";
-import PaymentMethodsPanel from "./PaymentMethodsPanel";
 import PaymentSummary from "./PaymentSummary";
+import { getCheckoutPriceBreakdown } from "../../../services/checkoutPricing";
 
 function Payment() {
   const navigate = useNavigate();
   const {
     booking,
     paymentError,
-    paymentMethod,
-    upiId,
-    setUpiId,
     processing,
     handlePayment,
-    handlePaymentMethodChange,
   } = usePaymentWorkflow();
+  const checkoutStarted = useRef(false);
   const servicePrice = booking.package?.price || 0;
-  const platformFee = 20;
-  const discount = 20;
-  const total = servicePrice > 0 ? servicePrice + platformFee - discount : 0;
+  const offerDiscount = Number(booking.appliedOffer?.discountAmount || 0);
+  const { platformFee, discountAmount: discount, automaticDiscountAmount, offerDiscountAmount, taxAmount, totalAmount: total } = getCheckoutPriceBreakdown(servicePrice, offerDiscount);
+
+  useEffect(() => {
+    if (checkoutStarted.current) return;
+    checkoutStarted.current = true;
+    void handlePayment();
+  }, [handlePayment]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -39,22 +42,29 @@ function Payment() {
           onClick={() => navigate("/customer/booking-review")}
           className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900"
         >
-          <ArrowLeft size={17} /> Back to booking review
+          Back to booking review
         </button>
         <div className="mt-8 grid gap-7 lg:grid-cols-[1.35fr_0.65fr]">
-          <PaymentMethodsPanel
-            paymentMethod={paymentMethod}
-            onMethodChange={handlePaymentMethodChange}
-            upiId={upiId}
-            setUpiId={setUpiId}
-          />
+          <section className="rounded-3xl border border-slate-200 bg-white p-6">
+            <h2 className="text-xl font-bold text-slate-900">Secure Razorpay checkout</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              Opening Razorpay to complete your payment. Choose an available payment method securely in the gateway.
+            </p>
+            <p role="status" className="mt-5 text-sm font-medium text-blue-700">
+              {processing ? "Connecting to Razorpay…" : paymentError ? "Checkout needs your attention." : "Razorpay checkout is ready."}
+            </p>
+          </section>
           <PaymentSummary
             booking={booking}
             servicePrice={servicePrice}
             platformFee={platformFee}
             discount={discount}
+            automaticDiscountAmount={automaticDiscountAmount}
+            offerDiscountAmount={offerDiscountAmount}
+            offerDiscount={offerDiscount}
+            appliedOffer={booking.appliedOffer}
             total={total}
-            paymentMethod={paymentMethod}
+            taxAmount={taxAmount}
             processing={processing}
             paymentError={paymentError}
             handlePayment={handlePayment}

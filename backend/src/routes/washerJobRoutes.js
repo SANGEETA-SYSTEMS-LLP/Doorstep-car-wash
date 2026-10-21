@@ -18,7 +18,7 @@ import {
   completeService,
 } from "../controllers/washerJobController.js";
 
-import { uploadServicePhotos } from "../middleware/uploadMiddleware.js";
+import { uploadServicePhotos, validateServicePhotoSignatures } from "../middleware/uploadMiddleware.js";
 import { uploadPhotos } from "../controllers/servicePhotoController.js";
 
 import { getChecklist, updateChecklistItem } from "../controllers/checklistController.js";
@@ -66,6 +66,7 @@ router.post(
 router.post(
   "/bookings/:bookingId/photos",
   uploadServicePhotos.array("photos", 5),
+  validateServicePhotoSignatures,
   uploadPhotos
 );
 

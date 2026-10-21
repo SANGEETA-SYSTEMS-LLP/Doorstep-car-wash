@@ -17,3 +17,16 @@ test("a valid signature still requires captured matching currency, amount and or
 test("captured checkout updates payment and triggers completion-aware earnings",async()=>{reset();fixtures.payments=call=>call.steps.some(s=>s[0]==="update")?{data:null}:{data:{id:"payment",amount:500,customer_id:"customer-record",provider_order_id:"order_test",booking_id:"booking"}};const r=await run(verifyPayment,{body:{razorpay_order_id:"order_test",razorpay_payment_id:"pay_test",razorpay_signature:signature()}});assert.equal(r.status,200);assert.equal(earnings,1);});
 test("verification rejects another customer before fetching or changing payment",async()=>{reset();fixtures.payments={data:{customer_id:"other-customer"}};assert.equal((await run(verifyPayment,{body:{razorpay_order_id:"order_test",razorpay_payment_id:"pay_test",razorpay_signature:signature()}})).status,403);assert.equal(earnings,0);});
 test("webhook rejects tampered signatures without database writes",async()=>{reset();const r=await run(razorpayWebhook,{headers:{"x-razorpay-signature":"invalid"},body:Buffer.from('{}')});assert.equal(r.status,400);assert.equal(calls.length,0);});
+
+test("pay-after-service bookings can use Razorpay only after customer confirmation",async()=>{
+ reset();fixtures.bookings.data.payment_method="cod";
+ assert.equal((await run(createPaymentOrder)).status,400);assert.equal(orders,0);
+ fixtures.bookings.data.status="customer_confirmed";
+ fixtures.payments={data:{id:"payment",status:"created",amount:500,provider_order_id:"order_test"}};
+ const result=await run(createPaymentOrder);assert.equal(result.status,200);assert.equal(result.result.orderId,"order_test");
+ reset();fixtures.bookings.data.payment_method="cod";fixtures.bookings.data.status="closed";
+ fixtures.payments={data:{id:"payment",status:"created",amount:500,provider_order_id:"order_test"}};
+ assert.equal((await run(createPaymentOrder)).status,200);
+ fixtures.payments={data:{status:"paid"}};
+ assert.equal((await run(createPaymentOrder)).status,409);
+});

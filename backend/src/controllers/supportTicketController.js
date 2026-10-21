@@ -115,7 +115,7 @@ export async function listSupportTickets(req, res, next) {
     if (error) throw error;
     return res.json({ success: true, tickets: data || [] });
   } catch (error) {
-    return next(error);
+    return handleSupportStorageError(error, res, next);
   }
 }
 
@@ -138,6 +138,6 @@ export async function updateSupportTicket(req, res, next) {
     }
     return res.json({ success: true, ticket: data });
   } catch (error) {
-    return next(error);
+    return handleSupportStorageError(error, res, next);
   }
 }

@@ -11,6 +11,7 @@ import {
 
 import {
   getServiceOtp,
+  getCustomerBookingDetails,
   getPendingExtraCharges,
   respondExtraCharge,
   getServicePhotos,
@@ -19,6 +20,13 @@ import {
 
 const router =
   express.Router();
+
+router.get(
+  "/bookings/:bookingId/details",
+  requireAuth,
+  allowRoles("customer"),
+  getCustomerBookingDetails
+);
 
 router.get(
   "/bookings/:bookingId/service-otp",

@@ -13,8 +13,8 @@ test("finance SQL executes and protects refund/payout reservations",async t=>{
  create table payments(id uuid primary key default gen_random_uuid(),booking_id uuid,customer_id uuid,amount numeric,payment_method text,status text,provider text,provider_payment_id text,paid_at timestamptz);
  create table washer_earnings(id uuid primary key,booking_id uuid,washer_id uuid,washer_amount numeric,status text,settled_at timestamptz);
  `);
- await db.exec(await readFile(new URL("../../supabase/migrations/20261013150000_finance_operations.sql",import.meta.url),"utf8"));
- await db.exec(await readFile(new URL("../../supabase/migrations/20261013152000_payment_idempotency.sql",import.meta.url),"utf8"));
+ await db.exec(await readFile(new URL("../../database-history/supabase-before-cleanup-20261015/migrations/20261013150000_finance_operations.sql",import.meta.url),"utf8"));
+ await db.exec(await readFile(new URL("../../database-history/supabase-before-cleanup-20261015/migrations/20261013152000_payment_idempotency.sql",import.meta.url),"utf8"));
  await db.query("insert into auth.users values($1)",[actor]);await db.query("insert into profiles values($1,'accountant',true)",[actor]);
  await db.query("insert into washers values($1,true,true)",[washer]);
  await db.query("insert into bookings values($1,$2,$3,'online','completed',500)",[booking,actor,washer]);

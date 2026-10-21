@@ -1,20 +1,58 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import BookingSteps from "../../../components/booking/BookingSteps";
-import { useBooking } from "../../../context/BookingContext";
 import BookingReviewContent from "./BookingReviewContent";
+import usePaymentWorkflow from "../payment/usePaymentWorkflow";
+import { useBooking } from "../../../context/BookingContext";
+import { validateCustomerOffer } from "../../../services/customerOfferService";
+import { getCheckoutPriceBreakdown } from "../../../services/checkoutPricing";
 
 function BookingReview() {
-  const { booking } = useBooking();
+  const { booking, paymentError, processing, handlePayment } = usePaymentWorkflow();
+  const { updateBooking } = useBooking();
+  const [offerCode, setOfferCode] = useState(booking.promoCode || "");
+  const [offerError, setOfferError] = useState("");
+  const [offerBusy, setOfferBusy] = useState(false);
   const servicePrice = booking.package?.price || 0;
-  const platformFee = 20;
-  const discount = 20;
-  const total =
-    servicePrice > 0
-      ? servicePrice + platformFee - discount
-      : 0;
+  const offerDiscount = Number(booking.appliedOffer?.discountAmount || 0);
+  const { platformFee, discountAmount: discount, automaticDiscountAmount, offerDiscountAmount, taxAmount, totalAmount: total } = getCheckoutPriceBreakdown(servicePrice, offerDiscount);
 
   const navigate = useNavigate();
+
+  async function applyOffer(event) {
+    event.preventDefault();
+    setOfferError("");
+    if (!booking.vehicle?.id || !booking.package?.id || !booking.schedule?.date?.iso) {
+      setOfferError("Choose your vehicle, package, and service date before applying an offer.");
+      return;
+    }
+    setOfferBusy(true);
+    try {
+      const offer = await validateCustomerOffer({
+        code: offerCode,
+        vehicleId: booking.vehicle.id,
+        packageId: booking.package.id,
+        scheduledDate: booking.schedule.date.iso,
+      });
+      updateBooking({
+        promoCode: offer.code,
+        appliedOffer: { code: offer.code, title: offer.title, discountAmount: Number(offer.discount_amount) },
+      });
+      setOfferCode(offer.code);
+    } catch (error) {
+      updateBooking({ promoCode: null, appliedOffer: null });
+      setOfferError(error.message || "This offer could not be applied.");
+    } finally {
+      setOfferBusy(false);
+    }
+  }
+
+  function removeOffer() {
+    setOfferCode("");
+    setOfferError("");
+    updateBooking({ promoCode: null, appliedOffer: null });
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -46,7 +84,28 @@ function BookingReview() {
           </p>
         </div>
 
-        <BookingReviewContent booking={booking} servicePrice={servicePrice} platformFee={platformFee} discount={discount} total={total} navigate={navigate} />
+        <BookingReviewContent
+          booking={booking}
+          servicePrice={servicePrice}
+          platformFee={platformFee}
+          discount={discount}
+          automaticDiscountAmount={automaticDiscountAmount}
+          offerDiscountAmount={offerDiscountAmount}
+          offerDiscount={offerDiscount}
+          appliedOffer={booking.appliedOffer}
+          offerCode={offerCode}
+          offerError={offerError}
+          offerBusy={offerBusy}
+          onOfferCodeChange={setOfferCode}
+          onApplyOffer={applyOffer}
+          onRemoveOffer={removeOffer}
+          total={total}
+          taxAmount={taxAmount}
+          paymentError={paymentError}
+          processing={processing}
+          onContinue={handlePayment}
+          navigate={navigate}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BookingSteps from "../../../components/booking/BookingSteps";
+import NearbyWashers from "./NearbyWashers";
 import ServiceMap from "../../../components/map/ServiceMap";
 import AddressSearch from "../../../components/map/AddressSearch";
 import { useBooking } from "../../../context/BookingContext";
@@ -81,7 +82,7 @@ export default function SelectLocation() {
     if (!coverage?.available || !validServiceAddress(location) || busy || saveLock.current) return;
     saveLock.current = true; setSaving(true); setError("");
     try {
-      const selected = { ...location, address: location.address.trim(), name: location.address.trim() };
+      const selected = { ...location, address: location.address.trim(), name: location.name || location.address.trim() };
       const latest = await checkCoverage(selected);
       if (!latest.available) { setCoverage(latest); throw new Error("Please select a valid map location."); }
       const saved = await saveServiceAddress(user.id, selected, address, latest.society?.id);
@@ -104,11 +105,12 @@ export default function SelectLocation() {
             <AddressSearch onSelect={selectPosition} disabled={saving} onStart={begin} onError={(message, id) => { if (id === request.current) { setError(message); setBusy(false); } }} />
             <button type="button" disabled={busy || saving} onClick={locate} className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 font-semibold text-blue-800 disabled:opacity-50">{busy ? "Checking selected location…" : "Use current location"}</button>
             <p className="text-sm text-slate-500">Choose a suggestion from the list. Typing a city or state alone does not select a service address.</p>
-            {savedAddresses.length > 0 && <label className="block text-sm font-semibold">Or use a saved address<select value="" disabled={saving} onChange={e => selectSavedAddress(e.target.value)} className={fieldClass}><option value="">Choose saved address</option>{savedAddresses.filter(row => coordinates(row)).map(row => <option key={row.id} value={row.id}>{row.address_line}</option>)}</select></label>}
+            {savedAddresses.length > 0 && <label className="block text-sm font-semibold">Or use a saved address<select value="" disabled={saving} onChange={e => selectSavedAddress(e.target.value)} className={fieldClass}><option value="">Choose saved address</option>{savedAddresses.filter(row => coordinates(row)).map(row => <option key={row.id} value={row.id}>{row.label && row.label !== row.address_line ? `${row.label} — ${row.address_line}` : row.address_line}</option>)}</select></label>}
             {savedError && <p className="text-sm text-amber-800">{savedError}</p>}
           </div>
           <ServiceMap location={location} onSelect={saving ? undefined : selectPosition} className="h-[420px] rounded-b-2xl sm:h-[500px]" />
           <p className="p-4 text-sm text-slate-500">Click the map to move your service pin. The washer will navigate to this point.</p>
+          {coordinates(location) && <NearbyWashers latitude={location.latitude} longitude={location.longitude} />}
         </section>
         <form onSubmit={confirm} className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="text-xl font-bold">Confirm your service address</h2>

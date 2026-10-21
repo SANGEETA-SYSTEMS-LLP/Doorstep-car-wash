@@ -28,9 +28,8 @@ export async function createWasherEarning(
 
   if (
     ![
-      "service_completed",
       "customer_confirmed",
-      "completed",
+      "closed",
       "payment_completed",
     ].includes(booking.status)
   ) {

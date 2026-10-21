@@ -12,9 +12,10 @@ function VehicleForm({ navigate, loading, error, form, handleChange, handleSubmi
         placeholder="OD 02 AB 1234"
       />
       <div>
-        <label className="mb-2 block text-sm font-semibold">Vehicle Type</label>
+        <label htmlFor="vehicleType" className="mb-2 block text-sm font-semibold">Vehicle Type</label>
         <select
           required
+          id="vehicleType"
           name="vehicleType"
           value={form.vehicleType}
           onChange={handleChange}
@@ -25,8 +26,24 @@ function VehicleForm({ navigate, loading, error, form, handleChange, handleSubmi
           <option value="sedan">Sedan</option>
           <option value="suv">SUV</option>
           <option value="luxury">Luxury</option>
+          <option value="other">Others</option>
         </select>
       </div>
+      {form.vehicleType === "other" && (
+        <div>
+          <label htmlFor="customVehicleType" className="mb-2 block text-sm font-semibold">Enter your vehicle type</label>
+          <input
+            required
+            id="customVehicleType"
+            name="customVehicleType"
+            value={form.customVehicleType}
+            onChange={handleChange}
+            maxLength={50}
+            placeholder="e.g. Van, Pickup truck, Minibus"
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 outline-none focus:border-blue-500"
+          />
+        </div>
+      )}
       <div className="grid gap-5 sm:grid-cols-2">
         <Input label="Brand" name="brand" value={form.brand} onChange={handleChange} placeholder="Hyundai" />
         <Input label="Model" name="model" value={form.model} onChange={handleChange} placeholder="Creta" />
@@ -43,6 +60,24 @@ function VehicleForm({ navigate, loading, error, form, handleChange, handleSubmi
             className="w-full rounded-xl border border-slate-300 py-3.5 pl-12 pr-4 outline-none focus:border-blue-500"
           />
         </div>
+      </div>
+      <div>
+        <label htmlFor="seatingCapacity" className="mb-2 block text-sm font-semibold">Seating Capacity</label>
+        <input
+          required
+          id="seatingCapacity"
+          name="seatingCapacity"
+          type="number"
+          min="2"
+          max="20"
+          step="1"
+          inputMode="numeric"
+          value={form.seatingCapacity}
+          onChange={handleChange}
+          placeholder="Enter total seats, including the driver"
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+        />
+        <p className="mt-1.5 text-xs text-slate-500">Enter a whole number from 2 to 20.</p>
       </div>
       {error && (
         <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">

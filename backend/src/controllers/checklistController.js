@@ -2,11 +2,18 @@ import {
   supabaseAdmin,
 } from "../config/supabase.js";
 
+async function assignedWasherId(userId) {
+ const {data,error}=await supabaseAdmin.from("washers").select("id").eq("user_id",userId).maybeSingle();
+ if(error)throw error;
+ if(!data)throw new Error("Washer profile not found.");
+ return data.id;
+}
 export async function getChecklist(
   req,
   res
 ) {
   try {
+    const washerId = await assignedWasherId(req.user.id);
     const {
       bookingId,
     } = req.params;
@@ -16,12 +23,12 @@ export async function getChecklist(
     } = await supabaseAdmin
       .from("bookings")
       .select(
-        "id, washer_id"
+        "id, assigned_washer_id"
       )
       .eq("id", bookingId)
       .eq(
-        "washer_id",
-        req.user.id
+        "assigned_washer_id",
+        washerId
       )
       .maybeSingle();
 
@@ -86,14 +93,15 @@ export async function getChecklist(
 
 export async function updateChecklistItem(req, res) {
   try {
+    const washerId = await assignedWasherId(req.user.id);
     const { bookingId, checklistId } = req.params;
     const { completed } = req.body || {};
 
     const { data: booking, error: bookingError } = await supabaseAdmin
       .from("bookings")
-      .select("id, washer_id, status")
+      .select("id, assigned_washer_id, status")
       .eq("id", bookingId)
-      .eq("washer_id", req.user.id)
+      .eq("assigned_washer_id", washerId)
       .maybeSingle();
 
     if (bookingError) throw bookingError;

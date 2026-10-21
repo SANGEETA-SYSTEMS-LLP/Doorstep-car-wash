@@ -27,6 +27,9 @@ const initialBooking = {
 
   paymentMethod: null,
 
+  promoCode: null,
+  appliedOffer: null,
+
   databaseBookingId: null,
 
   bookingId: null,

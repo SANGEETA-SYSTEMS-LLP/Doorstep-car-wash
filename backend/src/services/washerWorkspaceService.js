@@ -1,10 +1,10 @@
 import { supabaseAdmin as db } from "../config/supabase.js";
 import { referenceId } from "../utils/referenceId.js";
 export const activeJobStatuses = ["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started", "service_completed"];
-const bookingColumns = "id, booking_number, customer_id, address_id, vehicle_id, package_id, assigned_washer_id, scheduled_date, scheduled_start_time, status, total_amount, payment_method, customer_notes, service_address, tower, flat_number, landmark, latitude, longitude, created_at";
+const bookingColumns = "id, booking_number, customer_id, address_id, vehicle_id, package_id, assigned_washer_id, scheduled_date, scheduled_start_time, status, total_amount, customer_notes, created_at";
 
 export async function washerForUser(userId) {
-  const { data, error } = await db.from("washers").select("id, user_id, status, is_active, rating, jobs_completed").eq("user_id", userId).maybeSingle();
+  const { data, error } = await db.from("washers").select("id, user_id, status, is_active, is_verified, rating, jobs_completed").eq("user_id", userId).maybeSingle();
   if (error) throw error;
   if (!data) throw Object.assign(new Error("Washer profile not found."), { status: 404 });
   if (!data.is_active) throw Object.assign(new Error("Your washer account is inactive."), { status: 403 });
@@ -23,7 +23,7 @@ export async function hydrateWasherJobs(bookings, washer) {
   if (!bookings.length) return [];
   const [customers, addresses, vehicles, packages] = await Promise.all([
     records("customers", bookings.map(b => b.customer_id), "id, user_id"),
-    records("customer_addresses", bookings.map(b => b.address_id), "id, address_line, tower, flat_number, landmark, city, state, postal_code, latitude, longitude"),
+    records("customer_addresses", bookings.map(b => b.address_id), "*"),
     records("vehicles", bookings.map(b => b.vehicle_id), "id, brand, model, vehicle_type, vehicle_number, colour"),
     records("service_packages", bookings.map(b => b.package_id), "id, name, description, duration_minutes"),
   ]);
@@ -36,15 +36,15 @@ export async function hydrateWasherJobs(bookings, washer) {
     const address = addresses.get(booking.address_id);
     const paymentRows = (payments || []).filter(p => p.booking_id === booking.id);
     const payment = paymentRows.find(p => ["paid", "captured", "success", "completed"].includes(p.status)) || paymentRows[0];
-    const fullAddress = address ? [address.address_line, address.tower, address.flat_number, address.landmark, address.city, address.state, address.postal_code].filter(Boolean).join(", ") : [booking.service_address, booking.tower, booking.flat_number, booking.landmark].filter(Boolean).join(", ");
+    const fullAddress = address ? [address.address_line, address.tower, address.flat_number, address.landmark, address.city, address.state, address.postal_code].filter(Boolean).join(", ") : "";
     return {
       ...booking,
       customer: { name: profile?.full_name || "Customer", phone: profile?.phone || null, referenceId: referenceId("CUS", customer?.user_id) },
       washerReferenceId: washer.referenceId,
       vehicle: vehicles.get(booking.vehicle_id) || null,
       package: packages.get(booking.package_id) || null,
-      location: { name: address?.address_line || booking.service_address || "Service location", address: fullAddress || "Address unavailable", latitude: address?.latitude ?? booking.latitude, longitude: address?.longitude ?? booking.longitude },
-      payment: { status: payment?.status || "Not recorded", method: payment?.payment_method || booking.payment_method || "Not recorded" },
+      location: { name: address?.address_line || "Service location", address: fullAddress || "Address unavailable", latitude: address?.latitude ?? null, longitude: address?.longitude ?? null },
+      payment: { status: payment?.status || "Not recorded", method: payment?.payment_method || "Not recorded" },
     };
   });
 }

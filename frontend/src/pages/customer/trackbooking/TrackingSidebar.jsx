@@ -21,7 +21,7 @@ function TrackingSidebar({ currentStatus, washer, distance, eta }) {
     <aside className="space-y-5">
             {/* WASHER CARD */}
 
-            <TrackingWasherCard washer={washer} />
+            {washer ? <TrackingWasherCard washer={washer} /> : <div className="rounded-3xl border border-slate-200 bg-white p-6"><p className="text-xs font-bold uppercase tracking-wider text-slate-400">Washer assignment</p><h2 className="mt-3 text-lg font-bold text-slate-900">We’re finding a nearby washer</h2><p className="mt-1 text-sm leading-6 text-slate-500">The washer’s name and contact details will appear here as soon as they accept your booking.</p></div>}
 
             {/* ETA */}
 
@@ -84,7 +84,7 @@ function TrackingSidebar({ currentStatus, washer, distance, eta }) {
               </div>
             </div>
 
-            <div className="flex gap-3 rounded-2xl bg-green-50 p-5">
+            {washer && <div className="flex gap-3 rounded-2xl bg-green-50 p-5">
               <ShieldCheck
                 size={21}
                 className="shrink-0 text-green-600"
@@ -100,7 +100,7 @@ function TrackingSidebar({ currentStatus, washer, distance, eta }) {
                   verification process.
                 </p>
               </div>
-            </div>
+            </div>}
           </aside>
   );
 }

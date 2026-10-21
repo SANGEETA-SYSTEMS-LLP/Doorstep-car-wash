@@ -68,7 +68,9 @@ function WasherNavigation() {
     if (!bookingId) return;
 
     try {
-      await markWasherArrived(bookingId);
+      if (washerState.activeJob?.status !== "washer_arrived") {
+        await markWasherArrived(bookingId);
+      }
       updateJobStatus("washer_arrived");
       navigate(`/washer/jobs/${bookingId}/service`);
     } catch (error) {

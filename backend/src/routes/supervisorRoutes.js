@@ -1,3 +1,7 @@
+import { addSupervisorWasher, linkSupervisorWasher } from "../controllers/supervisorWasherController.js";
+import { listWasherReviews, verifyWasher } from "../controllers/supervisorWasherReviewController.js";
+import { getSupervisorWasherRoster } from "../controllers/supervisorWasherRosterController.js";
+import { acceptSupervisorBooking } from "../controllers/supervisorController.js";
 import { getOperations } from "../controllers/operationsController.js";
 import express from "express";
 
@@ -82,5 +86,11 @@ router.patch(
   reviewExtraCharge
 );
 
+router.post("/jobs/:bookingId/accept", acceptSupervisorBooking);
 router.get("/operations", getOperations);
+router.get("/washer-roster", getSupervisorWasherRoster);
+router.post("/washers", addSupervisorWasher);
+router.post("/washers/link", linkSupervisorWasher);
+router.get("/washers/review", listWasherReviews);
+router.patch("/washers/:washerId/verify", verifyWasher);
 export default router;

@@ -1,5 +1,4 @@
 import { supabaseAdmin } from "../config/supabase.js";
-import { createWasherEarning } from "./earningService.js";
 
 export async function validateServiceCompletion({
   bookingId,
@@ -12,7 +11,7 @@ export async function validateServiceCompletion({
 
   const { data: booking, error: bookingError } = await supabaseAdmin
     .from("bookings")
-    .select("id, assigned_washer_id, status")
+    .select("id, assigned_washer_id, status, service_validated_at")
     .eq("id", bookingId)
     .maybeSingle();
 
@@ -32,8 +31,7 @@ export async function validateServiceCompletion({
     }
   }
 
-  if (booking.status === "completed") {
-    await createWasherEarning(bookingId);
+  if (booking.service_validated_at || ["customer_confirmed", "payment_completed", "closed"].includes(booking.status)) {
     return booking;
   }
 
@@ -58,11 +56,10 @@ export async function validateServiceCompletion({
   const { data: completedBooking, error: updateError } = await supabaseAdmin
     .from("bookings")
     .update({
-      status: "completed",
+      status: "service_completed",
       service_validated_at: now,
       service_validated_by: userId,
       service_validated_role: role,
-      completed_at: now,
       updated_at: now,
     })
     .eq("id", bookingId)
@@ -75,6 +72,5 @@ export async function validateServiceCompletion({
     throw Object.assign(new Error("This booking was already validated."), { status: 409 });
   }
 
-  await createWasherEarning(bookingId);
   return completedBooking;
 }

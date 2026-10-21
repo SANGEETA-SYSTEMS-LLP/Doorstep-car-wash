@@ -1,7 +1,2701 @@
 ◇ injected env (9) from .env
-GET /api/support/my {
-  code: 'PGRST205',
+Washer workspace: {
+  code: '42703',
   details: null,
   hint: null,
-  message: "Could not find the table 'public.support_tickets' in the schema cache"
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Supabase Auth unavailable: {
+  name: 'AuthRetryableFetchError',
+  status: 0,
+  code: undefined,
+  message: 'fetch failed'
+}
+Supabase Auth unavailable: {
+  name: 'AuthRetryableFetchError',
+  status: 0,
+  code: undefined,
+  message: 'fetch failed'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Supabase Auth unavailable: {
+  name: 'AuthRetryableFetchError',
+  status: 0,
+  code: undefined,
+  message: 'fetch failed'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Supabase Auth unavailable: {
+  name: 'AuthRetryableFetchError',
+  status: 0,
+  code: undefined,
+  message: 'fetch failed'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Supabase Auth unavailable: {
+  name: 'AuthRetryableFetchError',
+  status: 0,
+  code: undefined,
+  message: 'fetch failed'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Supabase Auth unavailable: {
+  name: 'AuthRetryableFetchError',
+  status: 0,
+  code: undefined,
+  message: 'fetch failed'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Supabase Auth unavailable: {
+  name: 'AuthRetryableFetchError',
+  status: 0,
+  code: undefined,
+  message: 'fetch failed'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Supabase Auth unavailable: {
+  name: 'AuthRetryableFetchError',
+  status: 0,
+  code: undefined,
+  message: 'fetch failed'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
+}
+Washer workspace: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column bookings.payment_method does not exist'
 }

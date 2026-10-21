@@ -1,0 +1,11 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import {PGlite} from '@electric-sql/pglite';
+test('supervisor adds opted-in washer once and cannot take another supervisor washer',async()=>{const db=new PGlite();try{await db.exec(`create role anon;create role authenticated;create role service_role;create schema auth;create table auth.users(id uuid,raw_user_meta_data jsonb);create table profiles(id uuid primary key,role text,is_active boolean);create table washers(id uuid default gen_random_uuid(),user_id uuid unique,supervisor_id uuid,service_radius_km numeric,status text,is_active boolean,is_verified boolean);
+insert into profiles values('11111111-1111-4111-8111-111111111111','supervisor',true),('22222222-2222-4222-8222-222222222222','customer',true),('33333333-3333-4333-8333-333333333333','supervisor',true);`);
+await db.exec(await readFile(new URL('../../database-history/supabase-before-cleanup-20261015/migrations/20261015130000_supervisor_add_washer.sql',import.meta.url),'utf8'));
+const call="select supervisor_add_washer('11111111-1111-4111-8111-111111111111','22222222-2222-4222-8222-222222222222',5)";
+await assert.rejects(db.query(call),/Washer sign up/);
+await db.exec(`insert into auth.users values('22222222-2222-4222-8222-222222222222','{"requested_role":"washer"}');`);
+await db.query(call);await db.query(call);assert.equal((await db.query('select * from washers')).rows.length,1);assert.equal((await db.query('select is_verified from washers')).rows[0].is_verified,false);
+await assert.rejects(db.query("select supervisor_add_washer('33333333-3333-4333-8333-333333333333','22222222-2222-4222-8222-222222222222',5)"),/another supervisor/);
+await assert.rejects(db.query("select supervisor_add_washer(null,'22222222-2222-4222-8222-222222222222',5)"),/permission/);
+}finally{await db.close();}});

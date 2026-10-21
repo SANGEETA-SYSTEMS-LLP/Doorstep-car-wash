@@ -1,3 +1,4 @@
+import ResponsiveNavigation from "./ResponsiveNavigation";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -49,28 +50,25 @@ function WasherSidebar() {
   };
 
   return (
-    <aside className="hidden min-h-screen w-64 shrink-0 border-r border-slate-200 bg-white lg:flex lg:flex-col">
-      {/* LOGO */}
-
-      <div className="flex h-20 items-center gap-3 border-b border-slate-200 px-6">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
+    <ResponsiveNavigation title="WashNow"><aside className="hidden min-h-screen w-64 shrink-0 flex-col border-r border-slate-200/80 bg-white lg:flex">
+      <div className="flex h-20 items-center gap-3 border-b border-slate-100 px-5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-700 to-cyan-700 text-white shadow-sm">
           <Car size={21} />
         </div>
 
         <div>
-          <p className="font-bold">
+          <p className="font-black tracking-tight text-slate-950">
             WashNow
           </p>
 
-          <p className="text-xs text-slate-400">
-            Washer Partner
+          <p className="text-xs text-slate-500">
+            Partner workspace
           </p>
         </div>
       </div>
 
-      {/* MENU */}
-
-      <nav className="flex-1 space-y-2 p-4">
+      <nav aria-label="Washer workspace" className="flex-1 space-y-1 p-3">
+        <p className="px-3 pb-2 pt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Workspace</p>
         {menuItems.map((item) => {
           const Icon = item.icon;
 
@@ -80,10 +78,10 @@ function WasherSidebar() {
               to={item.path}
               end={item.end}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                `flex items-center gap-3 rounded-xl border px-3.5 py-3 text-sm font-semibold transition ${
                   isActive
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    ? "border-blue-100 bg-blue-50 text-blue-800 shadow-sm shadow-blue-900/[0.03]"
+                    : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-950"
                 }`
               }
             >
@@ -95,11 +93,9 @@ function WasherSidebar() {
         })}
       </nav>
 
-      {/* USER */}
-
-      <div className="border-t border-slate-200 p-4">
-        <div className="mb-4 flex items-center gap-3 rounded-xl bg-slate-50 p-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">
+      <div className="border-t border-slate-100 p-4">
+        <div className="mb-3 flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-800 ring-2 ring-white">
             {initials}
           </div>
 
@@ -108,8 +104,8 @@ function WasherSidebar() {
               {displayName}
             </p>
 
-            <p className="text-xs text-green-600">
-              Verified Washer
+            <p className="text-xs font-medium text-slate-500">
+              {profile?.role === "washer" ? "Washer partner" : "Account"}
             </p>
           </div>
         </div>
@@ -122,7 +118,7 @@ function WasherSidebar() {
           Logout
         </button>
       </div>
-    </aside>
+    </aside></ResponsiveNavigation>
   );
 }
 

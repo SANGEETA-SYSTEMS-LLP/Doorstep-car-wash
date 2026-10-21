@@ -6,12 +6,12 @@ function ValidationStatus({ completed }) {
       <ShieldCheck className="shrink-0 text-green-600" />
       <div>
         <p className="font-semibold text-green-800">
-          {completed ? "Validation complete" : "Waiting for validation"}
+          {completed ? "Service confirmed" : "Review your service"}
         </p>
         <p className="mt-1 text-sm leading-6 text-green-700">
           {completed
             ? "The booking status has been updated for you, the washer, and the supervisor."
-            : "The booking will be marked complete once the washer or supervisor validates the submitted photos."}
+            : "Review the photos and confirm you received the service. The submitted photos must be validated first."}
         </p>
       </div>
     </div>

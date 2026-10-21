@@ -3,91 +3,24 @@ import { supabase } from "./supabase";
 
 export async function createBooking({ userId, booking, requestId }) {
  if(!userId) throw new Error("Sign in to create a booking.");
- const result=await apiRequest("/customer/bookings",{method:"POST",body:JSON.stringify({requestId,addressId:booking.location?.addressId,vehicleId:booking.vehicle?.id,packageId:booking.package?.id,date:convertBookingDate(booking.schedule?.date),time:convertTimeTo24Hour(booking.schedule?.time),paymentMethod:booking.paymentMethod})});
+ const result=await apiRequest("/customer/bookings",{method:"POST",body:JSON.stringify({requestId,addressId:booking.location?.addressId,vehicleId:booking.vehicle?.id,packageId:booking.package?.id,date:convertBookingDate(booking.schedule?.date),time:convertTimeTo24Hour(booking.schedule?.time),paymentMethod:booking.paymentMethod,promoCode:booking.promoCode || null})});
  return result.booking;
 }
 
 export async function getMyBookings(userId) {
-  if (!userId) {
-    return [];
-  }
-
-  const { data: customer, error: customerError } = await supabase
-    .from("customers")
-    .select("id")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (customerError) {
-    throw customerError;
-  }
-  if (!customer) {
-    return [];
-  }
-
-  const { data, error } = await supabase
-    .from("bookings")
-    .select(`
-      *,
-      vehicle:vehicles (
-        id,
-        brand,
-        model,
-        vehicle_number,
-        vehicle_type,
-        colour
-      ),
-      package:service_packages (
-        id,
-        name,
-        description,
-        price,
-        duration_minutes
-      )
-    `)
-    .eq("customer_id", customer.id)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw error;
-  }
-
-  return data || [];
+  if (!userId) return [];
+  const result = await apiRequest("/account/bookings");
+  return result.bookings || [];
 }
-
 export async function getBookingById(bookingId) {
   if (!bookingId) {
     throw new Error("Booking ID is required.");
   }
 
-  const { data, error } = await supabase
-    .from("bookings")
-    .select(`
-      *,
-      vehicle:vehicles (
-        id,
-        brand,
-        model,
-        vehicle_number,
-        vehicle_type,
-        colour
-      ),
-      package:service_packages (
-        id,
-        name,
-        description,
-        price,
-        duration_minutes
-      )
-    `)
-    .eq("id", bookingId)
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
+  const result = await apiRequest(
+    `/customer/bookings/${encodeURIComponent(bookingId)}/details`
+  );
+  return result.booking;
 }
 
 export async function getBookingByNumber(bookingNumber) {

@@ -13,9 +13,11 @@ function AddVehicle() {
   const [form, setForm] = useState({
     vehicleNumber: "",
     vehicleType: "",
+    customVehicleType: "",
     brand: "",
     model: "",
     colour: "",
+    seatingCapacity: "",
   });
 
   const handleChange = (e) => {
@@ -45,6 +47,19 @@ function AddVehicle() {
       return;
     }
 
+    const vehicleType = form.vehicleType === "other"
+      ? form.customVehicleType.trim()
+      : form.vehicleType;
+    if (!vehicleType || vehicleType.length > 50) {
+      setError("Enter your vehicle type (1–50 characters).");
+      return;
+    }
+    const seatingCapacity = Number(form.seatingCapacity);
+    if (!Number.isInteger(seatingCapacity) || seatingCapacity < 2 || seatingCapacity > 20) {
+      setError("Enter a valid seating capacity from 2 to 20.");
+      return;
+    }
+
     try {
       setLoading(true);
       setError("");
@@ -52,10 +67,11 @@ function AddVehicle() {
       await createVehicle({
         userId: user.id,
         vehicleNumber: form.vehicleNumber,
-        vehicleType: form.vehicleType,
+        vehicleType,
         brand: form.brand,
         model: form.model,
         colour: form.colour,
+        seatingCapacity,
       });
 
       navigate("/customer/vehicles", { replace: true });

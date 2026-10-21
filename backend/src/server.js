@@ -14,13 +14,9 @@ const { processExpiredAssignments } =
 const PORT =
   process.env.PORT || 5000;
 
-const localTestMode =
-  process.env.NODE_ENV === "development" &&
-  process.env.TEST_MODE === "true";
-
 app.listen(
   PORT,
-  localTestMode ? "127.0.0.1" : "0.0.0.0",
+  process.env.NODE_ENV === "development" ? "127.0.0.1" : "0.0.0.0",
   () => {
     console.log(
       `API running on port ${PORT}`

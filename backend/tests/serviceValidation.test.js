@@ -75,11 +75,11 @@ test("supervisor validates submitted after photos and completes the booking", as
     role: "supervisor",
   });
 
-  assert.equal(result.status, "completed");
-  assert.equal(updatePayload.status, "completed");
+  assert.equal(result.status, "service_completed");
+  assert.equal(updatePayload.status, "service_completed");
   assert.equal(updatePayload.service_validated_by, "supervisor-user");
   assert.equal(updatePayload.service_validated_role, "supervisor");
-  assert.equal(earningCalls, 1);
+  assert.equal(earningCalls, 0);
 });
 
 test("only the assigned washer can validate as a washer", async () => {

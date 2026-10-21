@@ -5,6 +5,13 @@ import {
 const API_URL =
   import.meta.env.VITE_API_URL;
 
+let refreshing;
+async function refreshAccessToken() {
+  refreshing ??= supabase.auth.refreshSession().finally(() => { refreshing = null; });
+  const { data, error } = await refreshing;
+  if (error) return null;
+  return data.session?.access_token || null;
+}
 async function getAccessToken() {
   const {
     data: { session },
@@ -26,7 +33,7 @@ export async function apiRequest(
 
   const isFormData = options.body instanceof FormData;
 
-  const response =
+  let response =
     await fetch(
       `${API_URL}${endpoint}`,
       {
@@ -49,6 +56,13 @@ export async function apiRequest(
       }
     );
 
+  if (response.status === 401 && token) {
+    const renewed = await refreshAccessToken();
+    if (renewed) response = await fetch(API_URL + endpoint, {
+      ...options,
+      headers: { ...(!isFormData ? {"Content-Type":"application/json"} : {}), ...options.headers, Authorization: "Bearer " + renewed },
+    });
+  }
   let data = null;
 
   try {
@@ -59,10 +73,7 @@ export async function apiRequest(
   }
 
   if (!response.ok) {
-    throw new Error(
-      data?.message ||
-        `Request failed (${response.status})`
-    );
+    throw Object.assign(new Error(data?.message || `Request failed (${response.status})`), { status: response.status });
   }
 
   return data;

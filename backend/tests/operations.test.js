@@ -1,6 +1,8 @@
 import {test,mock} from "node:test";
 import assert from "node:assert/strict";
 const now=Date.now();const tables={washers:[{id:"fresh",status:"available"},{id:"stale",status:"available"}],washer_locations:[{id:"loc1",washer_id:"fresh",latitude:17,longitude:78,updated_at:new Date(now).toISOString()},{id:"loc2",washer_id:"stale",latitude:17,longitude:78,updated_at:new Date(now-600000).toISOString()}],bookings:[{id:"late",status:"pending",assigned_washer_id:null,scheduled_date:"2020-01-01",scheduled_start_time:"09:00:00"},{id:"started",status:"service_started",scheduled_date:"2020-01-01",scheduled_start_time:"09:00:00"}]};
-mock.module("../src/config/supabase.js",{namedExports:{supabaseAdmin:{from(table){const q={};for(const method of ["select","eq","not","order"])q[method]=()=>q;q.range=async()=>({data:tables[table]});return q;}}}});
+mock.module("../src/config/supabase.js",{namedExports:{supabaseAdmin:{from(table){const q={};for(const method of ["select","eq","not","order"])q[method]=()=>q;q.not=(column,operator,value)=>{assert.equal(column,"status");assert.equal(value,"(closed,cancelled,payment_completed)");return q;};q.range=async()=>({data:tables[table]});return q;}}}});
 const {getOperations}=await import("../src/controllers/operationsController.js");
 test("operations flags stale washer positions and only delays unstarted jobs",async()=>{let result,error;await getOperations({}, {json(data){result=data;}},e=>{error=e;});assert.equal(error,undefined);assert.equal(result.washers[0].stale,false);assert.equal(result.washers[1].stale,true);assert.equal(result.jobs[0].delayed,true);assert.equal(result.jobs[1].delayed,false);});
+
+test("operations also excludes legacy completed records without querying an unsupported enum",async()=>{tables.bookings.push({id:"done",status:"completed"});let result;await getOperations({}, {json(data){result=data;}},e=>{throw e;});assert.equal(result.jobs.some(job=>job.id==="done"),false);});

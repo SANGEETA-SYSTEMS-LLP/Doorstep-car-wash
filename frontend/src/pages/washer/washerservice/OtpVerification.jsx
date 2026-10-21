@@ -12,8 +12,7 @@ function OtpVerification({ otp, setOtp, verifyOtp, error }) {
             </h2>
 
             <p className="mt-2 leading-6 text-slate-500">
-              Ask the customer for the 6-digit service
-              verification OTP before starting the wash.
+              {import.meta.env.DEV ? "Development mode: enter any 6 digits to continue testing." : "Ask the customer for the 6-digit service verification OTP before starting the wash."}
             </p>
 
             <input

@@ -1,54 +1,30 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { loadGoogleMaps, coordinates } from "../../services/maps";
-
-export default function ServiceMap({ location, washerLocation, onSelect, path, points, className = "h-96" }) {
-  const container = useRef(null);
-  const callback = useRef(onSelect);
-  const [instance, setInstance] = useState(null);
-  const [error, setError] = useState("");
-  const latitude = location?.latitude;
-  const longitude = location?.longitude;
-  const customer = useMemo(() => coordinates({ latitude, longitude }), [latitude, longitude]);
-  const washer = useMemo(() => coordinates(washerLocation), [washerLocation]);
-  useEffect(() => { callback.current = onSelect; }, [onSelect]);
-  useEffect(() => {
-    let active = true;
-    let click;
-    loadGoogleMaps().then(async maps => {
-      const { Map } = await maps.importLibrary("maps");
-      await maps.importLibrary("marker");
-      if (!active) return;
-      const map = new Map(container.current, {
-        center: { lat: 20.5937, lng: 78.9629 }, zoom: 5,
-        mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID",
-        streetViewControl: false, mapTypeControl: false,
-      });
-      click = map.addListener("click", event => {
-        if (event.latLng) callback.current?.(event.latLng.toJSON());
-      });
-      setInstance(map);
-    }).catch(err => { if (active) setError(err.message); });
-    return () => { active = false; click?.remove(); };
-  }, []);
-
-  useEffect(() => {
-    if (!instance) return;
-    const maps = window.google.maps;
-    const markers = [];
-    const bounds = new maps.LatLngBounds();
-    for (const [position, title] of [[customer, "Service location"], [washer, "Washer location"], ...(points || []).map(point => [coordinates(point), point.title])]) {
-      if (!position) continue;
-      markers.push(new maps.marker.AdvancedMarkerElement({ map: instance, position, title }));
-      bounds.extend(position);
-    }
-    if (markers.length > 1) instance.fitBounds(bounds, 70);
-    else if (markers.length) { instance.panTo(markers[0].position); instance.setZoom(16); }
-    const line = path?.length ? new maps.Polyline({ map: instance, path, strokeColor: "#2563eb", strokeWeight: 5 }) : null;
-    return () => { markers.forEach(marker => { marker.map = null; }); line?.setMap(null); };
-  }, [instance, customer, washer, path, points]);
-
-  return <div className={"relative overflow-hidden bg-slate-100 " + className}>
-    <div ref={container} className="h-full w-full" aria-label="Service location map" />
-    {!instance && <div role={error ? "alert" : "status"} className="absolute inset-0 flex items-center justify-center p-8 text-center text-slate-600">{error || "Loading map..."}</div>}
-  </div>;
+import { useEffect, useRef } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { coordinates } from "../../services/maps";
+export default function ServiceMap({location, washerLocation, onSelect, path, points, className="h-96"}) {
+ const container=useRef(null), map=useRef(null), callback=useRef(onSelect);
+ useEffect(()=>{callback.current=onSelect;},[onSelect]);
+ useEffect(()=>{
+  const instance=L.map(container.current).setView([20.5937,78.9629],5); map.current=instance;
+  L.tileLayer(import.meta.env.VITE_MAP_TILE_URL || "https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:import.meta.env.VITE_MAP_ATTRIBUTION || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(instance);
+  instance.on("click",event=>callback.current?.({lat:event.latlng.lat,lng:event.latlng.lng}));
+  const observer=new ResizeObserver(()=>instance.invalidateSize()); observer.observe(container.current);
+  return ()=>{observer.disconnect();instance.remove();map.current=null;};
+ },[]);
+ useEffect(()=>{
+  if(!map.current)return;
+  const group=L.layerGroup().addTo(map.current), positions=[];
+  for(const [value,title,color] of [[location,"Service location","#2563eb"],[washerLocation,"Washer location","#059669"],...(points || []).map(point=>[point,point.title,"#7c3aed"])]) {
+   const p=coordinates(value); if(!p)continue;
+   positions.push([p.lat,p.lng]);
+   const label=document.createElement("span");label.textContent=value.name || title || "Location";
+   L.circleMarker([p.lat,p.lng],{radius:9,color:"white",weight:3,fillColor:color,fillOpacity:1}).bindTooltip(label).addTo(group);
+  }
+  if(positions.length>1)map.current.fitBounds(positions,{padding:[50,50],maxZoom:16});
+  else if(positions.length)map.current.setView(positions[0],16);
+  if(path?.length)L.polyline(path.map(p=>Array.isArray(p)?p:[p.lat,p.lng]),{color:"#2563eb",weight:5}).addTo(group);
+  return ()=>group.remove();
+ },[location,washerLocation,points,path]);
+ return <div className={"relative z-0 overflow-hidden bg-slate-100 "+className}><div ref={container} className="h-full w-full" aria-label="Service location map"/></div>;
 }

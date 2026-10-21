@@ -2,8 +2,9 @@ import { Link } from "react-router-dom";
 import { isPackageForVehicle } from "../../../utils/packageCompatibility";
 import { LockKeyhole, ShieldCheck } from "lucide-react";
 import SummaryRow from "./SummaryRow";
+import { GST_RATE_PERCENT, formatRupees } from "../../../services/checkoutPricing";
 
-function PaymentSummary({ booking, servicePrice, platformFee, discount, total, paymentMethod, processing, paymentError, handlePayment }) {
+function PaymentSummary({ booking, servicePrice, platformFee, discount, offerDiscount = 0, appliedOffer, total, taxAmount, processing, paymentError, handlePayment }) {
   const compatible = isPackageForVehicle(booking.package, booking.vehicle);
   return (
     <aside>
@@ -31,19 +32,16 @@ function PaymentSummary({ booking, servicePrice, platformFee, discount, total, p
               <div className="mt-5 space-y-4 text-sm">
                 <SummaryRow
                   label="Service amount"
-                  value={`₹${servicePrice}`}
+                  value={formatRupees(servicePrice)}
                 />
 
                 <SummaryRow
                   label="Platform fee"
-                  value={`₹${platformFee}`}
+                  value={formatRupees(platformFee)}
                 />
 
-                <SummaryRow
-                  label="Discount"
-                  value={`-₹${discount}`}
-                  green
-                />
+                {discount > 0 && <SummaryRow label={appliedOffer ? `${appliedOffer.code} offer` : "Discount"} value={`-${formatRupees(discount)}`} green />}
+                <SummaryRow label={`GST (${GST_RATE_PERCENT}%)`} value={formatRupees(taxAmount)} />
               </div>
 
               <div className="my-5 border-t border-dashed border-slate-200" />
@@ -55,12 +53,12 @@ function PaymentSummary({ booking, servicePrice, platformFee, discount, total, p
                   </p>
 
                   <p className="mt-1 text-xs text-slate-400">
-                    Inclusive of taxes
+                    Includes GST at {GST_RATE_PERCENT}%
                   </p>
                 </div>
 
                 <p className="text-3xl font-bold">
-                  ₹{total}
+                  {formatRupees(total)}
                 </p>
               </div>
 
@@ -82,10 +80,8 @@ function PaymentSummary({ booking, servicePrice, platformFee, discount, total, p
                     <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
                     Processing...
                   </>
-                ) : paymentMethod === "cod" ? (
-                  "Confirm Booking"
                 ) : (
-                  `Pay ₹${total}`
+                  `Open Razorpay · ${formatRupees(total)}`
                 )}
               </button>
 

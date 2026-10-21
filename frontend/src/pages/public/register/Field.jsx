@@ -10,7 +10,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-semibold text-slate-700">
+      <label htmlFor={name} className="mb-2 block text-sm font-semibold text-slate-700">
         {label}
       </label>
 
@@ -20,6 +20,8 @@ function Field({
         </div>
 
         <input
+          id={name}
+          autoComplete={({ fullName: "name", phone: "tel", email: "email" })[name]}
           required
           type={type}
           name={name}

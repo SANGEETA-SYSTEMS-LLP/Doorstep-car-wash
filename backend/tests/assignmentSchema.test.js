@@ -2,6 +2,7 @@ import { test, mock } from "node:test";
 import assert from "node:assert/strict";
 let calls = [];
 let assigned = false;
+let bookingStatus = "finding_washer";
 const db = { from(table) {
   const call = { table, steps: [] }; calls.push(call);
   const query = {};
@@ -11,9 +12,9 @@ const db = { from(table) {
     if (table === "bookings") {
       if (call.steps.some(s => s[0] === "update")) data = null;
       else if (call.steps.some(s => s[0] === "eq" && s[1] === "assigned_washer_id")) data = [];
-      else data = { id: "booking", booking_number: "CW-1", status: "finding_washer", assigned_washer_id: assigned ? "another-washer" : null, latitude: 17, longitude: 78, scheduled_date: "2026-10-13", scheduled_start_time: "10:00:00", package: { service_id: "service", duration_minutes: 30 } };
+      else data = { id: "booking", booking_number: "CW-1", status: bookingStatus, assigned_washer_id: assigned ? "another-washer" : null, latitude: 17, longitude: 78, scheduled_date: "2026-10-13", scheduled_start_time: "10:00:00", package: { service_id: "service", duration_minutes: 30 } };
     }
-    if (table === "washers") data = [{ id: "washer-record", user_id: "washer-account", is_active: true, status: "available", jobs_completed: 10, service_radius_km: 5, rating: 4.8, skills: [{ service_id: "service" }], location: { latitude: 17, longitude: 78, updated_at: new Date().toISOString() } }];
+    if (table === "washers") data = [{ id: "washer-record", user_id: "washer-account", is_active: true, status: "available", jobs_completed: 10, service_radius_km: 5, rating: 4.8, availability: [{ day_of_week: 2, start_time: "08:00:00", end_time: "18:00:00", is_available: true }], skills: [{ service_id: "service" }], location: { latitude: 17, longitude: 78, updated_at: new Date().toISOString() } }];
     if (table === "booking_assignments") data = call.steps.some(s => s[0] === "upsert") ? { id: "offer" } : [];
     return Promise.resolve({ data }).then(resolve, reject);
   };
@@ -43,4 +44,10 @@ test("already assigned booking does not create another offer", async () => {
   calls = []; assigned = true;
   await assert.rejects(assignWasherToBooking("booking"), /already has an assigned washer/);
   assert.ok(!calls.some(c => c.table === "booking_assignments"));
+});
+
+test("pending bookings cannot bypass supervisor review through automatic assignment", async () => {
+ calls=[];assigned=false;bookingStatus="pending";
+ try { await assert.rejects(assignWasherToBooking("booking"),/cannot be assigned/); assert.equal(calls.length,1); }
+ finally {bookingStatus="finding_washer";}
 });

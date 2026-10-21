@@ -1,4 +1,5 @@
 import express from "express";
+import { getCustomerPaymentOptions } from "../controllers/customerPaymentOptionsController.js";
 
 import {
   requireAuth,
@@ -16,6 +17,7 @@ import {
 
 const router =
   express.Router();
+router.get("/bookings/:bookingId/options", requireAuth, allowRoles("customer"), getCustomerPaymentOptions);
 
 router.post(
   "/bookings/:bookingId/order",

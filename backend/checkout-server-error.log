@@ -1,0 +1,7 @@
+◇ injected env (9) from .env
+POST /api/customer/bookings {
+  code: '22P02',
+  details: null,
+  hint: null,
+  message: 'invalid input value for enum booking_status: "booking_update"'
+}

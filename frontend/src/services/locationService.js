@@ -1,39 +1,41 @@
 import { validServiceAddress } from "./locationSelection";
 import { apiRequest } from "./api";
-import { supabase } from "./supabase";
 
 export function checkCoverage(location) {
   return apiRequest("/locations/coverage?" + new URLSearchParams({ latitude: location.latitude, longitude: location.longitude }));
 }
-
+function requireUser(userId) {
+  if (!userId) throw new Error("Please sign in to manage addresses.");
+}
 export async function saveServiceAddress(userId, location, address = {}, societyId) {
+  requireUser(userId);
   if (!validServiceAddress(location)) throw new Error("Select a map pin and enter a complete street address.");
-  const { data: customer, error: customerError } = await supabase.from("customers").select("id").eq("user_id", userId).maybeSingle();
-  if (customerError) throw customerError;
-  if (!customer) throw new Error("Your customer profile is not ready. Please contact support.");
-  const payload = {
-    customer_id: customer.id, label: "Service location", address_line: location.address,
+  return apiRequest("/account/addresses", { method: "POST", body: JSON.stringify({
+    address_id: location.addressId || null,
+    label: location.name?.trim() || "Service location", address_line: location.address.trim(),
     society_id: societyId || null, tower: address.tower || null, flat_number: address.flatNumber || null,
     landmark: address.landmark || null, city: location.city || null, state: location.state || null,
-    postal_code: location.postalCode || null, latitude: location.latitude, longitude: location.longitude,
-  };
-  if (location.addressId) {
-    const { data: existing, error: lookupError } = await supabase.from("customer_addresses").select("*").eq("id", location.addressId).eq("customer_id", customer.id).maybeSingle();
-    if (lookupError) throw lookupError;
-    const unchanged = existing && Object.entries(payload).every(([key, value]) => key === "label" || (["latitude", "longitude"].includes(key) ? Number(existing[key]) === Number(value) : (existing[key] || null) === (value || null)));
-    if (unchanged) return { id: existing.id };
-  }
-  const { data, error } = await supabase.from("customer_addresses").insert(payload).select("id").single();
-  if (error) throw error;
-  return data;
+    postal_code: location.postalCode || null, latitude: Number(location.latitude), longitude: Number(location.longitude),
+  }) });
 }
-
 export async function getSavedAddresses(userId) {
   if (!userId) return [];
-  const { data: customer, error: customerError } = await supabase.from("customers").select("id").eq("user_id", userId).maybeSingle();
-  if (customerError) throw customerError;
-  if (!customer) return [];
-  const { data, error } = await supabase.from("customer_addresses").select("id,address_line,label,latitude,longitude,city,state,postal_code,tower,flat_number,landmark").eq("customer_id", customer.id).order("created_at", { ascending: false }).limit(50);
-  if (error) throw error;
-  return data || [];
+  const result = await apiRequest("/account/customer/addresses");
+  return result.rows || [];
+}
+export async function updateSavedAddress(userId, addressId, location) {
+  requireUser(userId);
+  if (!validServiceAddress(location)) throw new Error("Select a location and enter a complete address (10–500 characters).");
+  return apiRequest(`/account/addresses/${encodeURIComponent(addressId)}`, { method: "PATCH", body: JSON.stringify({
+    label: location.label?.trim() || "Home", address_line: location.address.trim(),
+    latitude: Number(location.latitude), longitude: Number(location.longitude),
+    city: location.city?.trim() || null, state: location.state?.trim() || null,
+    postal_code: location.postalCode?.trim() || null, tower: location.tower?.trim() || null,
+    flat_number: location.flatNumber?.trim() || null, landmark: location.landmark?.trim() || null,
+    society_id: null,
+  }) });
+}
+export async function deleteSavedAddress(userId, addressId) {
+  requireUser(userId);
+  return apiRequest(`/account/addresses/${encodeURIComponent(addressId)}`, { method: "DELETE" });
 }

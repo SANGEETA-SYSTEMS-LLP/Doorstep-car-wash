@@ -1,3 +1,4 @@
+import { getBookingById } from "../../../services/bookingService";
 import useDrivingRoute from "../../../hooks/useDrivingRoute";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -10,8 +11,10 @@ import TrackingHeader from "./TrackingHeader";
 import LiveLocationInfo from "./LiveLocationInfo";
 
 function TrackBooking() {
-  const { booking, updateStatus } = useBooking();
-  const washer = booking.washer;
+  const { booking, updateStatus, setWasher } = useBooking();
+  const [assignedWasher, setAssignedWasher] = useState(null);
+  const [contactError, setContactError] = useState("");
+  const washer = assignedWasher;
   const navigate = useNavigate();
 
   const [currentStatus, setCurrentStatus] = useState(booking.status);
@@ -22,6 +25,28 @@ function TrackBooking() {
     if (!bookingId) return;
 
     let cancelled = false;
+    let pending = false;
+    setAssignedWasher(null);
+    const refreshContact = async () => {
+      if (pending) return; pending = true;
+      try {
+        const fresh = await getBookingById(bookingId);
+        if (!cancelled) {
+          setAssignedWasher(fresh.washer || null);
+          setWasher(fresh.washer || null);
+          setCurrentStatus(fresh.status);
+          updateStatus(fresh.status);
+          setContactError("");
+          if (fresh.status === "washer_arrived") navigate("/customer/washer-arrived", { replace: true });
+          if (["service_completed", "customer_confirmed", "payment_completed", "closed", "completed"].includes(fresh.status)) {
+            navigate("/customer/service-completed", { replace: true });
+          }
+        }
+      } catch (err) { if (!cancelled) setContactError("Unable to refresh washer contact details. Retrying shortly."); }
+      finally { pending = false; }
+    };
+    refreshContact();
+    const timer = setInterval(refreshContact, 15000);
     const channel = supabase
       .channel(`tracking-booking-${bookingId}`)
       .on(
@@ -34,11 +59,13 @@ function TrackBooking() {
         },
         (payload) => {
           if (cancelled) return;
+          refreshContact();
           const status = payload.new.status;
           setCurrentStatus(status);
           updateStatus(status);
-          if (status === "washer_arrived") {
-            navigate("/customer/washer-arrived");
+          if (status === "washer_arrived") navigate("/customer/washer-arrived", { replace: true });
+          if (["service_completed", "customer_confirmed", "payment_completed", "closed", "completed"].includes(status)) {
+            navigate("/customer/service-completed", { replace: true });
           }
         }
       )
@@ -46,12 +73,13 @@ function TrackBooking() {
 
     return () => {
       cancelled = true;
+      clearInterval(timer);
       supabase.removeChannel(channel);
     };
   }, [booking.databaseBookingId]);
 
   useEffect(() => {
-    const washerId = booking.washer?.id;
+    const washerId = assignedWasher?.id;
     let active = true;
 
     if (!washerId) {
@@ -98,7 +126,7 @@ function TrackBooking() {
       clearInterval(locationPoll);
       supabase.removeChannel(channel);
     };
-  }, [booking.washer?.id]);
+  }, [assignedWasher?.id]);
 
   const { distance, eta, path, error: routeError } = useDrivingRoute(washerLocation, booking.location);
 
@@ -106,9 +134,10 @@ function TrackBooking() {
     <div className="min-h-screen bg-slate-50">
       {/* HEADER */}
 
-      <TrackingHeader booking={booking} currentStatus={currentStatus} navigate={navigate} />
+      <TrackingHeader booking={booking} washer={washer} currentStatus={currentStatus} navigate={navigate} />
 
       <main className="mx-auto max-w-7xl p-6 lg:p-8">
+        {contactError && <p role="status" className="mb-4 text-sm text-amber-700">{contactError}</p>}
         <LiveLocationInfo location={washerLocation} />
 
         <div className="grid gap-6 xl:grid-cols-[1.5fr_0.7fr]">

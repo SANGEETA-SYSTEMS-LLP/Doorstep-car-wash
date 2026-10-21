@@ -2,7 +2,26 @@ import { CalendarDays, Car, Clock3, MapPin, Sparkles } from "lucide-react";
 import ReviewCard from "./ReviewCard";
 import PriceSummary from "./PriceSummary";
 
-function BookingReviewContent({ booking, servicePrice, platformFee, discount, total, navigate }) {
+function BookingReviewContent({
+  booking,
+  servicePrice,
+  platformFee,
+  discount,
+  offerDiscount,
+  appliedOffer,
+  offerCode,
+  offerError,
+  offerBusy,
+  onOfferCodeChange,
+  onApplyOffer,
+  onRemoveOffer,
+  total,
+  taxAmount,
+  paymentError,
+  processing,
+  onContinue,
+  navigate,
+}) {
   return (
     <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
           <div className="space-y-5">
@@ -91,6 +110,21 @@ function BookingReviewContent({ booking, servicePrice, platformFee, discount, to
                 </p>
               </div>
             </ReviewCard>
+
+            <ReviewCard icon={<Sparkles />} title="Offer code">
+              {appliedOffer ? (
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-sm text-emerald-700"><span className="font-semibold">{appliedOffer.code}</span> applied · save ₹{offerDiscount}</p>
+                  <button type="button" onClick={onRemoveOffer} className="text-sm font-semibold text-slate-600 underline">Remove</button>
+                </div>
+              ) : (
+                <form onSubmit={onApplyOffer} className="flex flex-col gap-3 sm:flex-row">
+                  <input value={offerCode} onChange={(event) => onOfferCodeChange(event.target.value.toUpperCase())} aria-label="Offer code" placeholder="Enter offer code" maxLength={40} className="min-h-11 flex-1 rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-slate-500" />
+                  <button type="submit" disabled={offerBusy || !offerCode.trim()} className="min-h-11 rounded-lg border border-slate-300 px-4 text-sm font-semibold text-slate-800 disabled:opacity-50">{offerBusy ? "Checking…" : "Apply offer"}</button>
+                </form>
+              )}
+              {offerError && <p role="alert" className="mt-3 text-sm text-red-700">{offerError}</p>}
+            </ReviewCard>
           </div>
 
           {/* PAYMENT SUMMARY */}
@@ -100,7 +134,13 @@ function BookingReviewContent({ booking, servicePrice, platformFee, discount, to
             servicePrice={servicePrice}
             platformFee={platformFee}
             discount={discount}
+            offerDiscount={offerDiscount}
+            appliedOffer={appliedOffer}
             total={total}
+            taxAmount={taxAmount}
+            paymentError={paymentError}
+            processing={processing}
+            onContinue={onContinue}
             navigate={navigate}
           />
         </div>

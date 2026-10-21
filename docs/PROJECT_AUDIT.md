@@ -1,3 +1,5 @@
+> Current document comparison: [15 October 2026 requirements audit](./REQUIREMENTS_AUDIT_2026-10-15.md). Older snapshots below include stale route and configuration claims.
+
 > Latest booking/finance implementation and remaining live prerequisites: [BOOKING_FINANCE_SETUP.md](./BOOKING_FINANCE_SETUP.md). This follow-up supersedes older missing-feature notes below for the operations map, finance transaction UI, service invoices and operational reports. New finance migrations are not yet applied to hosted Supabase.
 
 # Project completion audit — 13 October 2026
@@ -73,7 +75,7 @@ Live checks still required:
 - Customer sees fresh washer markers and real route estimates; navigation targets the actual booking address.
 - Arrival, OTP, photos, checklist, completion, customer confirmation and earnings all persist correctly.
 - Supervisor resolves escalation by real assignment; extra charges require both approvals exactly once after the new migration is applied and tested against Supabase.
-- Cross-role and cross-customer requests are rejected outside explicit local test mode.
+- Cross-role and cross-customer requests are rejected by backend authorization.
 
 No claim of full completion should be made until the queue and live acceptance checks are complete.
 

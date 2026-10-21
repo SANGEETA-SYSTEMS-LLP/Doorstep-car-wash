@@ -62,6 +62,12 @@ function BookingHistoryCard({ booking, onDetails }) {
                 <span className="line-clamp-1">{booking.service_address}</span>
               </p>
             )}
+            {booking.washer && (
+              <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+                <span className="font-semibold">Washer: {booking.washer.name}</span>
+                {booking.washer.phone && <a className="ml-2 underline" href={`tel:${String(booking.washer.phone).replace(/[^+0-9]/g, "")}`}>{booking.washer.phone}</a>}
+              </div>
+            )}
           </div>
         </div>
 

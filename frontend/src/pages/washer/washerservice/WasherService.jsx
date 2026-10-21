@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useWasher } from "../../../context/WasherContext";
 import useServiceChecklist from "./useServiceChecklist";
@@ -24,9 +24,14 @@ function WasherService() {
     if (serviceCompleted) return "completed";
     if (afterPhotosAdded) return "after";
     if (serviceStarted) return "service";
-    if (beforePhotosAdded || otpVerified) return "before";
+    if (beforePhotosAdded || otpVerified || activeJob?.status === "washer_arrived") return "before";
     return "otp";
   });
+  useEffect(() => {
+    if (activeJob?.status === "washer_arrived") {
+      setStage((current) => current === "otp" ? "before" : current);
+    }
+  }, [activeJob?.status]);
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);

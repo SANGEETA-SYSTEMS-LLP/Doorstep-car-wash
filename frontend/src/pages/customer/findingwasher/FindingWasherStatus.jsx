@@ -17,16 +17,15 @@ function FindingWasherStatus({ booking, databaseBooking, navigate, washerFound }
 
                   <div className="mt-5 text-center">
                     <h2 className="text-2xl font-bold">
-                      {databaseBooking?.status === "finding_washer"
+                      {databaseBooking?.status === "pending" ? "Waiting for supervisor review" : databaseBooking?.status === "confirmed" ? "Booking accepted" : databaseBooking?.status === "finding_washer"
                         ? "Finding your washer..."
                         : databaseBooking
                           ? "Booking status: " + (databaseBooking.status || "pending").split("_").join(" ")
                           : "Loading booking..."}
                     </h2>
-                    {databaseBooking?.status === "finding_washer" && (
+                    {databaseBooking && !washerFound && (
                       <p className="mt-2 text-slate-500">
-                        We're looking for an available car wash
-                        professional near your location.
+                        Your supervisor will check your booking details and assign an available washer. Assigned washer details will appear here.
                       </p>
                     )}
                   </div>

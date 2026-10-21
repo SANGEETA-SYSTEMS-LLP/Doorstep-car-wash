@@ -3,13 +3,16 @@ import { isPackageForVehicle } from "../../../utils/packageCompatibility";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
-import { supabase } from "../../../services/supabase";
+import { getMonthlyWashPackages, getOneTimeWashPackages } from "../../../services/packageService";
 import SelectPackageContent from "./SelectPackageContent";
 
 function SelectPackage() {
   const { booking, updateBooking } = useBooking();
   const navigate = useNavigate();
   const [packages, setPackages] = useState([]);
+  const [monthlyPackages, setMonthlyPackages] = useState([]);
+  const [monthlyLoading, setMonthlyLoading] = useState(true);
+  const [monthlyError, setMonthlyError] = useState("");
   const [checking, setChecking] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -24,31 +27,18 @@ function SelectPackage() {
         setError("");
 
         if (!booking.vehicle?.type) { setPackages([]); setError("Select a vehicle before choosing a package."); return; }
-        const { data, error } = await supabase
-          .from("service_packages")
-          .select("*")
-          .eq("is_active", true)
-          .eq("vehicle_type", booking.vehicle.type)
-          .order("price", { ascending: true });
-
-        if (error) {
-          console.error("Package query failed:", {
-            message: error.message,
-            code: error.code,
-            details: error.details,
-            hint: error.hint,
-          });
-          if (!cancelled) {
-            setError(
-              `Unable to load service packages: ${error.message}`
-            );
-          }
-          return;
-        }
+        const [data, monthlyData] = await Promise.all([
+          getOneTimeWashPackages(booking.vehicle.id),
+          getMonthlyWashPackages(booking.vehicle.id).catch(monthlyFailure => {
+            if (!cancelled) setMonthlyError(monthlyFailure.message || "Unable to load monthly plans.");
+            return [];
+          }),
+        ]);
 
         if (cancelled) return;
 
         setPackages(data ?? []);
+        setMonthlyPackages(monthlyData ?? []);
         setSelected((previous) =>
           (data ?? []).some((pkg) => pkg.id === previous)
             ? previous
@@ -71,19 +61,15 @@ function SelectPackage() {
           );
         }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) { setLoading(false); setMonthlyLoading(false); }
       }
     };
 
     loadPackages();
     return () => { cancelled = true; };
-  }, [booking.vehicle?.type]);
+  }, [booking.vehicle?.type, booking.vehicle?.id]);
 
-  const handleContinue = async () => {
-    let selectedPackage = packages.find(
-      (pkg) => pkg.id === selected
-    );
-
+  const continueWithPackage = async selectedPackage => {
     if (loading || checking) return;
 
     if (!selectedPackage || !isPackageForVehicle(selectedPackage, booking.vehicle)) {
@@ -107,14 +93,18 @@ function SelectPackage() {
         price: Number(selectedPackage.price),
         duration: selectedPackage.duration_minutes,
         vehicleType: selectedPackage.vehicle_type,
+        washCount: Number(selectedPackage.plan_washes || 0) || null,
+        billingPeriod: selectedPackage.plan_washes ? "monthly" : null,
       },
     });
 
     navigate("/customer/select-schedule");
   };
 
+  const handleContinue = () => continueWithPackage(packages.find(pkg => pkg.id === selected));
+
   return (
-    <SelectPackageContent booking={booking} packages={packages} loading={loading} checking={checking} error={error} navigate={navigate} selected={selected} setSelected={setSelected} handleContinue={handleContinue} />
+    <SelectPackageContent booking={booking} packages={packages} monthlyPackages={monthlyPackages} monthlyLoading={monthlyLoading} monthlyError={monthlyError} loading={loading} checking={checking} error={error} navigate={navigate} selected={selected} setSelected={setSelected} handleContinue={handleContinue} handleMonthlyContinue={continueWithPackage} />
   );
 }
 

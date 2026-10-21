@@ -6,7 +6,7 @@ The existing frontend/services directory is the API layer. Keep using it instead
 
 Use Node.js 24 or a compatible current runtime. In frontend and backend separately, run npm install. Copy each .env.example to .env only when .env does not already exist. Never overwrite existing credentials. In separate terminals run npm run dev in backend and frontend. Open the Vite localhost URL and sign in.
 
-Backend development test mode binds to 127.0.0.1 and allows cross-role API requests for authenticated local users. Production builds enforce frontend roles and NODE_ENV=production disables backend test access. See ../TEST_MODE.md.
+Backend role authorization is enforced during development and production. Use accounts with the appropriate roles when exercising role-specific APIs and pages.
 
 ## Google Maps
 

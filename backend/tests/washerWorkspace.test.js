@@ -47,6 +47,7 @@ test("job detail resolves customer profile and enforces assigned washer record o
   const query = calls.find(c => c.table === "bookings");
   assert.ok(query.steps.some(s => s[0] === "eq" && s[1] === "assigned_washer_id" && s[2] === washer.id));
   assert.ok(!query.steps[0][1].includes("service_otp"));
+  assert.doesNotMatch(query.steps[0][1], /service_address|payment_method|latitude|flat_number/);
 });
 test("unauthorized booking never loads customer contact records", async () => {
   reset({ bookings: { data: null } });

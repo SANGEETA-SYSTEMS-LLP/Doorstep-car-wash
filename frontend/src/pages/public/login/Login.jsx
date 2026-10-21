@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import LoginBenefits from "./LoginBenefits";
 import LoginForm from "./LoginForm";
+import { loginErrorMessage } from "../../../services/authTransport";
 
 function Login() {
   const navigate = useNavigate();
@@ -25,14 +26,14 @@ function Login() {
 
     try {
       setLoading(true);
-      const data = await login(email, password);
+      const data = await login(email.trim(), password);
       const user = data.user;
       if (!user) {
         throw new Error("Login failed.");
       }
       navigate("/dashboard");
     } catch (error) {
-      setError(error?.message || "Invalid email or password.");
+      setError(loginErrorMessage(error));
     } finally {
       setLoading(false);
     }

@@ -59,16 +59,16 @@ export default function SupervisorJobDetails() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => navigate("/supervisor/jobs")} className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900">
+      <button onClick={() => navigate("/supervisor/jobs")} className="inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-semibold text-slate-500 transition hover:bg-white hover:text-slate-900">
         <ArrowLeft size={17} /> Back to jobs
       </button>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm text-gray-500">Supervisor / Active jobs</p>
-          <h1 className="mt-1 text-2xl font-bold text-gray-900">Job details</h1>
-          <p className="mt-1 text-sm text-gray-500">Booking #{job.booking_number}</p>
+          <p className="text-sm font-medium text-slate-500">Supervisor <span className="px-1 text-slate-300">/</span> Active jobs</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950">Job details</h1>
+          <p className="mt-1.5 text-sm text-slate-500">Booking #{job.booking_number}</p>
         </div>
-        <span className="rounded-full bg-blue-50 px-3 py-1.5 text-sm font-semibold capitalize text-blue-700">
+        <span className="rounded-full bg-blue-50 px-3.5 py-2 text-sm font-semibold capitalize text-blue-800 ring-1 ring-blue-100">
           {status}
         </span>
       </div>

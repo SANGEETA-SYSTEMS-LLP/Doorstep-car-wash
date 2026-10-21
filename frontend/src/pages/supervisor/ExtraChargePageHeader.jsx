@@ -1,8 +1,9 @@
 function ExtraChargePageHeader() {
   return (
     <>
-      <h1 className="text-3xl font-black text-slate-900">Extra Charge Requests</h1>
-      <p className="mt-2 text-slate-500">Review additional charges requested during service.</p>
+      <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Customer approvals</p>
+      <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Extra charge requests</h1>
+      <p className="mt-3 text-sm leading-6 text-slate-600">Review additional charges requested during service.</p>
     </>
   );
 }

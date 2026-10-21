@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowRight, Car, Check, Plus } from "lucide-react";
 import BookingSteps from "../../../components/booking/BookingSteps";
 
-function SelectVehicleContent({ navigate, selected, setSelected, vehicles, loading, error, handleContinue }) {
+function SelectVehicleContent({ navigate, selected, setSelected, vehicles, loading, error, onRetry, handleContinue }) {
   return (
     <div className="min-h-screen bg-slate-50">
       <BookingSteps currentStep={2} />
@@ -35,8 +35,11 @@ function SelectVehicleContent({ navigate, selected, setSelected, vehicles, loadi
           <p role="status" className="mt-8 text-slate-500">Loading vehicles...</p>
         )}
         {error && (
-          <div role="alert" className="mt-8 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-            {error}
+          <div role="alert" className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            <span>{error}</span>
+            <button type="button" onClick={onRetry} className="rounded-lg border border-red-200 bg-white px-3 py-2 font-semibold text-red-700 hover:bg-red-100">
+              Try again
+            </button>
           </div>
         )}
         {!loading && !error && vehicles.length === 0 && (
@@ -83,6 +86,7 @@ function SelectVehicleContent({ navigate, selected, setSelected, vehicles, loadi
 
                 <p className="mt-1 text-xs text-slate-400">
                   {vehicle.vehicle_type}
+                  {vehicle.seating_capacity ? ` · ${vehicle.seating_capacity} seats` : ""}
                   {vehicle.colour && ` • ${vehicle.colour}`}
                 </p>
               </button>

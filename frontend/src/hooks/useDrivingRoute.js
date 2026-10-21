@@ -1,5 +1,6 @@
+import { apiRequest } from "../api/apiClient";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { coordinates, loadGoogleMaps } from "../services/maps";
+import { coordinates } from "../services/maps";
 
 export default function useDrivingRoute(origin, destination) {
   const [route, setRoute] = useState(null);
@@ -17,14 +18,10 @@ export default function useDrivingRoute(origin, destination) {
       if (pending) return;
       pending = true;
       try {
-        const maps = await loadGoogleMaps();
-        const { Route } = await maps.importLibrary("routes");
         const points = latest.current;
         if (!points?.start || !points?.end || !active) return;
-        const { routes } = await Route.computeRoutes({
-          origin: points.start, destination: points.end, travelMode: "DRIVING",
-          fields: ["path", "distanceMeters", "durationMillis"],
-        });
+        const route = await apiRequest("/locations/route?" + new URLSearchParams({fromLat:points.start.lat,fromLon:points.start.lng,toLat:points.end.lat,toLon:points.end.lng}));
+        const routes = [route];
         if (!routes.length) throw new Error("No driving route is available.");
         if (active) { setRoute(routes[0]); setError(""); }
       } catch (err) {

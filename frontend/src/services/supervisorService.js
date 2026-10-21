@@ -8,6 +8,10 @@ export function getSupervisorDashboard() {
   );
 }
 
+export function getSupervisorWasherRoster() {
+  return apiRequest("/supervisor/washer-roster");
+}
+
 export function getSupervisorJobs() {
   return apiRequest(
     "/supervisor/jobs"
@@ -76,3 +80,4 @@ export function assignWasherToBooking(
     }
   );
 }
+export const acceptSupervisorBooking = id => apiRequest(`/supervisor/jobs/${encodeURIComponent(id)}/accept`, { method: "POST" });

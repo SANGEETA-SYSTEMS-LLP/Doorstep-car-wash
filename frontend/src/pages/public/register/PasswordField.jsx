@@ -10,7 +10,7 @@ function PasswordField({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-semibold text-slate-700">
+      <label htmlFor={name} className="mb-2 block text-sm font-semibold text-slate-700">
         {label}
       </label>
 
@@ -21,6 +21,8 @@ function PasswordField({
         />
 
         <input
+          id={name}
+          autoComplete={"new-password"}
           required
           minLength={6}
           type={visible ? "text" : "password"}
@@ -33,6 +35,8 @@ function PasswordField({
 
         <button
           type="button"
+          aria-label={visible ? "Hide " + label.toLowerCase() : "Show " + label.toLowerCase()}
+          aria-pressed={visible}
           onClick={() => setVisible(!visible)}
           className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
         >

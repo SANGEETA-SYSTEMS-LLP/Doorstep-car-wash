@@ -1,5 +1,5 @@
-import { Bell } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
+import { CustomerNotificationBell } from "../../../components/layout/CustomerBookingNotifications";
 
 function getDashboardTimeDetails() {
   const now = new Date();
@@ -44,10 +44,7 @@ function CustomerHomeHeader() {
         <h1 className="text-xl font-bold">{greeting}, {firstName} 👋</h1>
       </div>
       <div className="flex items-center gap-4">
-        <button className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200">
-          <Bell size={19} />
-          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" />
-        </button>
+        <CustomerNotificationBell />
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">
           {initials}
         </div>

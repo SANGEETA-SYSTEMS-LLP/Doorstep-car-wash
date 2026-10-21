@@ -8,7 +8,7 @@ function WasherArrivalIntro({ washer }) {
       </div>
       <h2 className="mt-5 text-3xl font-bold text-green-900">Your washer has arrived!</h2>
       <p className="mx-auto mt-3 max-w-xl leading-7 text-green-700">
-        {washer?.name || "Assigned Washer"} has reached your service location. Please meet the washer and verify the service using your OTP.
+        {washer?.name || "Assigned Washer"} has reached your service location. You can now meet the washer and follow the service progress.
       </p>
     </div>
   );

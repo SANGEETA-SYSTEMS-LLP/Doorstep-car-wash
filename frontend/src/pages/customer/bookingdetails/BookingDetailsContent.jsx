@@ -1,7 +1,8 @@
-import { ArrowLeft, CalendarDays, Car, Clock3, MapPin } from "lucide-react";
+import { ArrowLeft, CalendarDays, Car, Clock3, MapPin, Phone, Star, UserRound } from "lucide-react";
 import Card from "./Card";
 import Info from "./Info";
 import Price from "./Price";
+import { Link } from "react-router-dom";
 
 function BookingDetailsContent({ navigate, booking }) {
   return (
@@ -95,6 +96,50 @@ function BookingDetailsContent({ navigate, booking }) {
                 </div>
               </div>
             </Card>
+
+            <Card title="Your Washer">
+              {booking.washer ? (
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex min-w-0 items-center gap-4">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+                      <UserRound size={26} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="break-words text-lg font-bold text-slate-900">
+                        {booking.washer.name}
+                      </p>
+                      <p className="mt-1 break-all text-sm font-semibold text-blue-700">{booking.washer.phone || "Contact number unavailable"}</p>
+                      <p className="mt-1 text-sm capitalize text-slate-500">
+                        Assigned washer
+                        {booking.washer.referenceId
+                          ? ` · ${booking.washer.referenceId}`
+                          : ""}
+                      </p>
+                      <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-600">
+                        <Star size={15} className="fill-amber-400 text-amber-400" />
+                        {Number(booking.washer.rating || 0).toFixed(1)}
+                        <span className="text-slate-400">
+                          · {booking.washer.totalJobs || 0} completed jobs
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  {booking.washer.phone && (
+                    <a
+                      href={`tel:${String(booking.washer.phone).replace(/[^+0-9]/g, "")}`}
+                      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800"
+                    >
+                      <Phone size={16} />
+                      Call washer
+                    </a>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm leading-6 text-slate-600">
+                  A washer has not accepted this booking yet. Their name and contact details will appear here after they accept it.
+                </p>
+              )}
+            </Card>
           </div>
 
           <div className="space-y-5">
@@ -111,6 +156,9 @@ function BookingDetailsContent({ navigate, booking }) {
 
               <Price label="Total Amount" value={`₹${Number(booking.total_amount).toLocaleString("en-IN")}`} bold />
             </Card>
+
+            {booking.washer && ["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started"].includes(booking.status) && <Link to="/customer/track-booking" className="flex min-h-12 items-center justify-center rounded-xl bg-blue-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800">Track your washer</Link>}
+            {booking.washer && ["service_completed", "customer_confirmed", "payment_completed", "closed", "completed"].includes(booking.status) && <Link to="/customer/service-completed" className="flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800">View before and after photos</Link>}
           </div>
         </div>
       </div>
