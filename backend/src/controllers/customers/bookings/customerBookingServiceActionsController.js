@@ -2,57 +2,8 @@ import { supabaseAdmin } from "../../../config/supabase.js";
 import { getCustomerBooking } from "./customerBookingAccess.js";
 
 import { createWasherEarning } from "../../../services/finance/earningService.js";
-import { getOtp } from "../../../services/auth/otpService.js";
 import { getSignedServicePhotos } from "../../serviceOperations/servicePhotoController.js";
 import { referenceId } from "../../../../../shared/referenceId.mjs";
-
-export async function getServiceOtp(
-  req,
-  res
-) {
-  try {
-    const { bookingId } =
-      req.params;
-
-    const booking = await getCustomerBooking(bookingId, req.user.id);
-    if (!booking) {
-      return res.status(404).json({
-        message:
-          "Booking not found.",
-      });
-    }
-
-    if (
-      booking.status !==
-      "washer_arrived"
-    ) {
-      return res.status(400).json({
-        message:
-          "Service OTP is not available yet.",
-      });
-    }
-
-    const otp = getOtp(booking.id);
-    if (!otp) {
-      return res.status(410).json({
-        message:
-          "OTP has expired. Request a new OTP.",
-      });
-    }
-
-    return res.json({ success: true, otp, expiresAt: booking.service_otp_expires_at });
-  } catch (error) {
-    console.error(
-      "Get service OTP:",
-      error
-    );
-
-    return res.status(500).json({
-      message:
-        "Unable to load OTP.",
-    });
-  }
-}
 
 export async function getPendingExtraCharges(req, res) {
   try {

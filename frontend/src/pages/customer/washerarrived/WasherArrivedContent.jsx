@@ -1,9 +1,9 @@
 import WasherArrivalIntro from "./WasherArrivalIntro";
 import WasherArrivalProfile from "./WasherArrivalProfile";
 import WasherArrivalBookingDetails from "./WasherArrivalBookingDetails";
-import ArrivalOtpPanel from "./ArrivalOtpPanel";
+import ArrivalConfirmationPanel from "./ArrivalConfirmationPanel";
 
-function WasherArrivedContent({ booking, washer, loading, otp, error, onContinue }) {
+function WasherArrivedContent({ booking, washer, onContinue }) {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
@@ -21,13 +21,7 @@ function WasherArrivedContent({ booking, washer, loading, otp, error, onContinue
         <WasherArrivalIntro washer={washer} />
         <WasherArrivalProfile washer={washer} />
         <WasherArrivalBookingDetails booking={booking} />
-        <ArrivalOtpPanel
-          loading={loading}
-          bookingId={booking.databaseBookingId}
-          otp={otp}
-          error={error}
-          onContinue={onContinue}
-        />
+        <ArrivalConfirmationPanel onContinue={onContinue} />
       </main>
     </div>
   );

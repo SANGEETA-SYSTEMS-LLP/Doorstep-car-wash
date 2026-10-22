@@ -47,22 +47,6 @@ export function markWasherArrived(
   );
 }
 
-export function verifyWasherOtp(
-  bookingId,
-  otp
-) {
-  return apiRequest(
-    `/washer/bookings/${bookingId}/verify-otp`,
-    {
-      method: "POST",
-
-      body: JSON.stringify({
-        otp,
-      }),
-    }
-  );
-}
-
 export function startBookingService(
   bookingId
 ) {

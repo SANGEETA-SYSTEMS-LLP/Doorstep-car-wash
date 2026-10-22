@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useWasher } from "../../../context/WasherContext";
 import useServiceChecklist from "./useServiceChecklist";
@@ -6,44 +6,29 @@ import useWasherServiceActions from "./useWasherServiceActions";
 import WasherServiceHeader from "./WasherServiceHeader";
 import WasherServiceStages from "./WasherServiceStages";
 import NoActiveService from "./NoActiveService";
-import { markWasherArrived } from "../../../services/washer/washerJobService";
 
 function WasherService() {
   const context = useWasher();
   const { washerState } = context;
   const {
     activeJob,
-    otpVerified,
-    beforePhotosAdded,
     serviceStarted,
     afterPhotosAdded,
     serviceCompleted,
   } = washerState;
   const navigate = useNavigate();
   const { jobId } = useParams();
-  const [stage, setStage] = useState(() => {
-    if (serviceCompleted) return "completed";
-    if (afterPhotosAdded) return "after";
-    if (serviceStarted) return "service";
-    if (beforePhotosAdded || otpVerified || activeJob?.status === "otp_verified") return "before";
-    return "otp";
-  });
-  useEffect(() => {
-    if (otpVerified || activeJob?.status === "otp_verified") {
-      setStage((current) => current === "otp" ? "before" : current);
-    }
-  }, [activeJob?.status, otpVerified]);
-  const [otp, setOtp] = useState("");
+  const [stage, setStage] = useState(() =>
+    serviceCompleted ? "completed" : afterPhotosAdded ? "after" : serviceStarted ? "service" : "before"
+  );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(false);
-  const [otpReady, setOtpReady] = useState(false);
   const [beforePhotos, setBeforePhotos] = useState([]);
   const [afterPhotos, setAfterPhotos] = useState([]);
   const checklist = useServiceChecklist(activeJob, serviceStarted, setError);
   const actions = useWasherServiceActions({
     activeJob,
-    otp,
     beforePhotos,
     afterPhotos,
     allTasksCompleted: checklist.allTasksCompleted,
@@ -53,26 +38,12 @@ function WasherService() {
     setLoading,
     setValidating,
     setStage,
-    verifyOtp: context.verifyOtp,
     markBeforePhotosAdded: context.markBeforePhotosAdded,
     startService: context.startService,
     markAfterPhotosAdded: context.markAfterPhotosAdded,
     completeService: context.completeService,
     updateJobStatus: context.updateJobStatus,
   });
-
-  useEffect(() => {
-    if (!activeJob?.databaseId || stage !== "otp") return;
-    let active = true;
-    setOtpReady(false);
-    setError("");
-    markWasherArrived(activeJob.databaseId)
-      .then(() => { if (active) setOtpReady(true); })
-      .catch((requestError) => {
-        if (active) setError(requestError.message || "Unable to prepare the customer OTP. Please retry from navigation.");
-      });
-    return () => { active = false; };
-  }, [activeJob?.databaseId, stage]);
 
   if (!activeJob) {
     return <NoActiveService onDashboard={() => navigate("/washer")} />;
@@ -87,15 +58,11 @@ function WasherService() {
         onBack={() => navigate(-1)}
       />
       <main className="mx-auto max-w-6xl p-5 lg:p-8">
-        {error && stage !== "otp" && (
+        {error && (
           <p role="alert" className="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</p>
         )}
         <WasherServiceStages
           stage={stage}
-          otp={otp}
-          setOtp={setOtp}
-          error={error}
-          otpReady={otpReady}
           loading={loading}
           beforePhotos={beforePhotos}
           afterPhotos={afterPhotos}
@@ -107,7 +74,6 @@ function WasherService() {
           allTasksCompleted={checklist.allTasksCompleted}
           toggleTask={checklist.toggleTask}
           moveToAfterPhotos={() => checklist.allTasksCompleted && setStage("after")}
-          onVerifyOtp={actions.handleVerifyOtp}
           onBeforePhotos={(event) => setBeforePhotos(Array.from(event.target.files || []).slice(0, 5))}
           onStartService={actions.handleStartService}
           onAfterPhotos={(event) => setAfterPhotos(Array.from(event.target.files || []).slice(0, 5))}

@@ -9,9 +9,6 @@ function WasherArrived() {
     <WasherArrivedContent
       booking={booking}
       washer={booking.washer}
-      loading={false}
-      otp=""
-      error=""
       onContinue={() => {
         updateStatus("washer_arrived");
         navigate("/customer/service-progress");

@@ -1,7 +1,6 @@
 
 function StageBadge({ stage }) {
   const labels = {
-    otp: "OTP Verification",
     before: "Before Photos",
     service: "In Service",
     after: "After Photos",

@@ -15,7 +15,7 @@ Status is based on source inspection, a read-only Supabase REST schema inspectio
 | 3. Authentication | Partial | Register/login/logout/session and role guards exist. Password reset/update is wired. Admin, accountant, and staff support consoles have frontend routes. Test email delivery, reset redirects, and profile/customer provisioning. |
 | 4. Customer frontend | Partial | Booking flow, vehicles/packages, payment/history and review integrations exist. New map-based selection and address persistence added. Customer name and phone now load from and save to the authenticated profile; email is read-only because email changes require the provider's verification flow. Support creation/history is connected to the staff ticket API; offers remain incomplete. Schedule/pricing/booking creation need authoritative backend validation. |
 | 5. Maps | Integration implemented; provider/live verification pending | Replaced decorative maps in location selection, customer home, assignment search, tracking and washer navigation. Added Places search, current location, map selection/reverse geocoding, real markers, Routes distance/ETA, Google navigation link and service-zone coverage. Google key is not configured yet. Supervisor operations map remains missing. |
-| 6. Washer system | Partial; live schema migration still required | Dashboard/incoming jobs/accept-reject/navigation/service stages exist. Availability now persists through the backend; the UI still caches state locally. Service OTP/photo/validation columns are covered by an unapplied migration. Authenticated profile editing and paginated washer earnings are implemented; live persistence and some dashboard statistics remain unverified. |
+| 6. Washer system | Partial; live schema migration still required | Dashboard/incoming jobs/accept-reject/navigation/service stages exist. Arrival now leads directly to customer contact and service photos without OTP verification. Availability now persists through the backend; the UI still caches state locally. Photo/validation columns are covered by an unapplied migration. Authenticated profile editing and paginated washer earnings are implemented; live persistence and some dashboard statistics remain unverified. |
 | 7. Booking engine | Partial; atomic acceptance now defined | Candidate selection considers distance, fresh location, skills, radius, schedule conflicts and ranking. New database RPC migration serializes washer acceptance/manual assignment and rechecks key eligibility conditions. Working hours, live schema compatibility and concurrency behavior remain to be verified; automatic offer generation still needs operational validation. |
 | 8. Supervisor | Partial | Dashboard/jobs/escalations/manual assignment/extra-charge screens exist. Dashboard now counts pending extra-charge requests from the database. Operations map, washer management, delay detection and broader issue workflows are missing. |
 | 9. Admin | Partial; authenticated console is now routed | Admin and accountant Express routers are mounted under `/api/admin` and `/api/accountant`. The frontend now routes admin roles to the dashboard and generic resource pages, and accountants to read-only payment, earning and settlement lists. Existing resource definitions cover customers, washers, supervisors, societies, bookings, services, packages, zones, payments, earnings and settlements. Refunds, coupons, reports, settings and broader admin actions are not implemented. |
@@ -27,7 +27,7 @@ Status is based on source inspection, a read-only Supabase REST schema inspectio
 - bookings.customer_id relates to a customer record in createBooking, while multiple backend actions compare it directly to req.user.id. Resolve customers.id from authenticated user, then enforce ownership.
 - Recheck candidate selection and supervisor washer listing against live schema before production use; the audit's earlier `active`, `total_jobs`, `washer_skills.active`, and location timestamp/accuracy findings were not verified against a current schema export in this task.
 - booking_assignments has `offered_at`, not `assigned_at`.
-- The lifecycle migration adds service OTP, arrival, start, validation and completion metadata, but has not been applied to the live database.
+- The lifecycle migration adds arrival, start, validation and completion metadata, but has not been applied to the live database.
 - `accept_booking_assignment` and `supervisor_assign_washer` are now defined in an additive migration. They serialize acceptance, verify role/washer ownership, and recheck active availability, location freshness, skills, radius and booking overlap. The migration has not been applied or validated against the live Supabase schema; working-hours constraints are not represented in current source/schema evidence.
 - booking_service_photos uses `photo_url`; lifecycle code now uses that field and signs stored photo paths for display.
 - Existing address-less bookings can still show Address unavailable in supervisor lists; new map bookings save address_id.
@@ -57,7 +57,7 @@ Status is based on source inspection, a read-only Supabase REST schema inspectio
 1. Finish live configuration: Google key/APIs, Supabase recovery redirect, test accounts.
 2. Export/review actual foreign keys, RPC definitions and RLS. Reconcile customer/washer identity and all schema mismatches above. Prepare reviewed migrations only where truly needed.
 3. Move booking creation/pricing/coverage checks to the backend; finish washer profile persistence and verify every role's ownership rules.
-4. Repair atomic assignment/acceptance/expiry, working hours and conflict checks; complete OTP/photos/start/finish lifecycle.
+4. Repair atomic assignment/acceptance/expiry, working hours and conflict checks; complete arrival/photos/start/finish lifecycle.
 5. Run the full customer-to-washer booking and payment scenario against test data.
 6. Complete supervisor operations map, washer management, reassignment, delay/issue management and verify the new atomic charge-approval migration.
 7. Build seven-role admin/support/accountant modules on verified tables, including societies/zones/service pricing.
@@ -73,7 +73,7 @@ Live checks still required:
 - Create a booking with authoritative price, successful test payment or cash flow, and correct ownership.
 - Washer goes online, shares a location, receives/accepts an eligible job and recovers it after refresh.
 - Customer sees fresh washer markers and real route estimates; navigation targets the actual booking address.
-- Arrival, OTP, photos, checklist, completion, customer confirmation and earnings all persist correctly.
+- Arrival, photos, checklist, completion, customer confirmation and earnings all persist correctly.
 - Supervisor resolves escalation by real assignment; extra charges require both approvals exactly once after the new migration is applied and tested against Supabase.
 - Cross-role and cross-customer requests are rejected by backend authorization.
 

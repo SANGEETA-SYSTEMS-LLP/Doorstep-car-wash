@@ -2,13 +2,11 @@ import {
   completeBookingService,
   startBookingService,
   validateWasherService,
-  verifyWasherOtp,
 } from "../../../services/washer/washerJobService";
 import { uploadServicePhotos } from "../../../services/booking/servicePhotoService";
 
 function useWasherServiceActions({
   activeJob,
-  otp,
   beforePhotos,
   afterPhotos,
   allTasksCompleted,
@@ -18,27 +16,12 @@ function useWasherServiceActions({
   setLoading,
   setValidating,
   setStage,
-  verifyOtp,
   markBeforePhotosAdded,
   startService,
   markAfterPhotosAdded,
   completeService,
   updateJobStatus,
 }) {
-  const handleVerifyOtp = async () => {
-    if (!activeJob?.databaseId) return setError("Booking details are unavailable.");
-    if (otp.length !== 6) return setError("Enter the 6-digit customer OTP.");
-    try {
-      setError("");
-      await verifyWasherOtp(activeJob.databaseId, otp);
-      verifyOtp();
-      setStage("before");
-    } catch (error) {
-      console.error(error);
-      setError(error.message || "Incorrect OTP.");
-    }
-  };
-
   const handleStartService = async () => {
     if (!activeJob?.databaseId || loading) return;
     if (!beforePhotos.length) return setError("Add at least one before-service photo.");
@@ -94,7 +77,7 @@ function useWasherServiceActions({
     }
   };
 
-  return { handleVerifyOtp, handleStartService, completeJob, validateJob };
+  return { handleStartService, completeJob, validateJob };
 }
 
 export default useWasherServiceActions;

@@ -36,6 +36,7 @@ export async function getCustomerBookingDetails(req, res) {
     if (packageResult.error) throw packageResult.error;
 
     const customerBooking = { ...booking };
+    // Legacy service OTP hashes may still be present on existing database rows.
     delete customerBooking.service_otp_hash;
     delete customerBooking.service_otp_expires_at;
 

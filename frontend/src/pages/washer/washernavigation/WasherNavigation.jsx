@@ -68,7 +68,7 @@ function WasherNavigation() {
     if (!bookingId) return;
 
     try {
-      // Idempotently ensure the service OTP exists for this booking, including older arrivals.
+      // Persist the arrived status before opening the service checklist.
       await markWasherArrived(bookingId);
       updateJobStatus("washer_arrived");
       navigate(`/washer/jobs/${bookingId}/service`);

@@ -6,7 +6,6 @@ const initialWasherState = {
   online: false,
   activeJob: null,
   jobStatus: "idle",
-  otpVerified: false,
   beforePhotosAdded: false,
   completedTasks: [],
   serviceStarted: false,
@@ -51,13 +50,11 @@ export function WasherProvider({ children }) {
   const restoreJob = useCallback((job) => {
     const completed = ["service_completed", "completed"].includes(job.status);
     const serviceStarted = ["service_started", "service_completed", "completed"].includes(job.status);
-    const otpVerified = ["otp_verified", "service_started", "service_completed", "completed"].includes(job.status);
     setWasherState(previous => ({
       ...(previous.activeJob?.databaseId === job.databaseId ? previous : initialWasherState),
       online: previous.online,
       activeJob: job,
       jobStatus: job.status,
-      otpVerified,
       beforePhotosAdded: serviceStarted || completed,
       serviceStarted,
       afterPhotosAdded: completed,
@@ -74,7 +71,6 @@ export function WasherProvider({ children }) {
       ...previous,
       activeJob: job,
       jobStatus: "accepted",
-      otpVerified: false,
       beforePhotosAdded: false,
       completedTasks: [],
       serviceStarted: false,
@@ -89,14 +85,6 @@ export function WasherProvider({ children }) {
 
   const setCompletedTasks = (completedTasks) => {
     setWasherState((previous) => ({ ...previous, completedTasks }));
-  };
-
-  const verifyOtp = () => {
-    setWasherState((previous) => ({
-      ...previous,
-      otpVerified: true,
-      jobStatus: "otp_verified",
-    }));
   };
 
   const markBeforePhotosAdded = () => {
@@ -139,7 +127,6 @@ export function WasherProvider({ children }) {
       ...previous,
       activeJob: null,
       jobStatus: "idle",
-      otpVerified: false,
       beforePhotosAdded: false,
       serviceStarted: false,
       completedTasks: [],
@@ -157,7 +144,7 @@ export function WasherProvider({ children }) {
 
   return (
     <WasherContext.Provider
-      value={{ restoreJob, washerState, setOnline, acceptJob, rejectJob, updateJobStatus, setCompletedTasks, startService, verifyOtp, markBeforePhotosAdded, markAfterPhotosAdded, completeService, closeActiveJob }}
+      value={{ restoreJob, washerState, setOnline, acceptJob, rejectJob, updateJobStatus, setCompletedTasks, startService, markBeforePhotosAdded, markAfterPhotosAdded, completeService, closeActiveJob }}
     >
       {children}
     </WasherContext.Provider>

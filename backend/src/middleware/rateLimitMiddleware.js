@@ -33,14 +33,6 @@ export const paymentActionRateLimit = limiter({
   byUser: true,
 });
 
-export const serviceOtpRateLimit = limiter({
-  windowMs: 15 * 60 * 1000,
-  limit: 10,
-  skipSuccessfulRequests: true,
-  message: "Too many verification attempts. Please wait before trying again.",
-  byUser: true,
-});
-
 export const payoutDetailsRateLimit = limiter({
   windowMs: 60 * 60 * 1000,
   limit: 10,

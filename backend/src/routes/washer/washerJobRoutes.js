@@ -13,7 +13,6 @@ import {
   startJourney,
   updateLocation,
   markArrived,
-  verifyServiceOtp,
   startService,
   completeService,
 } from "../../controllers/washer/jobs/washerJobController.js";
@@ -25,7 +24,6 @@ import { getChecklist, updateChecklistItem } from "../../controllers/bookings/ch
 
 import { requestExtraCharge } from "../../controllers/serviceOperations/extraChargeController.js";
 import { validateService } from "../../controllers/serviceOperations/serviceValidationController.js";
-import { serviceOtpRateLimit } from "../../middleware/rateLimitMiddleware.js";
 
 const router =
   express.Router();
@@ -52,12 +50,6 @@ router.post(
 router.post(
   "/bookings/:bookingId/arrived",
   markArrived
-);
-
-router.post(
-  "/bookings/:bookingId/verify-otp",
-  serviceOtpRateLimit,
-  verifyServiceOtp
 );
 
 router.post(

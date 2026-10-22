@@ -10,7 +10,6 @@ import {
 } from "../../middleware/roleMiddleware.js";
 
 import {
-  getServiceOtp,
   getCustomerBookingDetails,
   getPendingExtraCharges,
   respondExtraCharge,
@@ -26,13 +25,6 @@ router.get(
   requireAuth,
   allowRoles("customer"),
   getCustomerBookingDetails
-);
-
-router.get(
-  "/bookings/:bookingId/service-otp",
-  requireAuth,
-  allowRoles("customer"),
-  getServiceOtp
 );
 
 router.get(

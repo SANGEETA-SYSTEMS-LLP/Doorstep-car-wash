@@ -9,45 +9,6 @@ ALTER TABLE public.washer_locations
   ADD COLUMN IF NOT EXISTS service_latitude double precision,
   ADD COLUMN IF NOT EXISTS service_longitude double precision;
 
--- The service confirmation code is hashed at rest and expires after generation.
-ALTER TABLE public.bookings
-  ADD COLUMN IF NOT EXISTS service_otp_hash text,
-  ADD COLUMN IF NOT EXISTS service_otp_expires_at timestamptz,
-  ADD COLUMN IF NOT EXISTS otp_verified_at timestamptz;
-
-
--- OTPs are stored as bcrypt hashes; only the trusted backend can call these helpers.
-CREATE OR REPLACE FUNCTION public.hash_service_otp(p_otp text)
-RETURNS text
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, extensions, pg_temp
-AS $function$
-BEGIN
-  IF p_otp IS NULL OR p_otp !~ '^[0-9]{6}$' THEN
-    RAISE EXCEPTION 'A valid 6-digit OTP is required.' USING errcode = '22023';
-  END IF;
-  RETURN crypt(p_otp, gen_salt('bf'));
-END;
-$function$;
-
-CREATE OR REPLACE FUNCTION public.verify_service_otp_hash(p_otp text, p_hash text)
-RETURNS boolean
-LANGUAGE sql
-IMMUTABLE
-SECURITY DEFINER
-SET search_path = public, extensions, pg_temp
-AS $function$
-  SELECT p_otp ~ '^[0-9]{6}$'
-     AND p_hash IS NOT NULL
-     AND crypt(p_otp, p_hash) = p_hash
-$function$;
-
-REVOKE ALL ON FUNCTION public.hash_service_otp(text) FROM PUBLIC, anon, authenticated;
-REVOKE ALL ON FUNCTION public.verify_service_otp_hash(text, text) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.hash_service_otp(text) TO service_role;
-GRANT EXECUTE ON FUNCTION public.verify_service_otp_hash(text, text) TO service_role;
-
 CREATE OR REPLACE FUNCTION public.booking_washer_is_eligible(
   p_booking_id uuid,
   p_washer_id uuid

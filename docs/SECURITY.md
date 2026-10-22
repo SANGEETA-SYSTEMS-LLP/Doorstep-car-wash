@@ -1,6 +1,6 @@
 # Security baseline
 
-The repository now applies API security headers, strict frontend-origin checks, bounded JSON and webhook bodies, per-IP API throttling, and tighter limits on address searches, payment actions, service OTP attempts, payout changes, and administrative writes. The API does not use cookie authentication; protected requests require a Supabase access token in the `Authorization` header.
+The repository now applies API security headers, strict frontend-origin checks, bounded JSON and webhook bodies, per-IP API throttling, and tighter limits on address searches, payment actions, payout changes, and administrative writes. The API does not use cookie authentication; protected requests require a Supabase access token in the `Authorization` header.
 
 ## Production deployment
 
