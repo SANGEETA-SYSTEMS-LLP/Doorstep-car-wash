@@ -3,7 +3,9 @@ import {
 } from "../services/auth/supabase";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "/api";
+  import.meta.env.PROD
+    ? "/api"
+    : import.meta.env.VITE_API_URL || "/api";
 
 let refreshing;
 async function refreshAccessToken() {
