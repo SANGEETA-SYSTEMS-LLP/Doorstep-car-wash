@@ -127,13 +127,36 @@ export async function uploadPhotos(req, res) {
 
     return res.json({ success: true, photos: uploadedPhotos });
   } catch (error) {
+    const message = String(error?.message || "").toLowerCase();
+    const code = String(error?.code || "").toUpperCase();
+    let status = 500;
+    let publicMessage = "Photo upload failed. Please retry or contact platform support.";
+
+    if (message.includes("assigned booking not found")) {
+      status = 403;
+      publicMessage = "This booking is not assigned to your washer account. Refresh your jobs list.";
+    } else if (message.includes("washer profile not found") || message.includes("washer account is inactive")) {
+      status = 403;
+      publicMessage = "Your washer account cannot upload photos. Contact platform support.";
+    } else if (code === "42P01" || code === "PGRST205" || code === "PGRST204") {
+      status = 503;
+      publicMessage = "Service photo storage is not configured. Ask the platform administrator to run repair_service_photo_uploads.sql in Supabase.";
+    } else if (message.includes("bucket not found") || (String(error?.statusCode) === "404" && message.includes("bucket"))) {
+      status = 503;
+      publicMessage = "The private service-photos bucket is missing. Ask the platform administrator to run repair_service_photo_uploads.sql in Supabase.";
+    } else if (code === "42501" || message.includes("not authorized") || message.includes("permission")) {
+      status = 503;
+      publicMessage = "The backend cannot access service photo storage. Check its Supabase service-role configuration.";
+    }
+
     console.error("Service photo upload failed", {
       name: error?.name || "Error",
-      code: typeof error?.code === "string" ? error.code : undefined,
+      code: code || undefined,
+      statusCode: error?.statusCode || undefined,
     });
-    return res.status(400).json({
+    return res.status(status).json({
       success: false,
-      message: "Unable to upload photos. Please check the booking and try again.",
+      message: publicMessage,
     });
   }
 }
