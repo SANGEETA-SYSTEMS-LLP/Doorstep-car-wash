@@ -38,6 +38,12 @@ function configuredFrontendOrigins() {
     .map((value) => value.trim())
     .filter(Boolean);
 
+  // Vercel provides the deployment hostname at runtime. FRONTEND_URL can add
+  // custom domains when the deployment uses one.
+  if (process.env.VERCEL_URL) {
+    configured.push(`https://${process.env.VERCEL_URL}`);
+  }
+
   // Local development remains convenient, while production only trusts explicitly
   // configured origins. Never interpret an absent setting as "allow every site".
   if (process.env.NODE_ENV !== "production") {
