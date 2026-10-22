@@ -14,6 +14,12 @@ export async function setAvailability(req, res) {
   try {
     const washer = await washerForUser(req.user.id);
     if (req.body.online && !washer.is_verified) return res.status(403).json({ message: "Supervisor verification is required before you can go online and receive jobs." });
+    if (req.body.online) {
+      const { data: payoutAccount, error: payoutError } = await supabaseAdmin
+        .from("washer_payout_accounts").select("washer_id,account_label,destination_encrypted,fund_account_id").eq("washer_id", washer.id).maybeSingle();
+      if (payoutError) throw payoutError;
+      if (!payoutAccount?.account_label || !(payoutAccount.destination_encrypted || payoutAccount.fund_account_id)) return res.status(403).json({ message: "Add and save your payout account in Profile before going online and receiving job assignments." });
+    }
     const { data: active, error: checkError } = await supabaseAdmin.from("bookings").select("id").eq("assigned_washer_id", washer.id).in("status", activeJobStatuses).limit(1);
     if (checkError) throw checkError;
     if (active?.length || washer.status === "busy") return res.status(409).json({ message: "Complete your active job before changing availability." });

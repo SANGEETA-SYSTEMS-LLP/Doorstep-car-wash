@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "../../config/supabase.js";
 import { calculateDistanceKm } from "../../utils/distance.js";
-import { referenceId } from "../../utils/referenceId.js";
+import { referenceId } from "../../../../shared/referenceId.mjs";
 import { washerHasScheduleConflict } from "../../services/booking/bookingAssignmentService.js";
 import { getSignedServicePhotos } from "../serviceOperations/servicePhotoController.js";
 import { enrichSupervisorBookings, normalizeServiceAddress } from "./supervisorBookingEnrichment.js";
@@ -90,10 +90,18 @@ export async function getSupervisorJobDetails(req, res) {
 
     const userIds = [...new Set(washers.map(washer => washer.user_id).filter(Boolean))];
     const profiles = new Map();
+    const payoutWasherIds = new Set();
     if (userIds.length) {
-      const result = await supabaseAdmin.from("profiles").select("id,full_name,phone,is_active").in("id", userIds);
-      if (result.error) throw result.error;
-      for (const profile of result.data || []) profiles.set(profile.id, profile);
+      const [profilesResult, payoutResult] = await Promise.all([
+        supabaseAdmin.from("profiles").select("id,full_name,phone,is_active").in("id", userIds),
+        supabaseAdmin.from("washer_payout_accounts").select("washer_id,account_label,destination_encrypted,fund_account_id").in("washer_id", washers.map(washer => washer.id)),
+      ]);
+      if (profilesResult.error) throw profilesResult.error;
+      if (payoutResult.error) throw payoutResult.error;
+      for (const profile of profilesResult.data || []) profiles.set(profile.id, profile);
+      for (const payout of payoutResult.data || []) {
+        if (payout.account_label && (payout.destination_encrypted || payout.fund_account_id)) payoutWasherIds.add(payout.washer_id);
+      }
     }
     const availableWashers = [];
     for (const washer of washers) {
@@ -110,6 +118,7 @@ export async function getSupervisorJobDetails(req, res) {
       const radius = Number(washer.service_radius_km || 5);
       if (!washer.is_active || !profile?.is_active) reasons.push("Washer account is inactive or incomplete.");
       if (!washer.is_verified) reasons.push("Supervisor verification required.");
+      if (!payoutWasherIds.has(washer.id)) reasons.push("Washer must save payout account details before assignment.");
       if (washer.status !== "available") reasons.push(washer.status === "busy" ? "Washer is currently busy." : "Washer must go online.");
       if (booking.latitude == null || booking.longitude == null) reasons.push("Booking map coordinates are missing.");
       if (distanceKm == null) reasons.push("Valid booking and washer map locations are required.");

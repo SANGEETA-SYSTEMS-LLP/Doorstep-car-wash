@@ -1,6 +1,6 @@
 import { test, mock } from "node:test";
 import assert from "node:assert/strict";
-import { referenceId } from "../src/utils/referenceId.js";
+import { referenceId } from "../../shared/referenceId.mjs";
 let fixtures = {};
 let calls = [];
 const db = { from(table) {
@@ -14,12 +14,12 @@ mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: db } }
 const { washerBooking, washerWorkspace, washerForUser } = await import("../src/services/washer/washerWorkspaceService.js");
 const user = "11111111-1111-4111-8111-111111111111";
 const customerUser = "22222222-2222-4222-8222-222222222222";
-const washer = { id: "washer-record", user_id: user, is_active: true, status: "available" };
+const washer = { id: "washer-record", user_id: user, is_active: true, is_verified: true, status: "available" };
 const booking = { id: "booking", customer_id: "customer-record", vehicle_id: "vehicle", address_id: "address", package_id: "package", assigned_washer_id: washer.id, status: "washer_assigned" };
 function reset(extra = {}) {
   calls = [];
   fixtures = {
-    washers: { data: washer }, bookings: { data: booking },
+    washers: { data: washer }, washer_payout_accounts: { data: { washer_id: washer.id, account_label: "Bank •••• 6789", destination_encrypted: "encrypted-test" } }, bookings: { data: booking },
     customers: { data: [{ id: "customer-record", user_id: customerUser }] },
     profiles: { data: [{ id: customerUser, full_name: "Test Customer", phone: "+919000000000" }] },
     vehicles: { data: [{ id: "vehicle", brand: "Tata", model: "Nexon", vehicle_number: "TEST123" }] },
@@ -67,8 +67,22 @@ test("workspace filters stale booking offers and scopes all assignment reads", a
   });
   const result = await washerWorkspace(user);
   assert.equal(result.assignments.length, 1);
+  assert.equal(result.payoutAccountConfigured, true);
   assert.equal(result.assignments[0].booking.customer.name, "Test Customer");
   const query = calls.find(c => c.table === "booking_assignments");
   assert.ok(query.steps.some(s => s[0] === "eq" && s[1] === "washer_id" && s[2] === washer.id));
   assert.ok(query.steps.some(s => s[0] === "gt" && s[1] === "expires_at"));
+});
+test("workspace hides incoming offers until payout details and supervisor verification are complete", async () => {
+  reset({
+    washer_payout_accounts: { data: null },
+    booking_assignments: { data: [{ id: "offer-1", booking_id: "booking" }] },
+    bookings: call => ({ data: call.steps.some(s => s[0] === "in") ? [{ ...booking, assigned_washer_id: null, status: "finding_washer" }] : [] }),
+  });
+  const missingPayout = await washerWorkspace(user);
+  assert.equal(missingPayout.payoutAccountConfigured, false);
+  assert.deepEqual(missingPayout.assignments, []);
+  reset({ washers: { data: { ...washer, is_verified: false } }, booking_assignments: { data: [{ id: "offer-1", booking_id: "booking" }] }, bookings: { data: [booking] } });
+  const unverified = await washerWorkspace(user);
+  assert.deepEqual(unverified.assignments, []);
 });

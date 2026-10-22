@@ -38,23 +38,13 @@ const adminLinks = [
   { label: "Settlements", path: "/admin/settlements", icon: CircleDollarSign },
 ];
 
-const accountantLinks = [
-  { label: "Payment confirmations", path: "/accountant/finance", icon: Banknote },
-  { label: "Invoices", path: "/accountant/invoices", icon: ClipboardList },
-  { label: "Reports", path: "/accountant/reports", icon: Gauge },
-  { label: "Payments", path: "/accountant/payments", icon: Banknote },
-  { label: "Earnings", path: "/accountant/earnings", icon: CircleDollarSign },
-  { label: "Settlements", path: "/accountant/settlements", icon: CircleDollarSign },
-];
-
 export default function StaffConsoleLayout() {
   const { logout, profile } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const isAccountant = location.pathname.startsWith("/accountant");
   const isSupport = location.pathname.startsWith("/support");
-  const links = isSupport ? [{ label: "Support tickets", path: "/support", icon: Users }] : isAccountant ? accountantLinks : adminLinks.filter(link => link.path !== "/admin/finance" || profile?.role === "super_admin");
-  const title = isSupport ? "Support Console" : isAccountant ? "Finance Console" : "Admin Console";
+  const links = isSupport ? [{ label: "Support tickets", path: "/support", icon: Users }] : adminLinks.filter(link => link.path !== "/admin/finance" || profile?.role === "super_admin");
+  const title = isSupport ? "Support Console" : "Admin Console";
 
   async function handleLogout() {
     try {

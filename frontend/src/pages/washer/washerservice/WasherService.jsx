@@ -6,6 +6,7 @@ import useWasherServiceActions from "./useWasherServiceActions";
 import WasherServiceHeader from "./WasherServiceHeader";
 import WasherServiceStages from "./WasherServiceStages";
 import NoActiveService from "./NoActiveService";
+import { markWasherArrived } from "../../../services/washer/washerJobService";
 
 function WasherService() {
   const context = useWasher();
@@ -24,18 +25,19 @@ function WasherService() {
     if (serviceCompleted) return "completed";
     if (afterPhotosAdded) return "after";
     if (serviceStarted) return "service";
-    if (beforePhotosAdded || otpVerified || activeJob?.status === "washer_arrived") return "before";
+    if (beforePhotosAdded || otpVerified || activeJob?.status === "otp_verified") return "before";
     return "otp";
   });
   useEffect(() => {
-    if (activeJob?.status === "washer_arrived") {
+    if (otpVerified || activeJob?.status === "otp_verified") {
       setStage((current) => current === "otp" ? "before" : current);
     }
-  }, [activeJob?.status]);
+  }, [activeJob?.status, otpVerified]);
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(false);
+  const [otpReady, setOtpReady] = useState(false);
   const [beforePhotos, setBeforePhotos] = useState([]);
   const [afterPhotos, setAfterPhotos] = useState([]);
   const checklist = useServiceChecklist(activeJob, serviceStarted, setError);
@@ -59,6 +61,19 @@ function WasherService() {
     updateJobStatus: context.updateJobStatus,
   });
 
+  useEffect(() => {
+    if (!activeJob?.databaseId || stage !== "otp") return;
+    let active = true;
+    setOtpReady(false);
+    setError("");
+    markWasherArrived(activeJob.databaseId)
+      .then(() => { if (active) setOtpReady(true); })
+      .catch((requestError) => {
+        if (active) setError(requestError.message || "Unable to prepare the customer OTP. Please retry from navigation.");
+      });
+    return () => { active = false; };
+  }, [activeJob?.databaseId, stage]);
+
   if (!activeJob) {
     return <NoActiveService onDashboard={() => navigate("/washer")} />;
   }
@@ -80,6 +95,7 @@ function WasherService() {
           otp={otp}
           setOtp={setOtp}
           error={error}
+          otpReady={otpReady}
           loading={loading}
           beforePhotos={beforePhotos}
           afterPhotos={afterPhotos}

@@ -12,7 +12,7 @@ import {
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../context/AuthContext";
 import { apiRequest } from "../../api/apiClient";
-import { referenceId } from "../../services/shared/referenceId";
+import { referenceId } from "../../../../shared/referenceId.mjs";
 
 export default function AccountProfile({ children, customerView = false, notice }) {
   const { data, error, loading, refresh } = useApi("/account/profile");

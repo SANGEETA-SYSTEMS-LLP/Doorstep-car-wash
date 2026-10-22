@@ -9,6 +9,12 @@ ALTER TABLE public.washer_locations
   ADD COLUMN IF NOT EXISTS service_latitude double precision,
   ADD COLUMN IF NOT EXISTS service_longitude double precision;
 
+-- The service confirmation code is hashed at rest and expires after generation.
+ALTER TABLE public.bookings
+  ADD COLUMN IF NOT EXISTS service_otp_hash text,
+  ADD COLUMN IF NOT EXISTS service_otp_expires_at timestamptz,
+  ADD COLUMN IF NOT EXISTS otp_verified_at timestamptz;
+
 
 -- OTPs are stored as bcrypt hashes; only the trusted backend can call these helpers.
 CREATE OR REPLACE FUNCTION public.hash_service_otp(p_otp text)
@@ -81,6 +87,17 @@ BEGIN
 
   IF NOT FOUND OR v_washer.is_active IS DISTINCT FROM true OR v_washer.is_verified IS DISTINCT FROM true
      OR v_washer.status IS DISTINCT FROM 'available' THEN
+    RETURN false;
+  END IF;
+
+  -- A saved, encrypted payout destination is required before any job offer can
+  -- be sent or accepted. Provider credentials are not needed for this check.
+  IF NOT EXISTS (
+    SELECT 1 FROM public.washer_payout_accounts payout
+     WHERE payout.washer_id = p_washer_id
+       AND payout.account_label IS NOT NULL
+       AND (payout.destination_encrypted IS NOT NULL OR payout.fund_account_id IS NOT NULL)
+  ) THEN
     RETURN false;
   END IF;
 

@@ -30,7 +30,7 @@ function PasswordField({
           value={value}
           onChange={onChange}
           placeholder="Minimum 6 characters"
-          className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-12 pr-12 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+          className="h-12 w-full rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-12 text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
         />
 
         <button
@@ -38,7 +38,7 @@ function PasswordField({
           aria-label={visible ? "Hide " + label.toLowerCase() : "Show " + label.toLowerCase()}
           aria-pressed={visible}
           onClick={() => setVisible(!visible)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {visible ? <EyeOff size={19} /> : <Eye size={19} />}
         </button>

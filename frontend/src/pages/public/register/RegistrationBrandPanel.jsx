@@ -40,30 +40,33 @@ function RegistrationBrandPanel({ accountType = "customer" }) {
     </div>
   </section>;
   return (
-    <div className="hidden bg-gradient-to-br from-slate-950 via-blue-950 to-blue-700 p-12 text-white lg:flex lg:flex-col">
-      <Link to="/" className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10"><Car /></div>
-        <div>
+    <section className="hidden min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-blue-700 text-white lg:block">
+      <div className="sticky top-0 flex min-h-screen flex-col justify-between gap-10 p-10 xl:p-14">
+      <Link to="/" className="flex w-fit items-center gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10"><Car /></div>
+        <div className="leading-tight">
           <p className="text-xl font-bold">WashNow</p>
-          <p className="text-xs text-blue-200">Doorstep Car Care</p>
+          <p className="mt-1 text-xs text-blue-200">Doorstep Car Care</p>
         </div>
       </Link>
-      <div className="my-auto">
-        <p className="font-semibold text-blue-300">GET STARTED</p>
-        <h1 className="mt-4 max-w-lg text-5xl font-bold leading-tight">
+      <div className="my-auto w-full max-w-xl py-10">
+        <p className="font-semibold tracking-[0.14em] text-blue-300">GET STARTED</p>
+        <h1 className="mt-4 max-w-lg text-4xl font-bold leading-tight tracking-tight xl:text-5xl">
           {copy.title}
         </h1>
-        <p className="mt-6 max-w-lg text-lg leading-8 text-blue-100">
+        <p className="mt-5 max-w-lg text-base leading-7 text-blue-100 xl:text-lg xl:leading-8">
           {copy.description}
         </p>
-        <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-6">
-          <p className="text-sm text-blue-200">{copy.label}</p>
-          <div className="mt-5 space-y-5">
+        <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 xl:mt-9 xl:p-6">
+          <p className="text-xs font-semibold tracking-[0.12em] text-blue-200">{copy.label}</p>
+          <div className="mt-5 space-y-4">
             {copy.steps.map((text, index) => <Process key={text} number={String(index + 1).padStart(2, "0")} text={text} />)}
           </div>
         </div>
       </div>
-    </div>
+      <p className="border-t border-white/10 pt-5 text-xs text-blue-200/80">Your car care, all in one place.</p>
+      </div>
+    </section>
   );
 }
 

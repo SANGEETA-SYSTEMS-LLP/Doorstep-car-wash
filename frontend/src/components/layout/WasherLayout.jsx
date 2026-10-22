@@ -26,7 +26,7 @@ function WasherLayout() {
           </div>
         </header>
 
-        <main>
+        <main className="min-w-0">
           <Outlet />
         </main>
       </div>

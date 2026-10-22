@@ -15,11 +15,9 @@ export async function verifyPayment(
     } = req.body;
     const customerId = await customerIdForUser(req.user.id);
 
-    if (
-      !razorpay_order_id ||
-      !razorpay_payment_id ||
-      !razorpay_signature
-    ) {
+    if (typeof razorpay_order_id !== "string" || !/^order_[A-Za-z0-9]{6,64}$/.test(razorpay_order_id) ||
+      typeof razorpay_payment_id !== "string" || !/^pay_[A-Za-z0-9]{6,64}$/.test(razorpay_payment_id) ||
+      typeof razorpay_signature !== "string" || !/^[a-f0-9]{64}$/i.test(razorpay_signature)) {
       return res.status(400).json({
         message:
           "Payment verification details are missing.",
@@ -119,9 +117,6 @@ export async function verifyPayment(
         provider_payment_id:
           razorpay_payment_id,
 
-        provider_signature:
-          razorpay_signature,
-
         paid_at:
           now,
 
@@ -148,15 +143,14 @@ export async function verifyPayment(
         payment.booking?.status || "pending",
     });
   } catch (error) {
-    console.error(
-      "Verify payment:",
-      error
-    );
+    console.error("Payment verification failed", {
+      name: typeof error.name === "string" ? error.name : "Error",
+      code: typeof error.code === "string" ? error.code : undefined,
+    });
 
-    return res.status(400).json({
+    return res.status(502).json({
       success: false,
-      message:
-        error.message,
+      message: "We could not confirm the payment yet. Check the booking status before retrying.",
     });
   }
 }

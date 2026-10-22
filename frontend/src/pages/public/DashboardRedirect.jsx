@@ -67,12 +67,19 @@ function DashboardRedirect() {
     case "accountant":
       return (
         <Navigate
-          to="/supervisor/accountant"
+          to="/accountant"
           replace
         />
       );
 
     case "sub_admin":
+      return (
+        <Navigate
+          to="/sub-admin"
+          replace
+        />
+      );
+
     case "super_admin":
       return (
         <Navigate

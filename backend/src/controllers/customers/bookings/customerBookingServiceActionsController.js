@@ -4,7 +4,7 @@ import { getCustomerBooking } from "./customerBookingAccess.js";
 import { createWasherEarning } from "../../../services/finance/earningService.js";
 import { getOtp } from "../../../services/auth/otpService.js";
 import { getSignedServicePhotos } from "../../serviceOperations/servicePhotoController.js";
-import { referenceId } from "../../../utils/referenceId.js";
+import { referenceId } from "../../../../../shared/referenceId.mjs";
 
 export async function getServiceOtp(
   req,

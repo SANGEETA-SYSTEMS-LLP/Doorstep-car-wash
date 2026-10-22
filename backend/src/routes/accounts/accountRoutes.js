@@ -8,13 +8,14 @@ import { createCustomerVehicle, deleteCustomerVehicle } from "../../controllers/
 import { ensureMonthlyWashPackages, ensureOneTimeWashPackages, listPackages, validatePackage } from "../../controllers/packages/packageController.js";
 import { listCustomerOffers, validateCustomerOffer } from "../../controllers/customers/customerOfferController.js";
 import { allowRoles } from "../../middleware/roleMiddleware.js";
+import { payoutDetailsRateLimit } from "../../middleware/rateLimitMiddleware.js";
 const router = express.Router();
 router.use(requireAuth);
 router.get("/washer-location", getProfileLocation);
 router.put("/washer-location", saveProfileLocation);
 router.get("/nearby-washers", getNearbyWashers);
 router.get("/payout-account", getWasherPayout);
-router.put("/payout-account", saveWasherPayout);
+router.put("/payout-account", payoutDetailsRateLimit, saveWasherPayout);
 router.get("/bookings", getMyBookings);
 router.get("/packages", listPackages);
 router.post("/packages/monthly-plans", allowRoles("customer"), ensureMonthlyWashPackages);

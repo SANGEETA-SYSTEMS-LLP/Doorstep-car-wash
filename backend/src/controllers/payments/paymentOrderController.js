@@ -158,16 +158,14 @@ export async function createPaymentOrder(
         booking.booking_number,
     });
   } catch (error) {
-    console.error(
-      "Create payment order:",
-      error
-    );
+    console.error("Create payment order failed", {
+      name: typeof error.name === "string" ? error.name : "Error",
+      code: typeof error.code === "string" ? error.code : undefined,
+    });
 
-    return res.status(400).json({
+    return res.status(502).json({
       success: false,
-      message:
-        error.message ||
-        "Unable to create payment.",
+      message: "Unable to create the payment right now. Please retry shortly.",
     });
   }
 }

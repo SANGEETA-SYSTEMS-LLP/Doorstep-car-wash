@@ -1,4 +1,4 @@
-import { referenceId } from "../../../services/shared/referenceId";
+import { referenceId } from "../../../../../shared/referenceId.mjs";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";

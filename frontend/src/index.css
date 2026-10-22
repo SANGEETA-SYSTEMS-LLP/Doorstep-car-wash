@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
-/* Shared palette: ocean blue, muted teal, and cool neutral surfaces. */
+/* Shared visual system: deep ocean blue, restrained teal, and cool neutral surfaces. */
 @theme {
-  --font-sans: "Segoe UI Variable", "Segoe UI", Inter, ui-sans-serif, system-ui, sans-serif;
-  --color-brand: #216387;
-  --color-brand-strong: #1c506e;
-  --color-brand-soft: #eff6fa;
+  --font-sans: Inter, "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --color-brand: #205d82;
+  --color-brand-strong: #194c6b;
+  --color-brand-soft: #eff6fb;
   --color-surface: #ffffff;
   --color-page: #f6f8fa;
   --color-border: #dce3eb;
 
-  --color-blue-50: #eff6fa;
-  --color-blue-100: #dcecf5;
-  --color-blue-200: #bdd9e9;
-  --color-blue-300: #91bfd7;
-  --color-blue-400: #5b9dbf;
-  --color-blue-500: #327da4;
-  --color-blue-600: #216387;
-  --color-blue-700: #1c506e;
-  --color-blue-800: #1b435b;
-  --color-blue-900: #19384c;
-  --color-blue-950: #102635;
+  --color-blue-50: #eff6fb;
+  --color-blue-100: #dcebf5;
+  --color-blue-200: #bad5e9;
+  --color-blue-300: #8fb9d5;
+  --color-blue-400: #5d96bc;
+  --color-blue-500: #34769e;
+  --color-blue-600: #205d82;
+  --color-blue-700: #194c6b;
+  --color-blue-800: #173f58;
+  --color-blue-900: #153449;
+  --color-blue-950: #0c2233;
 
   --color-cyan-50: #effaf9;
   --color-cyan-100: #d6f0ec;
@@ -34,17 +34,17 @@
   --color-cyan-900: #193c3a;
   --color-cyan-950: #0b2423;
 
-  --color-slate-50: #f6f8fa;
-  --color-slate-100: #edf1f5;
-  --color-slate-200: #dce3eb;
-  --color-slate-300: #c2cdd9;
-  --color-slate-400: #8292a6;
-  --color-slate-500: #5e7086;
-  --color-slate-600: #495b71;
-  --color-slate-700: #36485e;
-  --color-slate-800: #24354a;
-  --color-slate-900: #172639;
-  --color-slate-950: #0e1929;
+  --color-slate-50: #f7f9fb;
+  --color-slate-100: #eef2f6;
+  --color-slate-200: #dfe6ed;
+  --color-slate-300: #c5d0dc;
+  --color-slate-400: #8493a5;
+  --color-slate-500: #607084;
+  --color-slate-600: #49596d;
+  --color-slate-700: #35465a;
+  --color-slate-800: #243448;
+  --color-slate-900: #172638;
+  --color-slate-950: #0d1928;
 
   --color-green-50: #eff9f3;
   --color-green-100: #d9efe2;
@@ -78,7 +78,7 @@ body {
   font-family: var(--font-sans);
   font-size: 0.9375rem;
   line-height: 1.55;
-  letter-spacing: 0.005em;
+  letter-spacing: 0;
   background: var(--color-slate-50);
   color: var(--color-slate-900);
 }
@@ -95,7 +95,9 @@ button {
 }
 /* Shared responsive foundation */
 :root { font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
-#root { min-height: 100dvh; }
+#root { width: 100%; min-width: 0; min-height: 100dvh; overflow-x: clip; }
+:where(main, aside, article, section, form) { min-width: 0; }
+:where(.flex, .grid) > * { min-width: 0; }
 :where(button, a, input, select, textarea):focus-visible { outline: 3px solid var(--color-blue-400); outline-offset: 3px; }
 button:disabled { cursor: not-allowed; }
 :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
@@ -135,11 +137,17 @@ a { text-underline-offset: 0.2em; }
  h1.text-5xl, h1.text-6xl { font-size:2.5rem; line-height:1.15; }
  .mobile-navigation-content nav { grid-template-columns:1fr; }
 }
+@media (min-width:1024px) and (max-height:760px) {
+ .login-benefits-panel { padding:1.5rem; }
+ .login-benefits-content { padding-block:.75rem; }
+ .login-benefits-content > div:last-child { margin-top:1.25rem; }
+ .login-benefits-content > div:last-child > :not(:last-child) { margin-block-end:.75rem; }
+}
 @media (prefers-reduced-motion:reduce) {
  html { scroll-behavior:auto; }
  *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
 }
 
-.overflow-x-auto { overscroll-behavior-inline: contain; }
+.overflow-x-auto { max-width: 100%; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; }
 .overflow-x-auto > table { min-width: 640px; }
 @media (max-width: 639px) { .mobile-navigation + main { width: 100%; } }

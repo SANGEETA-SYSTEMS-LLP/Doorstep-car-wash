@@ -1,6 +1,6 @@
 import { test, mock } from "node:test";
 import assert from "node:assert/strict";
-import { referenceId } from "../src/utils/referenceId.js";
+import { referenceId } from "../../shared/referenceId.mjs";
 const id = "22222222-2222-4222-8222-222222222222";
 let owner = null, writes = [], lookups = [];
 mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: {

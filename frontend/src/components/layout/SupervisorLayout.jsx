@@ -15,7 +15,7 @@ export default function SupervisorLayout() {
     useAuth();
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f5f8fb] lg:flex-row">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-[#f5f8fb] lg:flex-row">
       <SupervisorSidebar />
 
       <main className="min-w-0 flex-1">
@@ -31,7 +31,7 @@ export default function SupervisorLayout() {
           </div>
         </header>
 
-        <div className="mx-auto w-full max-w-[1720px] p-4 sm:p-6 xl:p-8">
+        <div className="mx-auto min-w-0 w-full max-w-[1720px] p-4 sm:p-6 xl:p-8">
           <Outlet />
         </div>
       </main>

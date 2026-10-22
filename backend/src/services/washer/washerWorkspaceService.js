@@ -1,5 +1,5 @@
 import { supabaseAdmin as db } from "../../config/supabase.js";
-import { referenceId } from "../../utils/referenceId.js";
+import { referenceId } from "../../../../shared/referenceId.mjs";
 export const activeJobStatuses = ["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started", "service_completed"];
 const bookingColumns = "id, booking_number, customer_id, address_id, vehicle_id, package_id, assigned_washer_id, scheduled_date, scheduled_start_time, status, total_amount, customer_notes, created_at";
 
@@ -52,22 +52,25 @@ export async function hydrateWasherJobs(bookings, washer) {
 export async function washerWorkspace(userId) {
   const washer = await washerForUser(userId);
   const now = new Date().toISOString();
-  const [offersResult, jobsResult] = await Promise.all([
+  const [payoutResult, offersResult, jobsResult] = await Promise.all([
+    db.from("washer_payout_accounts").select("washer_id,account_label,destination_encrypted,fund_account_id").eq("washer_id", washer.id).maybeSingle(),
     db.from("booking_assignments").select("id, booking_id, washer_id, status, distance_km, expires_at, offered_at").eq("washer_id", washer.id).eq("status", "pending").gt("expires_at", now).order("offered_at", { ascending: true }),
     db.from("bookings").select(bookingColumns).eq("assigned_washer_id", washer.id).order("scheduled_date", { ascending: false }).limit(100),
   ]);
+  if (payoutResult.error) throw payoutResult.error;
   if (offersResult.error) throw offersResult.error;
   if (jobsResult.error) throw jobsResult.error;
+  const payoutAccountConfigured = Boolean(payoutResult.data?.account_label && (payoutResult.data.destination_encrypted || payoutResult.data.fund_account_id));
   const offers = offersResult.data || [];
   const offerBookings = await records("bookings", offers.map(o => o.booking_id), bookingColumns);
-  const eligibleOffers = offers.filter(o => {
+  const eligibleOffers = washer.is_verified && payoutAccountConfigured ? offers.filter(o => {
     const booking = offerBookings.get(o.booking_id);
     return booking && !booking.assigned_washer_id && ["pending", "confirmed", "finding_washer", "support_escalated"].includes(booking.status);
-  });
+  }) : [];
   const all = new Map((jobsResult.data || []).map(b => [b.id, b]));
   eligibleOffers.forEach(o => all.set(o.booking_id, offerBookings.get(o.booking_id)));
   const enriched = new Map((await hydrateWasherJobs([...all.values()], washer)).map(b => [b.id, b]));
-  return { washer, assignments: eligibleOffers.map(o => ({ ...o, booking: enriched.get(o.booking_id) })), jobs: (jobsResult.data || []).map(b => enriched.get(b.id)) };
+  return { washer, payoutAccountConfigured, assignments: eligibleOffers.map(o => ({ ...o, booking: enriched.get(o.booking_id) })), jobs: (jobsResult.data || []).map(b => enriched.get(b.id)) };
 }
 
 export async function washerBooking(userId, bookingId) {

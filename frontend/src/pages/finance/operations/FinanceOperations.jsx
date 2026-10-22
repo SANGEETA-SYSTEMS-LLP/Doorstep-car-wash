@@ -15,7 +15,7 @@ export default function FinanceOperations() {
   const [message, setMessage] = useState("");
   const [payoutTarget, setPayoutTarget] = useState("");
   const [selectedWasher, setSelectedWasher] = useState(null);
-  const [payoutDraft, setPayoutDraft] = useState(null);
+  const [payoutRequest, setPayoutRequest] = useState(null);
   const [refundTarget, setRefundTarget] = useState("");
   const [refundAmount, setRefundAmount] = useState("");
   const [refundReason, setRefundReason] = useState("");
@@ -24,7 +24,8 @@ export default function FinanceOperations() {
   const { data: payoutOperations, error: payoutOperationsError, refresh: payoutOperationsRefresh } = useApi(`/finance/operations?kind=payout&page=${payoutPage}`);
   const { data: refundOperations, error: refundOperationsError, refresh: refundOperationsRefresh } = useApi(`/finance/operations?kind=refund&page=${refundPage}`);
   const { data: payoutData, error: payoutError, refresh: payoutRefresh } = useApi(`/finance/washer-payouts?status=pending&page=${payoutPage}`);
-  const pageError = payoutOperationsError || refundOperationsError || payoutError;
+  const { data: providerStatus, error: providerStatusError } = useApi("/finance/provider-status");
+  const pageError = payoutOperationsError || refundOperationsError || payoutError || providerStatusError;
 
   useEffect(() => {
     const timer = setInterval(() => { payoutOperationsRefresh(); refundOperationsRefresh(); payoutRefresh(); }, 30000);
@@ -38,7 +39,9 @@ export default function FinanceOperations() {
       const result = await apiRequest(path, { method, body: JSON.stringify(body) });
       const providerStatus = String(result.status || "").toLowerCase();
       setMessage(result.kind === "payout"
-        ? providerStatus === "processed"
+        ? result.simulated
+          ? "Simulation complete for the submission flow. No money moved; washer earnings remain pending."
+          : providerStatus === "processed"
           ? `Payment Completed · RazorpayX reference ${result.providerId || result.id}.`
           : `Payout submitted · ${result.status || "awaiting provider confirmation"}. The payment status will update when RazorpayX confirms settlement.`
         : `Saved${result.status ? ` · ${result.status}` : ""}.`);
@@ -47,7 +50,9 @@ export default function FinanceOperations() {
       payoutRefresh();
       return result;
     } catch (requestError) {
-      setMessage(requestError.message);
+      setMessage(requestError.message === "Payment provider credentials are not configured."
+        ? "RazorpayX is not configured. Add RAZORPAYX_KEY_ID, RAZORPAYX_KEY_SECRET, and RAZORPAYX_ACCOUNT_NUMBER to the backend environment, then restart the API. No payout was submitted."
+        : requestError.message);
       return false;
     } finally {
       setBusy(false);
@@ -57,34 +62,46 @@ export default function FinanceOperations() {
   async function submitOperation(event, kind) {
     event.preventDefault();
     const isPayout = kind === "payout";
-    const draft = isPayout ? payoutDraft : refundDraft;
+    if (isPayout) {
+      const request = payoutRequest || {
+        id: crypto.randomUUID(),
+        kind,
+        targetId: payoutTarget,
+        reason: `Washer payout for ${selectedWasher?.washer_name || "washer"} · ${selectedWasher?.pending_earning_count || 0} eligible earnings`,
+        paymentMethod: payout?.selectedMode || "IMPS",
+      };
+      setPayoutRequest(request);
+      if (await perform("/finance/operations", request)) {
+        setPayoutRequest(null);
+        setPayoutTarget("");
+        setSelectedWasher(null);
+        setPayout(null);
+      }
+      return;
+    }
+    const draft = refundDraft;
     if (draft) {
       if (await perform("/finance/operations", draft)) {
-        if (isPayout) { setPayoutDraft(null); setPayoutTarget(""); setSelectedWasher(null); setPayout(null); }
-        else { setRefundDraft(null); setRefundTarget(""); setRefundAmount(""); setRefundReason(""); }
+        setRefundDraft(null); setRefundTarget(""); setRefundAmount(""); setRefundReason("");
       }
       return;
     }
     const request = {
       id: crypto.randomUUID(),
       kind,
-      targetId: isPayout ? payoutTarget : refundTarget,
-      amount: isPayout ? undefined : refundAmount,
-      reason: isPayout
-        ? `Washer payout for ${selectedWasher?.washer_name || "washer"} · ${selectedWasher?.pending_earning_count || 0} eligible earnings`
-        : refundReason.trim(),
-      ...(isPayout ? { paymentMethod: payout?.selectedMode || "IMPS" } : {}),
+      targetId: refundTarget,
+      amount: refundAmount,
+      reason: refundReason.trim(),
     };
     const result = await perform("/finance/operations", { ...request, prepareOnly: true });
     if (result) {
-      const prepared = { ...request, paymentMethod: result.paymentMethod || request.paymentMethod, amountPaise: result.amountPaise };
-      if (isPayout) setPayoutDraft(prepared);
-      else setRefundDraft(prepared);
+      const prepared = { ...request, amountPaise: result.amountPaise };
+      setRefundDraft(prepared);
     }
   }
 
   function reviewWasherPayout(row) {
-    if (payoutDraft || busy) return;
+    if (payoutRequest || busy) return;
     setPayoutTarget(row.washer_id);
     setSelectedWasher(row);
     setPayout(row.payment_destination ? { method: row.payment_method, destination: row.payment_destination, accountType: row.payout_account_type, selectedMode: row.payout_account_type === "vpa" ? "UPI" : "IMPS", availableMethods: row.available_payment_methods || [] } : null);
@@ -100,15 +117,16 @@ export default function FinanceOperations() {
     <section id="washer-payments" aria-labelledby="washer-payments-heading" className="space-y-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-6">
       <div className="flex items-start gap-3"><span className="rounded-xl bg-blue-50 p-2.5 text-blue-700"><Users size={20} aria-hidden="true" /></span><div><h2 id="washer-payments-heading" className="text-xl font-bold text-slate-950">Washer and supervisor payments</h2><p className="mt-1 text-sm text-slate-600">Review pending washer earnings, payout method, and provider-confirmed settlement.</p></div></div>
 
-      <PendingWasherPayments rows={payoutData?.rows} error={payoutError} busy={busy || Boolean(payoutDraft)} refresh={payoutRefresh} review={reviewWasherPayout} />
+      {!providerStatusError && providerStatus?.razorpayXMode === "simulation" && <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">RazorpayX simulation mode is on for local testing. You can test the review and submission flow, but no money moves and earnings remain pending.</p>}
+      {!providerStatusError && providerStatus?.razorpayXConfigured === false && <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">Washer transfers are blocked because RazorpayX is not configured on the backend. Set <code>RAZORPAYX_KEY_ID</code>, <code>RAZORPAYX_KEY_SECRET</code>, and <code>RAZORPAYX_ACCOUNT_NUMBER</code> in <code>backend/.env</code> using credentials for the same RazorpayX test or live account, then restart the API. Pending earnings remain pending until Razorpay confirms a payout.</p>}
+      <PendingWasherPayments rows={payoutData?.rows} error={payoutError} busy={busy || Boolean(payoutRequest)} refresh={payoutRefresh} review={reviewWasherPayout} providerConfigured={providerStatus?.razorpayXConfigured === true} />
 
       <form onSubmit={event => submitOperation(event, "payout")} className="grid gap-3 rounded-xl border border-slate-200 bg-white p-5 md:grid-cols-2">
-        <div className="md:col-span-2"><h3 className="font-bold text-slate-900">Review washer payout</h3><p className="mt-1 text-sm text-slate-500">Select a washer above to load their saved payout method and pending earnings automatically.</p></div>
+        <div className="md:col-span-2"><h3 className="font-bold text-slate-900">Review and pay washer</h3><p className="mt-1 text-sm text-slate-500">Select a washer above, check the saved destination and pending amount, then send the payout.</p></div>
         {selectedWasher && <div className="rounded-lg bg-slate-50 p-4 text-sm text-slate-700 md:col-span-2"><strong>{selectedWasher.washer_name}</strong>{selectedWasher.washer_phone && <span> · {selectedWasher.washer_phone}</span>}<p className="mt-1">{payout?.method || "Payout method unavailable"} · {payout?.destination || "No payout destination saved"}</p><p className="mt-1">{selectedWasher.pending_earning_count || 0} eligible booking(s) · {money(Math.round(Number(selectedWasher.pending_total_amount || 0) * 100))}</p></div>}
-        {payout?.availableMethods?.length > 0 && <label className="text-sm font-medium text-slate-700 md:col-span-2">Transfer method<select disabled={!!payoutDraft} value={payout.selectedMode} onChange={event => setPayout({ ...payout, selectedMode: event.target.value })} className={`${inputClass} mt-1.5`}>{payout.availableMethods.map(mode => <option key={mode} value={mode}>{mode === "UPI" ? "UPI" : `${mode} bank transfer`} via RazorpayX</option>)}</select></label>}
-        {payoutDraft && <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900 md:col-span-2">Review: {payoutDraft.paymentMethod} payout to {payout?.destination || "verified washer account"} · {money(payoutDraft.amountPaise)}. Confirm sends the transfer through RazorpayX.</p>}
-        {selectedWasher && <button disabled={busy || !payoutTarget || !payout?.availableMethods?.length} className="rounded-lg bg-slate-900 p-3 font-bold text-white disabled:opacity-50">{busy ? "Processing…" : payoutDraft ? "Confirm and submit payout" : "Review payout"}</button>}
-        {payoutDraft && <button type="button" disabled={busy} onClick={async () => { if (await perform(`/finance/operations/${payoutDraft.id}/cancel`, {})) setPayoutDraft(null); }} className="rounded-lg border border-slate-300 p-3 text-sm font-semibold text-slate-700">Cancel draft</button>}
+        {payout?.availableMethods?.length > 0 && <label className="text-sm font-medium text-slate-700 md:col-span-2">Transfer method<select disabled={busy || Boolean(payoutRequest)} value={payout.selectedMode} onChange={event => setPayout({ ...payout, selectedMode: event.target.value })} className={`${inputClass} mt-1.5`}>{payout.availableMethods.map(mode => <option key={mode} value={mode}>{mode === "UPI" ? "UPI" : `${mode} bank transfer`} via RazorpayX</option>)}</select></label>}
+        {payoutRequest && <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900 md:col-span-2">The provider did not confirm the previous request. Retry uses the same request ID to prevent a duplicate transfer.</p>}
+        {selectedWasher && <button disabled={busy || !payoutTarget || !payout?.availableMethods?.length || providerStatus?.razorpayXConfigured !== true} className="rounded-lg bg-slate-900 p-3 font-bold text-white disabled:opacity-50">{busy ? "Sending payout…" : payoutRequest ? "Retry same payout" : `Pay washer now · ${money(Math.round(Number(selectedWasher.pending_total_amount || 0) * 100))}`}</button>}
       </form>
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white"><div className="border-b border-slate-100 p-5"><h3 className="font-bold text-slate-900">Washer payout records</h3><p className="mt-1 text-sm text-slate-500">Pending, processed, and reconciled transfers.</p></div>{payoutOperationsError && <p role="alert" className="p-4 text-sm text-red-700">{payoutOperationsError}</p>}<OperationHistory rows={payoutOperations?.rows} kind="payout" busy={busy} perform={perform} />{pagination(payoutPage, setPayoutPage, payoutOperations)}</div>

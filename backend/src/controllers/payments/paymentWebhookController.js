@@ -161,10 +161,10 @@ export async function razorpayWebhook(
       "OK"
     );
   } catch (error) {
-    console.error(
-      "Razorpay webhook:",
-      error
-    );
+    console.error("Razorpay webhook processing failed", {
+      name: typeof error.name === "string" ? error.name : "Error",
+      code: typeof error.code === "string" ? error.code : undefined,
+    });
 
     return res.status(500).send(
       "Webhook processing failed"

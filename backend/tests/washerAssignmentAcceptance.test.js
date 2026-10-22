@@ -15,6 +15,8 @@ test("washer assignment acceptance requires a verified online washer and confirm
       CREATE TABLE profiles(id uuid PRIMARY KEY, role text, is_active boolean);
       CREATE TABLE washers(id uuid PRIMARY KEY, user_id uuid, status text, is_active boolean,
         is_verified boolean, service_radius_km numeric, updated_at timestamptz);
+      CREATE TABLE washer_payout_accounts(washer_id uuid PRIMARY KEY, account_label text,
+        destination_encrypted text, fund_account_id text);
       CREATE TABLE bookings(id uuid PRIMARY KEY, status text, assigned_washer_id uuid,
         package_id uuid, scheduled_date date, scheduled_start_time time,
         latitude double precision, longitude double precision, requires_supervisor boolean,
@@ -51,6 +53,7 @@ test("washer assignment acceptance requires a verified online washer and confirm
     await db.exec(`
       INSERT INTO profiles VALUES (${query(ids.user)}, 'washer', true);
       INSERT INTO washers VALUES (${query(ids.washer)}, ${query(ids.user)}, 'available', true, true, 5, now());
+      INSERT INTO washer_payout_accounts VALUES (${query(ids.washer)}, 'Bank account •••• 7890 (HDFC0000001)', 'encrypted-test-value', null);
       INSERT INTO bookings VALUES (${query(ids.booking)}, 'confirmed', null, ${query(ids.package)},
         current_date, '23:30', 17, 78, false, now());
       INSERT INTO booking_assignments VALUES (${query(ids.accepted)}, ${query(ids.booking)}, ${query(ids.washer)},
@@ -90,6 +93,8 @@ test("washer assignment acceptance requires a verified online washer and confirm
 
     await db.exec(`UPDATE washers SET status = 'available', is_verified = false WHERE id = ${query(ids.washer)};`);
     await assert.rejects(db.query(`SELECT public.accept_booking_assignment(${query(ids.accepted)})`), /Supervisor verification is required/);
+    await db.exec(`UPDATE washers SET is_verified = true WHERE id = ${query(ids.washer)}; DELETE FROM washer_payout_accounts WHERE washer_id = ${query(ids.washer)};`);
+    assert.equal((await db.query(`SELECT public.booking_washer_is_eligible(${query(ids.booking)}, ${query(ids.washer)}) AS eligible`)).rows[0].eligible, false);
   } finally {
     await db.close();
   }

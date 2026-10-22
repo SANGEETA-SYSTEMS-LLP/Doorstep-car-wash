@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "../../../config/supabase.js";
 import { getAssignedBooking } from "./washerJobAccess.js";
+import { deleteOtp } from "../../../services/auth/otpService.js";
 
 export async function verifyServiceOtp(req, res) {
   try {
@@ -50,6 +51,7 @@ export async function verifyServiceOtp(req, res) {
       .single();
 
     if (error) throw error;
+    deleteOtp(bookingId);
     return res.json({ success: true, booking: data });
   } catch (error) {
     console.error("Verify OTP:", error);
@@ -62,9 +64,9 @@ export async function startService(req, res) {
     const { bookingId } = req.params;
     const booking = await getAssignedBooking(bookingId, req.user.id);
 
-    if (!["washer_arrived", "otp_verified"].includes(booking.status)) {
+    if (booking.status !== "otp_verified") {
       return res.status(400).json({
-        message: "The washer must arrive before starting service.",
+        message: "Verify the customer service OTP before starting service.",
       });
     }
 
@@ -110,7 +112,7 @@ export async function startService(req, res) {
       })
       .eq("id", bookingId)
       .eq("assigned_washer_id", booking.assigned_washer_id)
-      .in("status", ["washer_arrived", "otp_verified"])
+      .eq("status", "otp_verified")
       .select("*")
       .single();
 

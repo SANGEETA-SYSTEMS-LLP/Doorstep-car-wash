@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "../../config/supabase.js";
-import { referenceId } from "../../utils/referenceId.js";
+import { referenceId } from "../../../../shared/referenceId.mjs";
 
 export function normalizeServiceAddress(value) {
   return String(value || "").normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "").trim();

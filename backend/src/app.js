@@ -4,6 +4,8 @@ import locationRoutes from "./routes/locations/locationRoutes.js";
 import express from "express";
 import accountRoutes from "./routes/accounts/accountRoutes.js";
 import cors from "cors";
+import helmet from "helmet";
+import { apiRateLimit } from "./middleware/rateLimitMiddleware.js";
 
 import assignmentRoutes from "./routes/assignments/assignmentRoutes.js";
 import washerJobRoutes from "./routes/washer/washerJobRoutes.js";
@@ -24,6 +26,12 @@ import {
 const app =
   express();
 
+const trustProxyHops = Number(process.env.TRUST_PROXY_HOPS || 0);
+if (!Number.isSafeInteger(trustProxyHops) || trustProxyHops < 0 || trustProxyHops > 10) {
+  throw new Error("TRUST_PROXY_HOPS must be an integer from 0 to 10.");
+}
+app.set("trust proxy", trustProxyHops);
+
 function configuredFrontendOrigins() {
   const configured = (process.env.FRONTEND_URL || "")
     .split(",")
@@ -41,6 +49,9 @@ function configuredFrontendOrigins() {
     if (!["http:", "https:"].includes(url.protocol) || url.username || url.password) {
       throw new Error("FRONTEND_URL must contain trusted http(s) origins.");
     }
+    if (process.env.NODE_ENV === "production" && url.protocol !== "https:") {
+      throw new Error("Production FRONTEND_URL entries must use HTTPS.");
+    }
     if (url.pathname !== "/" || url.search || url.hash) {
       throw new Error("FRONTEND_URL entries must be origins without a path, query, or fragment.");
     }
@@ -54,14 +65,17 @@ if (process.env.NODE_ENV === "production" && allowedFrontendOrigins.size === 0) 
 }
 
 app.disable("x-powered-by");
-app.use((req, res, next) => {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-Frame-Options", "DENY");
-  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=(self)");
-  res.setHeader("Cross-Origin-Resource-Policy", "same-site");
-  next();
-});
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: { "frame-ancestors": ["'none'"] },
+  },
+  frameguard: { action: "deny" },
+  hsts: process.env.NODE_ENV === "production"
+    ? { maxAge: 31536000, includeSubDomains: true, preload: false }
+    : false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "same-site" },
+}));
 
 app.use(
   cors({
@@ -75,9 +89,10 @@ app.use(
       } catch { return callback(null, false); }
       return callback(null, allowedFrontendOrigins.has(normalized));
     },
-    credentials: true,
   })
 );
+
+app.use("/api", apiRateLimit);
 
 app.post(
   "/api/payments/webhook",

@@ -5,7 +5,7 @@ import ServiceChecklist from "./ServiceChecklist";
 import CompletedService from "./CompletedService";
 
 function WasherServiceStages({
-  stage, otp, setOtp, error, loading, beforePhotos, afterPhotos,
+  stage, otp, setOtp, error, otpReady, loading, beforePhotos, afterPhotos,
   checklist, checklistLoading, savingTask, retryChecklist, activeJob,
   allTasksCompleted, toggleTask, moveToAfterPhotos, onVerifyOtp,
   onBeforePhotos, onStartService, onAfterPhotos, onCompleteJob,
@@ -13,7 +13,7 @@ function WasherServiceStages({
 }) {
   return (
     <>
-      {stage === "otp" && <OtpVerification otp={otp} setOtp={setOtp} verifyOtp={onVerifyOtp} error={error} />}
+      {stage === "otp" && <OtpVerification otp={otp} setOtp={setOtp} verifyOtp={onVerifyOtp} error={error} otpReady={otpReady} />}
       {stage === "before" && (
         <PhotoStage
           title="Before Service Photos"

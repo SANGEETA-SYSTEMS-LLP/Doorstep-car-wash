@@ -16,8 +16,8 @@ const steps = [
 
 function BookingSteps({ currentStep }) {
   return (
-    <div className="overflow-x-auto border-b border-slate-200 bg-white">
-      <div className="mx-auto flex min-w-[650px] max-w-4xl items-center justify-between px-6 py-5">
+    <div className="overflow-hidden border-b border-slate-200 bg-white sm:overflow-x-auto">
+      <div className="mx-auto grid w-full max-w-4xl grid-cols-5 gap-1 px-2 py-3 sm:flex sm:min-w-[650px] sm:items-center sm:justify-between sm:px-6 sm:py-5">
         {steps.map((step, index) => {
           const Icon = step.icon;
 
@@ -25,10 +25,10 @@ function BookingSteps({ currentStep }) {
           const active = step.id === currentStep;
 
           return (
-            <div key={step.id} className="flex flex-1 items-center">
-              <div className="flex items-center gap-3">
+            <div key={step.id} className="flex min-w-0 flex-col items-center sm:flex-1 sm:flex-row">
+              <div className="flex min-w-0 flex-col items-center gap-1 sm:flex-row sm:gap-3">
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10 ${
                     completed
                       ? "bg-green-600 text-white"
                       : active
@@ -44,12 +44,12 @@ function BookingSteps({ currentStep }) {
                 </div>
 
                 <div>
-                  <p className="text-xs text-slate-400">
+                  <p className="hidden text-xs text-slate-400 sm:block">
                     Step {step.id}
                   </p>
 
                   <p
-                    className={`text-sm font-semibold ${
+                    className={`max-w-full text-center text-[10px] font-semibold leading-tight sm:text-left sm:text-sm ${
                       active || completed
                         ? "text-slate-900"
                         : "text-slate-400"
@@ -62,7 +62,7 @@ function BookingSteps({ currentStep }) {
 
               {index !== steps.length - 1 && (
                 <div
-                  className={`mx-4 h-[2px] flex-1 ${
+                  className={`hidden mx-4 h-[2px] flex-1 sm:block ${
                     completed ? "bg-green-500" : "bg-slate-200"
                   }`}
                 />

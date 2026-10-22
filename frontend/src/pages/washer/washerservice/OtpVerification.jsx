@@ -1,6 +1,6 @@
 import { LockKeyhole, ShieldCheck } from "lucide-react";
 
-function OtpVerification({ otp, setOtp, verifyOtp, error }) {
+function OtpVerification({ otp, setOtp, verifyOtp, error, otpReady }) {
   return (
     <section className="mx-auto mt-8 max-w-xl rounded-3xl border border-slate-200 bg-white p-7 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-blue-600">
@@ -12,7 +12,7 @@ function OtpVerification({ otp, setOtp, verifyOtp, error }) {
             </h2>
 
             <p className="mt-2 leading-6 text-slate-500">
-              {import.meta.env.DEV ? "Development mode: enter any 6 digits to continue testing." : "Ask the customer for the 6-digit service verification OTP before starting the wash."}
+              Ask the customer for the 6-digit service verification OTP before starting the wash.
             </p>
 
             <input
@@ -39,11 +39,11 @@ function OtpVerification({ otp, setOtp, verifyOtp, error }) {
             )}
 
             <button
-              disabled={otp.length !== 6}
+              disabled={otp.length !== 6 || !otpReady}
               onClick={verifyOtp}
               className="mt-6 w-full rounded-xl bg-blue-600 py-4 font-semibold text-white disabled:opacity-40"
             >
-              Verify OTP
+              {otpReady ? "Verify OTP" : "Preparing service OTP..."}
             </button>
 
             <div className="mt-5 flex gap-3 rounded-xl bg-amber-50 p-4 text-left">

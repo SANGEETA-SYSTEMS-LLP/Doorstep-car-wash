@@ -60,6 +60,8 @@ import SupervisorEscalationDetails from "../pages/supervisor/escalations/Supervi
 import SupervisorJobDetails from "../pages/supervisor/jobs/SupervisorJobDetails";
 import SupervisorProfile from "../pages/supervisor/profile/SupervisorProfile";
 import StaffConsoleLayout from "../components/layout/StaffConsoleLayout";
+import SubAdminLayout from "../components/layout/SubAdminLayout";
+import AccountantLayout from "../components/layout/AccountantLayout";
 import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
 import AdminRoleDashboard from "../pages/admin/dashboard/AdminRoleDashboard";
 import ResourcePage from "../pages/admin/resources/ResourcePage";
@@ -68,7 +70,11 @@ function LegacyAccountantRedirect() {
   const {resource} = useParams();
   const {search, hash} = useLocation();
   const path = ["payments","earnings","settlements","finance","reports","invoices"].includes(resource) ? "/" + resource : "";
-  return <Navigate to={"/supervisor/accountant" + path + search + hash} replace />;
+  return <Navigate to={"/accountant" + path + search + hash} replace />;
+}
+function LegacyAccountantHomeRedirect() {
+  const {search, hash} = useLocation();
+  return <Navigate to={"/accountant" + search + hash} replace />;
 }
 function AppRoutes() {
   return (
@@ -306,7 +312,7 @@ function AppRoutes() {
         path="/admin"
         element={
           <ProtectedRoute>
-            <RoleRoute allowedRoles={["sub_admin", "super_admin"]}>
+            <RoleRoute allowedRoles={["super_admin"]}>
               <StaffConsoleLayout />
             </RoleRoute>
           </ProtectedRoute>
@@ -324,10 +330,18 @@ function AppRoutes() {
         <Route path=":resource" element={<ResourcePage />} />
       </Route>
 
-      <Route path="/accountant" element={<Navigate to="/supervisor/accountant" replace />} />
-      <Route path="/accountant/:resource" element={<LegacyAccountantRedirect />} />
-      <Route path="/supervisor/accountant" element={<ProtectedRoute><RoleRoute allowedRoles={["accountant", "supervisor", "sub_admin", "super_admin"]}><SupervisorLayout /></RoleRoute></ProtectedRoute>}>
-        <Route index element={<AccountantDashboard base="/supervisor/accountant" />} />
+      <Route path="/sub-admin" element={<ProtectedRoute><RoleRoute allowedRoles={["sub_admin"]}><SubAdminLayout /></RoleRoute></ProtectedRoute>}>
+        <Route index element={<AdminRoleDashboard base="/sub-admin" />} />
+        <Route path="support" element={<SupportDashboard />} />
+        <Route path="operations" element={<OperationsMap />} />
+        <Route path="accountant" element={<AccountantDashboard base="/sub-admin" />} />
+        <Route path="reports" element={<Reports />} />
+        <Route path="invoices" element={<Invoice />} />
+        <Route path=":resource" element={<ResourcePage base="admin" />} />
+      </Route>
+
+      <Route path="/accountant" element={<ProtectedRoute><RoleRoute allowedRoles={["accountant", "supervisor", "sub_admin", "super_admin"]}><AccountantLayout /></RoleRoute></ProtectedRoute>}>
+        <Route index element={<AccountantDashboard base="/accountant" />} />
         <Route path="payments" element={<ResourcePage base="accountant" resource="payments" />} />
         <Route path="earnings" element={<ResourcePage base="accountant" resource="earnings" />} />
         <Route path="settlements" element={<ResourcePage base="accountant" resource="settlements" />} />
@@ -335,6 +349,8 @@ function AppRoutes() {
         <Route path="reports" element={<RoleRoute allowedRoles={["accountant", "sub_admin", "super_admin"]}><Reports /></RoleRoute>} />
         <Route path="invoices" element={<RoleRoute allowedRoles={["accountant", "sub_admin", "super_admin"]}><Invoice /></RoleRoute>} />
       </Route>
+      <Route path="/supervisor/accountant" element={<LegacyAccountantHomeRedirect />} />
+      <Route path="/supervisor/accountant/:resource" element={<LegacyAccountantRedirect />} />
 
       <Route path="/support" element={<ProtectedRoute><RoleRoute allowedRoles={["support", "sub_admin", "super_admin"]}><StaffConsoleLayout /></RoleRoute></ProtectedRoute>}><Route index element={<SupportDashboard />} /></Route>
       {/* NOT FOUND */}

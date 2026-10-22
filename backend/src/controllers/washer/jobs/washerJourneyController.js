@@ -1,5 +1,27 @@
 import { supabaseAdmin } from "../../../config/supabase.js";
 import { getWasher, getAssignedBooking } from "./washerJobAccess.js";
+import { randomInt } from "node:crypto";
+import { getOtp, storeOtp } from "../../../services/auth/otpService.js";
+
+const otpGenerationPromises = new Map();
+
+async function createServiceOtp(bookingId) {
+  const otp = String(randomInt(0, 1_000_000)).padStart(6, "0");
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+  const { data: hash, error: hashError } = await supabaseAdmin.rpc("hash_service_otp", { p_otp: otp });
+  if (hashError || !hash) throw hashError || new Error("Unable to secure service OTP.");
+
+  storeOtp(bookingId, otp);
+  return { service_otp_hash: hash, service_otp_expires_at: expiresAt };
+}
+
+function createServiceOtpOnce(bookingId) {
+  const pending = otpGenerationPromises.get(bookingId);
+  if (pending) return pending;
+  const generation = createServiceOtp(bookingId).finally(() => otpGenerationPromises.delete(bookingId));
+  otpGenerationPromises.set(bookingId, generation);
+  return generation;
+}
 
 export async function startJourney(req, res) {
   try {
@@ -95,7 +117,8 @@ export async function markArrived(req, res) {
     const { bookingId } = req.params;
     const booking = await getAssignedBooking(bookingId, req.user.id);
 
-    if (booking.status === "washer_arrived") {
+    if (booking.status === "washer_arrived" && booking.service_otp_hash && booking.service_otp_expires_at &&
+        new Date(booking.service_otp_expires_at).getTime() > Date.now() && getOtp(bookingId)) {
       return res.json({
         success: true,
         booking: {
@@ -106,24 +129,27 @@ export async function markArrived(req, res) {
       });
     }
 
-    if (booking.status !== "washer_on_the_way") {
+    if (!["washer_on_the_way", "washer_arrived"].includes(booking.status)) {
       return res.status(400).json({
         message: `Cannot mark arrived from status ${booking.status}.`,
       });
     }
 
     const now = new Date();
+    // Older arrived bookings may predate OTP generation. Issue a fresh code for them.
+    const otpFields = await createServiceOtpOnce(bookingId);
 
     const { data, error } = await supabaseAdmin
       .from("bookings")
       .update({
         status: "washer_arrived",
-        washer_arrived_at: now.toISOString(),
+        ...(booking.status === "washer_on_the_way" ? { washer_arrived_at: now.toISOString() } : {}),
+        ...otpFields,
         updated_at: now.toISOString(),
       })
       .eq("id", bookingId)
       .eq("assigned_washer_id", booking.assigned_washer_id)
-      .eq("status", "washer_on_the_way")
+      .eq("status", booking.status)
       .select("*")
       .single();
 

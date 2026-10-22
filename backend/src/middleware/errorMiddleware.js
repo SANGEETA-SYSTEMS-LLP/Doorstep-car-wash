@@ -9,6 +9,13 @@ export function errorMiddleware(error, req, res, next) {
     code: typeof error.code === "string" ? error.code : undefined,
     name: typeof error.name === "string" ? error.name : "Error",
   });
-  const message = status === 500 ? "Unable to complete this request. Please try again." : error.code === "23505" ? "A matching record already exists." : error.code === "23503" ? "A referenced record is unavailable." : error.message;
+  const databaseError = typeof error.code === "string" && (/^[0-9A-Z]{5}$/.test(error.code) || /^PGRST\d+$/.test(error.code));
+  const message = status >= 500 || databaseError
+    ? "Unable to complete this request. Please try again."
+    : error.code === "23505"
+      ? "A matching record already exists."
+      : error.code === "23503"
+        ? "A referenced record is unavailable."
+        : error.message;
   return res.status(status).json({ success: false, message });
 }

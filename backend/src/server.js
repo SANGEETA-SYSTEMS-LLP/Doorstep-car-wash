@@ -1,9 +1,13 @@
 import dotenv from "dotenv";
+import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
 
 dotenv.config({
   path: fileURLToPath(new URL("../.env", import.meta.url)),
 });
+
+// `npm start` is the production entry point; local development uses dev-server.js.
+process.env.NODE_ENV ??= "production";
 
 const { default: app } =
   await import("./app.js");
@@ -14,15 +18,15 @@ const { processExpiredAssignments } =
 const PORT =
   process.env.PORT || 5000;
 
-app.listen(
-  PORT,
-  process.env.NODE_ENV === "development" ? "127.0.0.1" : "0.0.0.0",
-  () => {
-    console.log(
-      `API running on port ${PORT}`
-    );
-  }
-);
+const server = createServer({
+  requestTimeout: 120_000,
+  headersTimeout: 30_000,
+  keepAliveTimeout: 5_000,
+  maxRequestsPerSocket: 1_000,
+}, app);
+server.listen(PORT, process.env.NODE_ENV === "development" ? "127.0.0.1" : "0.0.0.0", () => {
+  console.log(`API running on port ${PORT}`);
+});
 
 // Development-only scheduler; use a scheduled worker or queue in production.
 let processingTimeouts = false;

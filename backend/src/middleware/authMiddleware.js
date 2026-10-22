@@ -44,7 +44,6 @@ export async function requireAuth(
         name: error.name,
         status: error.status,
         code: error.code,
-        message: error.message,
       });
       return res.status(503).json({message: "Authentication service unavailable. Please try again shortly."});
     }
@@ -67,7 +66,7 @@ export async function requireAuth(
       .maybeSingle();
 
     if (profileError) {
-      console.error("Profile lookup failed:", profileError.code, profileError.message);
+      console.error("Profile lookup failed:", { code: profileError.code });
       return res.status(503).json({ message: "Your profile could not be loaded. Please try again shortly." });
     }
     if (!profile) {
@@ -85,10 +84,10 @@ export async function requireAuth(
 
     next();
   } catch (error) {
-    console.error(
-      "Authentication middleware:",
-      error
-    );
+    console.error("Authentication middleware failed", {
+      name: typeof error.name === "string" ? error.name : "Error",
+      code: typeof error.code === "string" ? error.code : undefined,
+    });
 
     return res.status(500).json({
       message:

@@ -15,6 +15,8 @@ import {
   recordCodPayment,
 } from "../../controllers/payments/paymentController.js";
 
+import { paymentActionRateLimit } from "../../middleware/rateLimitMiddleware.js";
+
 const router =
   express.Router();
 router.get("/bookings/:bookingId/options", requireAuth, allowRoles("customer"), getCustomerPaymentOptions);
@@ -23,6 +25,7 @@ router.post(
   "/bookings/:bookingId/order",
   requireAuth,
   allowRoles("customer"),
+  paymentActionRateLimit,
   createPaymentOrder
 );
 
@@ -30,6 +33,7 @@ router.post(
   "/verify",
   requireAuth,
   allowRoles("customer"),
+  paymentActionRateLimit,
   verifyPayment
 );
 
@@ -37,6 +41,7 @@ router.post(
   "/bookings/:bookingId/cod",
   requireAuth,
   allowRoles("washer"),
+  paymentActionRateLimit,
   recordCodPayment
 );
 

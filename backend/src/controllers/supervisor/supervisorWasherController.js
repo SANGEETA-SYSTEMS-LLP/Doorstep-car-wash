@@ -1,7 +1,7 @@
 import { supabaseAdmin } from "../../config/supabase.js";
 import { provisionPendingWasher } from "../../services/washer/washerSignupService.js";
 import { validWasherLocation } from "../../services/washer/washerLocationService.js";
-import { referenceId } from "../../utils/referenceId.js";
+import { referenceId } from "../../../../shared/referenceId.mjs";
 
 export async function addSupervisorWasher(req, res) {
   if (!["supervisor", "sub_admin", "super_admin"].includes(req.profile?.role)) return res.status(403).json({ message: "Sign in with a supervisor or administrator account to add washers." });

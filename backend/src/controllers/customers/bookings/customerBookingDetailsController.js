@@ -1,7 +1,7 @@
 import { supabaseAdmin } from "../../../config/supabase.js";
 import { getCustomerBooking, uuidPattern } from "./customerBookingAccess.js";
 
-import { referenceId } from "../../../utils/referenceId.js";
+import { referenceId } from "../../../../../shared/referenceId.mjs";
 
 export async function getCustomerBookingDetails(req, res) {
   try {
