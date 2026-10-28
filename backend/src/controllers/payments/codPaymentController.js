@@ -1,6 +1,4 @@
-import { supabaseAdmin, razorpay, createWasherEarning } from "./paymentDependencies.js";
-import { validateCapturedPayment } from "../../services/payments/paymentValidation.js";
-import crypto from "node:crypto";
+import { supabaseAdmin, createWasherEarning } from "./paymentDependencies.js";
 
 export async function recordCodPayment(
   req,

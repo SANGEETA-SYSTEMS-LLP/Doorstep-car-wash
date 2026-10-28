@@ -1,4 +1,4 @@
-import { supabaseAdmin, razorpay, createWasherEarning } from "./paymentDependencies.js";
+import { supabaseAdmin, createWasherEarning } from "./paymentDependencies.js";
 import { validateCapturedPayment } from "../../services/payments/paymentValidation.js";
 import { assignWasherToBooking } from "../../services/booking/bookingAssignmentService.js";
 import crypto from "node:crypto";

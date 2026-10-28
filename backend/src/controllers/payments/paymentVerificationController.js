@@ -1,4 +1,4 @@
-import { supabaseAdmin, razorpay, createWasherEarning } from "./paymentDependencies.js";
+import { supabaseAdmin, getRazorpay, createWasherEarning } from "./paymentDependencies.js";
 import { customerIdForUser } from "./paymentDependencies.js";
 import { validateCapturedPayment } from "../../services/payments/paymentValidation.js";
 import { assignWasherToBooking } from "../../services/booking/bookingAssignmentService.js";
@@ -9,6 +9,7 @@ export async function verifyPayment(
   res
 ) {
   try {
+    const razorpay = getRazorpay();
     const {
       razorpay_order_id,
       razorpay_payment_id,
@@ -159,9 +160,11 @@ export async function verifyPayment(
       code: typeof error.code === "string" ? error.code : undefined,
     });
 
-    return res.status(502).json({
+    return res.status(error.status || 502).json({
       success: false,
-      message: "We could not confirm the payment yet. Check the booking status before retrying.",
+      message: error.status === 503
+        ? error.message
+        : "We could not confirm the payment yet. Check the booking status before retrying.",
     });
   }
 }

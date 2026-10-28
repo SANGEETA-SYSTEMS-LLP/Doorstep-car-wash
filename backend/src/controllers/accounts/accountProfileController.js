@@ -2,8 +2,15 @@ import { supabaseAdmin as db } from "../../config/supabase.js";
 
 export async function getAccount(req, res, next) {
   try {
-    const { data, error } = await db.from("profiles").select("id, full_name, phone, role, avatar_url, is_active").eq("id", req.user.id).single();
+    // The account page only needs these fields. Keep this query aligned with
+    // the core profiles schema so a missing optional avatar column cannot make
+    // every authenticated user fail to load their dashboard.
+    const { data, error } = await db.from("profiles")
+      .select("id, full_name, phone, role, is_active")
+      .eq("id", req.user.id)
+      .maybeSingle();
     if (error) throw error;
+    if (!data) return res.status(404).json({ success: false, message: "Account profile not found." });
     res.json({ success: true, profile: { ...data, email: req.user.email } });
   } catch (err) { next(err); }
 }

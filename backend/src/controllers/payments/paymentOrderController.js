@@ -1,4 +1,4 @@
-import { supabaseAdmin, razorpay, createWasherEarning } from "./paymentDependencies.js";
+import { supabaseAdmin, getRazorpay } from "./paymentDependencies.js";
 import { customerIdForUser } from "./paymentDependencies.js";
 import { validateCapturedPayment } from "../../services/payments/paymentValidation.js";
 import crypto from "node:crypto";
@@ -8,6 +8,7 @@ export async function createPaymentOrder(
   res
 ) {
   try {
+    const razorpay = getRazorpay();
     const { bookingId } =
       req.params;
     const customerId = await customerIdForUser(req.user.id);
@@ -178,9 +179,11 @@ export async function createPaymentOrder(
       code: typeof error.code === "string" ? error.code : undefined,
     });
 
-    return res.status(502).json({
+    return res.status(error.status || 502).json({
       success: false,
-      message: "Unable to create the payment right now. Please retry shortly.",
+      message: error.status === 503
+        ? error.message
+        : "Unable to create the payment right now. Please retry shortly.",
     });
   }
 }
