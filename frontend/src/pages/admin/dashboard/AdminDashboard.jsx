@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import useApi from "../../../hooks/useApi";
 import { useAuth } from "../../../context/AuthContext";
+import ServiceCompletionFeed from "../../../components/operations/ServiceCompletionFeed";
 
 const statIcons = {
   customers: Users,
@@ -160,6 +161,7 @@ export default function AdminDashboard() {
           ))}
         </div>
       </section>
+      <ServiceCompletionFeed />
       <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 pt-4 text-xs text-slate-500">
         <span>WashNow Admin · {profile?.role?.replaceAll("_", " ") || "Authorized workspace"}</span>
         <span className="inline-flex items-center gap-1.5"><ArrowDownRight size={13} aria-hidden="true" />Data reflects the latest dashboard refresh</span>

@@ -11,8 +11,19 @@ async function getCustomer(userId) {
   return data;
 }
 
-export function listCustomerOffers(req, res) {
-  return res.json({ offers: customerOffers });
+export async function listCustomerOffers(req, res, next) {
+  try {
+    const customer = await getCustomer(req.user.id);
+    const { data: bookings, error } = await db.from("bookings")
+      .select("promo_code")
+      .eq("customer_id", customer.id)
+      .not("promo_code", "is", null);
+    if (error) throw error;
+    const usedCodes = new Set((bookings || []).map(booking => String(booking.promo_code || "").trim().toUpperCase()));
+    return res.json({ offers: customerOffers.filter(offer => !usedCodes.has(offer.code)) });
+  } catch (error) {
+    next(error);
+  }
 }
 
 export async function validateCustomerOffer(req, res, next) {
@@ -29,6 +40,11 @@ export async function validateCustomerOffer(req, res, next) {
     if (vehicleResult.error) throw vehicleResult.error;
     if (packageResult.error) throw packageResult.error;
     if (!vehicleResult.data) throw bad("This vehicle is no longer available. Please choose it again.", 404);
+    const normalizedCode = code.trim().toUpperCase();
+    const { data: priorUse, error: priorUseError } = await db.from("bookings")
+      .select("id").eq("customer_id", customer.id).eq("promo_code", normalizedCode).limit(1).maybeSingle();
+    if (priorUseError) throw priorUseError;
+    if (priorUse) throw bad("You have already used this offer on a previous booking.", 409);
     const packageType = String(packageResult.data?.vehicle_type || "").trim().toLowerCase();
     if (!packageResult.data || (packageType !== String(vehicleResult.data.vehicle_type || "").trim().toLowerCase() && !["all", "all vehicles", "all car types", "one time"].includes(packageType))) throw bad("This package is not available for the selected vehicle.");
     let firstBooking = false;

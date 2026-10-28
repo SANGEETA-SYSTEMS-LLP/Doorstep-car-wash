@@ -19,6 +19,26 @@ function ResourceTable({ base, resource }) {
   const { data, loading, error, refresh } = useApi(`/${base}/${resource}?page=${page}`);
   const rows = (data?.rows || []).filter(row => Object.values(row)
     .some(value => String(value ?? "").toLowerCase().includes(search.toLowerCase())));
+  function renderCell(row, column) {
+    if (["washers", "supervisors"].includes(resource) && column === "earning_records") {
+      const records = Array.isArray(row.earning_records) ? row.earning_records : [];
+      if (!records.length) return "No earnings yet";
+      return <details className="min-w-56">
+        <summary className="cursor-pointer font-semibold text-blue-700">View {records.length} earning record(s)</summary>
+        <div className="mt-2 max-h-56 space-y-2 overflow-y-auto rounded-lg bg-slate-50 p-3">
+          {records.map((earning, index) => <div key={`${earning.booking_number}-${index}`} className="border-b border-slate-200 pb-2 text-xs last:border-0">
+            <p className="font-semibold text-slate-800">{earning.booking_number}</p>
+            <p className="mt-0.5 text-slate-600">₹{Number(earning.amount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })} · {earning.status}</p>
+            {earning.date && <p className="mt-0.5 text-slate-500">{new Date(earning.date).toLocaleDateString("en-IN")}</p>}
+          </div>)}
+        </div>
+      </details>;
+    }
+    if (["washers", "supervisors"].includes(resource) && ["total_earnings", "pending_earnings"].includes(column)) {
+      return `₹${Number(row[column] || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
+    }
+    return typeof row[column] === "boolean" ? row[column] ? "Yes" : "No" : String(row[column] ?? "—");
+  }
 
   async function deletePackage(row) {
     if (!window.confirm(`Remove “${row.name}” from the customer booking catalog? Existing bookings will be preserved.`)) return;
@@ -53,7 +73,7 @@ function ResourceTable({ base, resource }) {
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-100"><tr>{data?.columns.map(column => <th key={column} className="whitespace-nowrap p-3 font-semibold capitalize">{column.replaceAll("_", " ")}</th>)}{data?.fields && base === "admin" && <th className="p-3">Actions</th>}</tr></thead>
           <tbody>{rows.map(row => <tr key={row.id} className="border-t border-slate-100">
-            {data.columns.map(column => <td key={column} className="max-w-xs break-words p-3">{typeof row[column] === "boolean" ? row[column] ? "Yes" : "No" : String(row[column] ?? "—")}</td>)}
+            {data.columns.map(column => <td key={column} className="max-w-xs break-words p-3">{renderCell(row, column)}</td>)}
             {data.fields && base === "admin" && <td className="whitespace-nowrap p-3">
               <button onClick={() => setEditor({ row })} className="text-blue-700 underline">Edit</button>
               {resource === "packages" && row.is_active !== false && <button disabled={deletingId === row.id} onClick={() => deletePackage(row)} className="ml-4 text-red-700 underline disabled:opacity-50">{deletingId === row.id ? "Removing…" : "Delete"}</button>}

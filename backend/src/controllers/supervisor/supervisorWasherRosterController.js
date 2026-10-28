@@ -1,4 +1,5 @@
 import { supabaseAdmin as db } from "../../config/supabase.js";
+import { getSupervisorAreaBookingIds, isWithinSupervisorArea } from "../../services/supervisor/supervisorServiceArea.js";
 
 async function allRows(table, columns, filters = []) {
   const rows = [];
@@ -14,7 +15,18 @@ async function allRows(table, columns, filters = []) {
 
 export async function getSupervisorWasherRoster(req, res, next) {
   try {
-    const washers = await allRows("washers", "id,user_id,status,is_active,is_verified,rating,jobs_completed,current_address");
+    const washerFilters = req.profile?.role === "supervisor"
+      ? [["eq", "supervisor_id", req.user.id]]
+      : [];
+    let washers = await allRows("washers", "id,user_id,supervisor_id,status,is_active,is_verified,rating,jobs_completed,current_address", washerFilters);
+    if (req.profile?.role === "supervisor") {
+      const points = await allRows("washer_locations", "washer_id,latitude,longitude,service_latitude,service_longitude");
+      const localIds = new Set(points.filter(point => isWithinSupervisorArea({
+        latitude: point.service_latitude ?? point.latitude,
+        longitude: point.service_longitude ?? point.longitude,
+      }, req.supervisorArea)).map(point => point.washer_id));
+      washers = washers.filter(washer => localIds.has(washer.id));
+    }
     const userIds = [...new Set(washers.map(washer => washer.user_id).filter(Boolean))];
     const profiles = [];
     for (let offset = 0; offset < userIds.length; offset += 500) {
@@ -24,12 +36,23 @@ export async function getSupervisorWasherRoster(req, res, next) {
       profiles.push(...(data || []));
     }
 
-    const [bookings, acceptedAssignments, earnings, payoutAccounts] = await Promise.all([
+    let areaBookingIds = null;
+    if (req.profile?.role === "supervisor") areaBookingIds = await getSupervisorAreaBookingIds(req.supervisorArea);
+    const [bookingRows, assignmentRows, earningRows, payoutAccounts] = await Promise.all([
       allRows("bookings", "id,assigned_washer_id,status", [["not", "assigned_washer_id", "is", null]]),
       allRows("booking_assignments", "booking_id,washer_id,status", [["eq", "status", "accepted"]]),
-      allRows("washer_earnings", "washer_id,gross_amount,platform_commission,washer_amount,status"),
+      allRows("washer_earnings", "washer_id,booking_id,gross_amount,platform_commission,washer_amount,status"),
       washers.length ? allRows("washer_payout_accounts", "washer_id,account_label,updated_at") : Promise.resolve([]),
     ]);
+    let bookings = bookingRows;
+    let localBookingIds = areaBookingIds ? new Set(areaBookingIds) : null;
+    if (req.profile?.role === "supervisor") {
+      bookings = bookingRows.filter(booking => localBookingIds.has(booking.id));
+    }
+    const acceptedAssignments = req.profile?.role === "supervisor" ? assignmentRows.filter(row => localBookingIds.has(row.booking_id)) : assignmentRows;
+    const earnings = req.profile?.role === "supervisor"
+      ? earningRows.filter(row => washers.some(washer => washer.id === row.washer_id) && (!row.booking_id || localBookingIds.has(row.booking_id)))
+      : earningRows;
     const payoutByWasher = new Map(payoutAccounts.map(account => [account.washer_id, account]));
 
     const profileByUserId = new Map(profiles.map(profile => [profile.id, profile]));

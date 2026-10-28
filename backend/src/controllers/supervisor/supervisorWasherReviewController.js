@@ -1,16 +1,24 @@
 import { supabaseAdmin as db } from "../../config/supabase.js";
+import { isWithinSupervisorArea } from "../../services/supervisor/supervisorServiceArea.js";
 
 const validUuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 
 export async function listWasherReviews(req, res, next) {
   try {
     const { data: washers, error } = await db.from("washers")
-      .select("id,user_id,status,is_active,is_verified,service_radius_km,current_address,location:washer_locations(latitude,longitude,updated_at)")
+      .select("id,user_id,status,is_active,is_verified,service_radius_km,current_address,location:washer_locations(latitude,longitude,service_latitude,service_longitude,updated_at)")
       .eq("is_active", true)
       .eq("is_verified", false)
       .order("user_id");
     if (error) throw error;
-    const userIds = [...new Set((washers || []).map(washer => washer.user_id).filter(Boolean))];
+    const scopedWashers = req.profile?.role === "supervisor" ? (washers || []).filter(washer => {
+      const location = Array.isArray(washer.location) ? washer.location[0] : washer.location;
+      return isWithinSupervisorArea(location && {
+        latitude: location.service_latitude ?? location.latitude,
+        longitude: location.service_longitude ?? location.longitude,
+      }, req.supervisorArea);
+    }) : washers || [];
+    const userIds = [...new Set(scopedWashers.map(washer => washer.user_id).filter(Boolean))];
     const [profilesResult, authUsers] = await Promise.all([
       userIds.length
         ? db.from("profiles").select("id,full_name,phone,role,is_active").in("id", userIds)
@@ -24,7 +32,7 @@ export async function listWasherReviews(req, res, next) {
     if (profilesResult.error) throw profilesResult.error;
     const profiles = new Map((profilesResult.data || []).map(profile => [profile.id, profile]));
     const emails = new Map(authUsers);
-    return res.json({ washers: (washers || []).map(washer => ({
+    return res.json({ washers: scopedWashers.map(washer => ({
       ...washer,
       profile: profiles.get(washer.user_id) || null,
       email: emails.get(washer.user_id) || null,
@@ -38,11 +46,18 @@ export async function verifyWasher(req, res, next) {
   try {
     if (!validUuid.test(req.params.washerId || "")) return res.status(400).json({ message: "Invalid washer ID." });
     const { data: washer, error } = await db.from("washers")
-      .select("id,user_id,is_active,is_verified,current_address,location:washer_locations(latitude,longitude)")
+      .select("id,user_id,is_active,is_verified,current_address,location:washer_locations(latitude,longitude,service_latitude,service_longitude)")
       .eq("id", req.params.washerId)
       .maybeSingle();
     if (error) throw error;
     if (!washer || !washer.is_active) return res.status(404).json({ message: "Active washer account not found." });
+    const washerLocation = Array.isArray(washer.location) ? washer.location[0] : washer.location;
+    if (req.profile?.role === "supervisor" && !isWithinSupervisorArea(washerLocation && {
+      latitude: washerLocation.service_latitude ?? washerLocation.latitude,
+      longitude: washerLocation.service_longitude ?? washerLocation.longitude,
+    }, req.supervisorArea)) {
+      return res.status(404).json({ message: "Washer not found in your service area." });
+    }
     if (washer.is_verified) return res.json({ success: true, washer: { id: washer.id, is_verified: true } });
 
     const [profileResult, locationResult] = await Promise.all([

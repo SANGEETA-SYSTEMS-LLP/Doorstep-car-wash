@@ -4,6 +4,7 @@ import { referenceId } from "../../../../shared/referenceId.mjs";
 import { washerHasScheduleConflict } from "../../services/booking/bookingAssignmentService.js";
 import { getSignedServicePhotos } from "../serviceOperations/servicePhotoController.js";
 import { enrichSupervisorBookings, normalizeServiceAddress } from "./supervisorBookingEnrichment.js";
+import { isWithinSupervisorArea } from "../../services/supervisor/supervisorServiceArea.js";
 
 export async function getSupervisorJobDetails(req, res) {
   try {
@@ -36,6 +37,9 @@ export async function getSupervisorJobDetails(req, res) {
         success: false,
         message: "Booking not found.",
       });
+    }
+    if (req.profile?.role === "supervisor" && !isWithinSupervisorArea(booking, req.supervisorArea)) {
+      return res.status(404).json({ success: false, message: "Booking not found in your service area." });
     }
 
     const bookingPackage = Array.isArray(booking.package)
@@ -75,18 +79,24 @@ export async function getSupervisorJobDetails(req, res) {
     const { data: previousAssignments, error: assignmentsError } =
       await supabaseAdmin
         .from("booking_assignments")
-        .select("washer_id, status")
+        .select("washer_id, status, expires_at")
         .eq("booking_id", booking.id);
 
     if (assignmentsError) throw assignmentsError;
 
-    const excludedWasherIds = new Set(
-      (previousAssignments || [])
-        .filter((assignment) =>
-          ["rejected", "expired", "cancelled"].includes(assignment.status)
-        )
-        .map((assignment) => assignment.washer_id)
-    );
+    const exclusionReasonByWasherId = new Map();
+    for (const assignment of previousAssignments || []) {
+      const pendingOfferExpired = assignment.status === "pending"
+        && assignment.expires_at
+        && Date.parse(assignment.expires_at) <= Date.now();
+      if (assignment.status === "rejected") {
+        exclusionReasonByWasherId.set(assignment.washer_id, "Washer declined a previous offer.");
+      } else if (assignment.status === "cancelled") {
+        exclusionReasonByWasherId.set(assignment.washer_id, "A previous offer was cancelled.");
+      } else if (assignment.status === "expired" || pendingOfferExpired) {
+        exclusionReasonByWasherId.set(assignment.washer_id, "Washer did not accept the offer before its response deadline. The booking schedule is unchanged.");
+      }
+    }
 
     const userIds = [...new Set(washers.map(washer => washer.user_id).filter(Boolean))];
     const profiles = new Map();
@@ -107,13 +117,17 @@ export async function getSupervisorJobDetails(req, res) {
     for (const washer of washers) {
       const profile = profiles.get(washer.user_id);
       const location = Array.isArray(washer.location) ? washer.location[0] : washer.location;
+      if (req.profile?.role === "supervisor" && !isWithinSupervisorArea({
+        latitude: location?.service_latitude ?? location?.latitude,
+        longitude: location?.service_longitude ?? location?.longitude,
+      }, req.supervisorArea)) continue;
       const reasons = [];
       const washerLatitude = location?.service_latitude ?? location?.latitude;
       const washerLongitude = location?.service_longitude ?? location?.longitude;
       const sameServiceAddress = normalizeServiceAddress(booking.service_address) !== ""
         && normalizeServiceAddress(booking.service_address) === normalizeServiceAddress(washer.current_address);
       const measuredDistanceKm = calculateDistanceKm(booking.latitude, booking.longitude, washerLatitude, washerLongitude);
-      const distanceKm = sameServiceAddress ? 0 : measuredDistanceKm;
+      const distanceKm = measuredDistanceKm;
       const age = (Date.now() - Date.parse(location?.updated_at || "")) / 60000;
       const radius = Number(washer.service_radius_km || 5);
       if (!washer.is_active || !profile?.is_active) reasons.push("Washer account is inactive or incomplete.");
@@ -124,7 +138,7 @@ export async function getSupervisorJobDetails(req, res) {
       if (distanceKm == null) reasons.push("Valid booking and washer map locations are required.");
       else if (!Number.isFinite(radius) || radius <= 0 || distanceKm > Math.min(Math.max(radius, 5), 7)) reasons.push(`Booking is ${Number.isFinite(radius) ? `outside the ${radius} km radius and the 7 km extended limit` : "outside the service radius"}.`);
       if (!Number.isFinite(age) || age > 15) reasons.push("Washer must refresh their live location.");
-      if (excludedWasherIds.has(washer.id)) reasons.push("A previous offer was rejected, expired or cancelled.");
+      if (exclusionReasonByWasherId.has(washer.id)) reasons.push(exclusionReasonByWasherId.get(washer.id));
       if (await washerHasScheduleConflict(washer.id, booking, bookingPackage)) reasons.push("Washer has a conflicting booking.");
       availableWashers.push({
         id: washer.id, user_id: washer.user_id, name: profile?.full_name || "Washer",

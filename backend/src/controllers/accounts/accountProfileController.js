@@ -7,6 +7,7 @@ export async function getAccount(req, res, next) {
     res.json({ success: true, profile: { ...data, email: req.user.email } });
   } catch (err) { next(err); }
 }
+
 export async function updateAccount(req, res, next) {
   try {
     const body = req.body;

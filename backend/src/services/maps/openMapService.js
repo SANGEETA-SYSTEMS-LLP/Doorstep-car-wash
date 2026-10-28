@@ -1,6 +1,16 @@
 const cache=new Map(); let pending=false, nextRequest=0;
 const DEFAULT_GEOCODING_BASE_URL="https://nominatim.openstreetmap.org";
 const DEFAULT_GEOCODING_USER_AGENT="DoorstepCarWash/1.0 (car-wash address search)";
+function configuredProviderBase(value, name) {
+ if (!value) return null;
+ let url;
+ try { url = new URL(value); } catch { throw new Error(`${name} must be a valid HTTPS provider URL.`); }
+ if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash) {
+  throw new Error(`${name} must be an HTTPS URL without credentials, query, or fragment.`);
+ }
+ if (url.port && url.port !== "443") throw new Error(`${name} must use the standard HTTPS port.`);
+ return url;
+}
 export function normalizeAddress(item) {
  const a=item.address || {};
  const latitude=Number(item.lat),longitude=Number(item.lon);
@@ -8,8 +18,9 @@ export function normalizeAddress(item) {
  return {latitude,longitude,address:item.display_name,name:item.namedetails?.name||item.name||item.display_name,city:a.city||a.town||a.village||a.municipality||"",state:a.state||"",postalCode:a.postcode||""};
 }
 async function geocode(endpoint,params) {
- const base=process.env.GEOCODING_BASE_URL||DEFAULT_GEOCODING_BASE_URL;
- const url=new URL(endpoint,base.replace(/\/$/,"")+"/");
+ const base=configuredProviderBase(process.env.GEOCODING_BASE_URL, "GEOCODING_BASE_URL") || new URL(DEFAULT_GEOCODING_BASE_URL);
+ const url=new URL(endpoint,base.href.replace(/\/$/,"")+"/");
+ if (url.origin !== base.origin || !url.pathname.startsWith(base.pathname.replace(/\/$/, "") + "/")) throw new Error("Geocoding provider URL is invalid.");
  for(const [key,value] of Object.entries({...params,format:"jsonv2",addressdetails:1,namedetails:1}))url.searchParams.set(key,value);
  const key=url.href, hit=cache.get(key);
  if(hit && hit.until>Date.now())return hit.data;
@@ -26,9 +37,11 @@ async function geocode(endpoint,params) {
 export async function searchPlaces(q){return (await geocode("search",{q,limit:5})).map(normalizeAddress);}
 export async function reversePlace(lat,lon){return normalizeAddress(await geocode("reverse",{lat,lon}));}
 export async function drivingRoute(fromLat,fromLon,toLat,toLon){
- const base=process.env.OSRM_BASE_URL;
+ const base=configuredProviderBase(process.env.OSRM_BASE_URL, "OSRM_BASE_URL");
  if(!base)throw Object.assign(new Error("Driving routes are not configured. Location markers are still available."),{status:503});
- const url=base.replace(/\/$/,"")+"/route/v1/driving/"+fromLon+","+fromLat+";"+toLon+","+toLat+"?overview=full&geometries=geojson";
+ const url=new URL("route/v1/driving/"+fromLon+","+fromLat+";"+toLon+","+toLat, base.href.replace(/\/$/,"")+"/");
+ url.searchParams.set("overview", "full"); url.searchParams.set("geometries", "geojson");
+ if (url.origin !== base.origin || !url.pathname.startsWith(base.pathname.replace(/\/$/, "") + "/")) throw new Error("Routing provider URL is invalid.");
  const response=await fetch(url,{signal:AbortSignal.timeout(10000)});
  if(!response.ok)throw new Error("Driving route unavailable.");
  const data=await response.json(),route=data.routes?.[0];

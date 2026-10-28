@@ -1,6 +1,7 @@
 import { useAuth } from "../../../context/AuthContext";
 import { Link } from "react-router-dom";
 import { Banknote, ArrowRight, FileText, ChartColumn, Wallet, CircleDollarSign } from "lucide-react";
+import ServiceCompletionFeed from "../../../components/operations/ServiceCompletionFeed";
 const sections = [
   { title: "Payments", description: "Review customer payments and payment statuses.", path: "payments", icon: Banknote },
   { title: "Payment confirmations", description: "Review washer payouts and payment status. Supervisor payout setup is pending.", path: "finance", icon: Wallet },
@@ -19,5 +20,6 @@ export default function AccountantDashboard({ base = "/admin" }) {
     <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{visible.map(({ title, description, path, icon: Icon }) => <Link key={path} to={base + "/" + path} className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-blue-400 hover:shadow-sm">
       <Icon className="text-blue-600" size={26} /><h2 className="mt-4 text-lg font-bold">{title}</h2><p className="mt-2 text-sm text-slate-500">{description}</p><span className="mt-5 flex items-center gap-2 text-sm font-semibold text-blue-700">Open <ArrowRight size={16} /></span>
     </Link>)}</div>
+    <div className="mt-8"><ServiceCompletionFeed /></div>
   </section>;
 }

@@ -5,13 +5,13 @@ import {
 export async function assignWasherToBooking(
   bookingId
 ) {
-  // Selection is always performed by the supervisor after reviewing the booking.
-  const { error } = await supabaseAdmin.from("bookings")
-    .update({ requires_supervisor: true, updated_at: new Date().toISOString() })
+  const { data, error } = await supabaseAdmin.from("bookings")
+    .update({ status: "pending", requires_supervisor: true, updated_at: new Date().toISOString() })
     .eq("id", bookingId).is("assigned_washer_id", null)
-    .in("status", ["pending", "confirmed", "finding_washer", "support_escalated"]);
+    .in("status", ["pending", "confirmed", "finding_washer", "support_escalated"])
+    .select("id").maybeSingle();
   if (error) throw error;
-  return { assigned: false, supervisorFallback: true, reason: "Waiting for supervisor to review and assign a nearby washer." };
+  return { assigned: false, requires_supervisor: true, supervisorReviewRequired: true, bookingId: data?.id || bookingId };
 }
 
 export async function washerHasScheduleConflict(washerId, booking, bookingPackage) {

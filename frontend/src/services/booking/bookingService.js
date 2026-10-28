@@ -12,6 +12,17 @@ export async function getMyBookings(userId) {
   const result = await apiRequest("/account/bookings");
   return result.bookings || [];
 }
+
+export async function removeBookingFromHistory(bookingId) {
+  if (!bookingId) throw new Error("Booking ID is required.");
+  return apiRequest(`/account/bookings/${encodeURIComponent(bookingId)}`, { method: "DELETE" });
+}
+
+export async function cancelBooking(bookingId) {
+  if (!bookingId) throw new Error("Booking ID is required.");
+  return apiRequest(`/customer/bookings/${encodeURIComponent(bookingId)}/cancel`, { method: "POST" });
+}
+
 export async function getBookingById(bookingId) {
   if (!bookingId) {
     throw new Error("Booking ID is required.");

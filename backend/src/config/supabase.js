@@ -11,6 +11,13 @@ const supabaseServiceRoleKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY ||
   process.env.SUPABASE_SECRET_KEY;
 
+function assertConfiguredSecret(name, value) {
+  if (process.env.NODE_ENV !== "production" || !value) return;
+  if (/^(your[-_]|change[-_]?me|replace[-_]?me|example|placeholder|test[-_]?secret)/i.test(value)) {
+    throw new Error(`${name} must be replaced with a production secret.`);
+  }
+}
+
 if (
   !supabaseUrl ||
   !supabaseAnonKey ||
@@ -20,6 +27,8 @@ if (
     "Missing Supabase backend environment variables."
   );
 }
+
+assertConfiguredSecret("SUPABASE_SERVICE_ROLE_KEY", supabaseServiceRoleKey);
 
 export const supabaseAuth =
   createClient(

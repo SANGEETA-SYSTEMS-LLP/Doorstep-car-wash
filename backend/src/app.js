@@ -6,6 +6,8 @@ import accountRoutes from "./routes/accounts/accountRoutes.js";
 import cors from "cors";
 import helmet from "helmet";
 import { apiRateLimit } from "./middleware/rateLimitMiddleware.js";
+import { requestLogger } from "./middleware/requestLogger.js";
+import telemetryRoutes from "./routes/telemetry/telemetryRoutes.js";
 
 import assignmentRoutes from "./routes/assignments/assignmentRoutes.js";
 import washerJobRoutes from "./routes/washer/washerJobRoutes.js";
@@ -71,9 +73,23 @@ if (process.env.NODE_ENV === "production" && allowedFrontendOrigins.size === 0) 
 }
 
 app.disable("x-powered-by");
+app.use(requestLogger);
 app.use(helmet({
   contentSecurityPolicy: {
-    directives: { "frame-ancestors": ["'none'"] },
+    directives: {
+      defaultSrc: ["'self'"],
+      baseUri: ["'self'"],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+      formAction: ["'self'", "https://api.razorpay.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://checkout.razorpay.com", "https://maps.googleapis.com", "https://maps.gstatic.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.googleapis.com", "https://*.gstatic.com", "https://tile.openstreetmap.org", "https://*.tile.openstreetmap.org", "https://*.razorpay.com"],
+      connectSrc: ["'self'", "https://*.supabase.co", "wss://*.supabase.co", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://maps.googleapis.com", "https://maps.gstatic.com", "https://nominatim.openstreetmap.org", "https://*.tile.openstreetmap.org", "https://*.openstreetmap.org"],
+      frameSrc: ["https://api.razorpay.com", "https://checkout.razorpay.com"],
+      upgradeInsecureRequests: process.env.NODE_ENV === "production" ? [] : null,
+    },
   },
   frameguard: { action: "deny" },
   hsts: process.env.NODE_ENV === "production"
@@ -99,6 +115,8 @@ app.use(
 );
 
 app.use("/api", apiRateLimit);
+
+app.use("/api/telemetry", express.json({ limit: "2kb" }), telemetryRoutes);
 
 app.post(
   "/api/payments/webhook",

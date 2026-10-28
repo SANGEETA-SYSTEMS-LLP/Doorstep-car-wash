@@ -1,4 +1,5 @@
 import multer from "multer";
+import { randomUUID } from "node:crypto";
 
 const storage =
   multer.memoryStorage();
@@ -29,8 +30,7 @@ const fileFilter = (
   callback(null, true);
 };
 
-export const uploadServicePhotos =
-  multer({
+const upload = multer({
     storage,
 
     fileFilter,
@@ -44,6 +44,21 @@ export const uploadServicePhotos =
       parts: 9,
     },
   });
+
+// Multer runs before the route handler, so translate its failures to safe 4xx
+// responses here instead of allowing malformed/oversized uploads to become 500s.
+export function uploadServicePhotos(req, res, next) {
+  upload.array("photos", 5)(req, res, (error) => {
+    if (!error) return next();
+    const isLimit = error instanceof multer.MulterError;
+    return res.status(isLimit ? 400 : 415).json({
+      success: false,
+      message: isLimit
+        ? "Upload exceeds the allowed file count or size."
+        : "Only JPG, PNG and WEBP images are allowed.",
+    });
+  });
+}
 
 export function validateServicePhotoSignatures(req, res, next) {
   const isJpeg = (buffer) => buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;

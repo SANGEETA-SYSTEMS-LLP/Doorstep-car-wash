@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../../../context/AuthContext";
-import { getMyBookings } from "../../../services/booking/bookingService";
+import { cancelBooking as cancelBookingRequest, getMyBookings, removeBookingFromHistory } from "../../../services/booking/bookingService";
 import BookingHistoryCard from "./BookingHistoryCard";
 import {
   cancelledStatuses,
@@ -24,8 +24,9 @@ const filters = [
 ];
 
 const upcomingStatuses = [
-  "pending",
+  "confirmed",
   "payment_completed",
+  "support_escalated",
   "finding_washer",
   "washer_assigned",
   "washer_on_the_way",
@@ -33,6 +34,12 @@ const upcomingStatuses = [
   "otp_verified",
   "service_started",
 ];
+
+function isUpcomingBooking(booking) {
+  if (!upcomingStatuses.includes(booking.status)) return false;
+  return booking.status !== "pending" || booking.payment?.status === "paid"
+    || ["cod", "cash"].includes(String(booking.payment?.payment_method || booking.payment_method || "").toLowerCase());
+}
 
 function BookingHistory() {
   const navigate = useNavigate();
@@ -42,6 +49,10 @@ function BookingHistory() {
   const [error, setError] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [reloadCount, setReloadCount] = useState(0);
+  const [deletingId, setDeletingId] = useState("");
+  const [cancellingId, setCancellingId] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [actionNotice, setActionNotice] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -75,9 +86,7 @@ function BookingHistory() {
 
   const counts = useMemo(() => ({
     all: bookings.length,
-    upcoming: bookings.filter((booking) =>
-      upcomingStatuses.includes(booking.status)
-    ).length,
+    upcoming: bookings.filter(isUpcomingBooking).length,
     completed: bookings.filter((booking) =>
       completedStatuses.includes(booking.status)
     ).length,
@@ -91,7 +100,7 @@ function BookingHistory() {
 
     return bookings.filter((booking) => {
       if (activeFilter === "upcoming") {
-        return upcomingStatuses.includes(booking.status);
+        return isUpcomingBooking(booking);
       }
       if (activeFilter === "completed") {
         return completedStatuses.includes(booking.status);
@@ -99,6 +108,69 @@ function BookingHistory() {
       return cancelledStatuses.includes(booking.status);
     });
   }, [activeFilter, bookings]);
+
+  async function removeBooking(booking) {
+    if (deletingId || !window.confirm("Remove this booking from your history? Payment and service records will be retained.")) return;
+    setDeletingId(booking.id);
+    setActionError("");
+    try {
+      await removeBookingFromHistory(booking.id);
+      setBookings(previous => previous.filter(item => item.id !== booking.id));
+    } catch (error) {
+      setActionError(error.message || "Unable to remove this booking from your history.");
+    } finally {
+      setDeletingId("");
+    }
+  }
+
+  async function cancelBooking(booking) {
+    if (cancellingId || !window.confirm("Cancel this booking? Any online refund will exclude the platform fee and return to your original payment method.")) return;
+    setCancellingId(booking.id);
+    setActionError("");
+    setActionNotice("");
+    try {
+      const result = await cancelBookingRequest(booking.id);
+      setBookings(previous => previous.map(item => item.id === booking.id ? {
+        ...item,
+        status: "cancelled",
+        cancellation: {
+          refund_amount_paise: Math.round(Number(result.refundAmount || 0) * 100),
+          platform_fee_paise: Math.round(Number(result.platformFeeRetained || 0) * 100),
+          status: result.cancellationStatus,
+        },
+      } : item));
+      const amount = Number(result.refundAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const fee = Number(result.platformFeeRetained || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      setActionNotice(`${result.message} Refund amount: ₹${amount}. Platform fee retained: ₹${fee}.`);
+    } catch (error) {
+      setActionError(error.message || "Unable to cancel this booking.");
+    } finally {
+      setCancellingId("");
+    }
+  }
+
+  async function checkCancellationRefund(booking) {
+    if (cancellingId) return;
+    setCancellingId(booking.id);
+    setActionError("");
+    setActionNotice("");
+    try {
+      const result = await cancelBookingRequest(booking.id);
+      setBookings(previous => previous.map(item => item.id === booking.id ? {
+        ...item,
+        cancellation: {
+          refund_amount_paise: Math.round(Number(result.refundAmount || 0) * 100),
+          platform_fee_paise: Math.round(Number(result.platformFeeRetained || 0) * 100),
+          status: result.cancellationStatus,
+        },
+      } : item));
+      setActionNotice(result.message);
+    } catch (error) {
+      setActionError(error.message || "Unable to check the refund status.");
+    } finally {
+      setCancellingId("");
+    }
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-7 sm:px-6 lg:px-8">
@@ -195,6 +267,8 @@ function BookingHistory() {
           </div>
 
           <div className="space-y-4 p-4 sm:p-6">
+            {actionError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{actionError}</p>}
+            {actionNotice && <p role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">{actionNotice}</p>}
             {loading && (
               <div role="status" className="space-y-4">
                 {[1, 2, 3].map((item) => (
@@ -228,6 +302,11 @@ function BookingHistory() {
                 key={booking.id}
                 booking={booking}
                 onDetails={() => navigate(`/customer/bookings/${booking.id}`)}
+                onDelete={() => removeBooking(booking)}
+                deleting={deletingId === booking.id}
+                onCancel={() => cancelBooking(booking)}
+                cancelling={cancellingId === booking.id}
+                onCheckRefund={() => checkCancellationRefund(booking)}
               />
             ))}
 

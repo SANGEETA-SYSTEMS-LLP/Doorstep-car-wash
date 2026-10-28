@@ -1,6 +1,7 @@
 import { supabaseAdmin, razorpay, createWasherEarning } from "./paymentDependencies.js";
 import { customerIdForUser } from "./paymentDependencies.js";
 import { validateCapturedPayment } from "../../services/payments/paymentValidation.js";
+import { assignWasherToBooking } from "../../services/booking/bookingAssignmentService.js";
 import crypto from "node:crypto";
 
 export async function verifyPayment(
@@ -117,6 +118,9 @@ export async function verifyPayment(
         provider_payment_id:
           razorpay_payment_id,
 
+        provider_method:
+          typeof captured.method === "string" ? captured.method : null,
+
         paid_at:
           now,
 
@@ -129,9 +133,16 @@ export async function verifyPayment(
       throw updatePaymentError;
     }
 
+    const { error: reviveExpiredBookingError } = await supabaseAdmin.from("bookings")
+      .update({ status: "pending", updated_at: now })
+      .eq("id", payment.booking_id)
+      .eq("status", "expired");
+    if (reviveExpiredBookingError) throw reviveExpiredBookingError;
+
     await createWasherEarning(
       payment.booking_id
     );
+    await assignWasherToBooking(payment.booking_id);
 
     return res.json({
       success: true,

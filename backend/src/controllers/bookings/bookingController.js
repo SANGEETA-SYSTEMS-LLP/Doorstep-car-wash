@@ -39,6 +39,10 @@ export async function createBooking(req,res,next) {
   if (promoCode != null && promoCode !== "") {
    if (typeof promoCode !== "string" || promoCode.length > 40) throw bad("Enter a valid offer code.");
    normalizedPromoCode = promoCode.trim().toUpperCase();
+   const { data: priorOfferUse, error: priorOfferUseError } = await db.from("bookings")
+    .select("id").eq("customer_id", customer.id).eq("promo_code", normalizedPromoCode).limit(1).maybeSingle();
+   if (priorOfferUseError) throw priorOfferUseError;
+   if (priorOfferUse) throw bad("You have already used this offer on a previous booking.", 409);
    let firstBooking = false;
    if (normalizedPromoCode === "FIRSTWASH") {
     const { count, error: countError } = await db.from("bookings").select("id", { count: "exact", head: true }).eq("customer_id", customer.id);

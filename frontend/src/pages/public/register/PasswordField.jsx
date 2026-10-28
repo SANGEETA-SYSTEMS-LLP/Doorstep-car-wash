@@ -24,12 +24,13 @@ function PasswordField({
           id={name}
           autoComplete={"new-password"}
           required
-          minLength={6}
+          minLength={12}
+          maxLength={128}
           type={visible ? "text" : "password"}
           name={name}
           value={value}
           onChange={onChange}
-          placeholder="Minimum 6 characters"
+          placeholder="At least 12 characters"
           className="h-12 w-full rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-12 text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
         />
 

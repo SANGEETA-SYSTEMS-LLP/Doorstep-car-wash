@@ -9,7 +9,7 @@ function specFor(req) {
 async function loadProfileDetails(userIds) {
   const ids = [...new Set(userIds.filter(Boolean))];
   if (!ids.length) return { profiles: new Map(), emails: new Map() };
-  const { data, error } = await db.from("profiles").select("id,full_name,phone").in("id", ids);
+  const { data, error } = await db.from("profiles").select("id,full_name,phone,role").in("id", ids);
   if (error) throw error;
   const profiles = new Map((data || []).map(profile => [profile.id, profile]));
   const entries = await Promise.all(ids.map(async id => {
@@ -32,6 +32,9 @@ async function addDirectoryDetails(resource, rows, role) {
     : await loadProfileDetails(userIds);
 
   const payoutByWasher = new Map();
+  const earningsByWasher = new Map();
+  const earningsBySupervisor = new Map();
+  const supervisorPayoutById = new Map();
   const addressesByCustomer = new Map();
   const vehiclesByCustomer = new Map();
   if (resource === "customers" && rows.length) {
@@ -60,6 +63,69 @@ async function addDirectoryDetails(resource, rows, role) {
     if (error) throw error;
     for (const payout of data || []) payoutByWasher.set(payout.washer_id, payout);
   }
+  if (resource === "washers" && rows.length) {
+    const earnings = [];
+    for (let offset = 0; ; offset += 1000) {
+      const { data, error } = await db.from("washer_earnings")
+        .select("id,washer_id,booking_id,washer_amount,status,settled_at,created_at")
+        .in("washer_id", rows.map(row => row.id)).order("created_at", { ascending: false }).range(offset, offset + 999);
+      if (error) throw error;
+      earnings.push(...(data || []));
+      if ((data || []).length < 1000) break;
+    }
+    const bookingIds = [...new Set((earnings || []).map(earning => earning.booking_id).filter(Boolean))];
+    const bookingRows = [];
+    for (let offset = 0; offset < bookingIds.length; offset += 500) {
+      const { data, error } = await db.from("bookings").select("id,booking_number").in("id", bookingIds.slice(offset, offset + 500));
+      if (error) throw error;
+      bookingRows.push(...(data || []));
+    }
+    const bookingNumbers = new Map(bookingRows.map(booking => [booking.id, booking.booking_number]));
+    for (const earning of earnings || []) {
+      const records = earningsByWasher.get(earning.washer_id) || [];
+      records.push({
+        booking_number: bookingNumbers.get(earning.booking_id) || earning.booking_id,
+        amount: Number(earning.washer_amount) || 0,
+        status: earning.status === "settled" ? "Paid" : "Pending",
+        date: earning.settled_at || earning.created_at,
+      });
+      earningsByWasher.set(earning.washer_id, records);
+    }
+  }
+  if (resource === "supervisors" && rows.length) {
+    const { data, error } = await db.from("supervisor_payout_accounts")
+      .select("supervisor_id,account_label,updated_at").in("supervisor_id", rows.map(row => row.id));
+    if (error) throw error;
+    for (const payout of data || []) supervisorPayoutById.set(payout.supervisor_id, payout);
+    const earnings = [];
+    for (let offset = 0; ; offset += 1000) {
+      const { data: page, error: earningsError } = await db.from("supervisor_earnings")
+        .select("id,supervisor_id,booking_id,supervisor_amount,status,settled_at,created_at")
+        .in("supervisor_id", rows.map(row => row.id)).order("created_at", { ascending: false }).range(offset, offset + 999);
+      if (earningsError) throw earningsError;
+      earnings.push(...(page || []));
+      if ((page || []).length < 1000) break;
+    }
+    const bookingIds = [...new Set(earnings.map(earning => earning.booking_id).filter(Boolean))];
+    const bookingRows = [];
+    for (let offset = 0; offset < bookingIds.length; offset += 500) {
+      const { data: page, error: bookingsError } = await db.from("bookings")
+        .select("id,booking_number").in("id", bookingIds.slice(offset, offset + 500));
+      if (bookingsError) throw bookingsError;
+      bookingRows.push(...(page || []));
+    }
+    const bookingNumbers = new Map(bookingRows.map(booking => [booking.id, booking.booking_number]));
+    for (const earning of earnings) {
+      const records = earningsBySupervisor.get(earning.supervisor_id) || [];
+      records.push({
+        booking_number: bookingNumbers.get(earning.booking_id) || earning.booking_id,
+        amount: Number(earning.supervisor_amount) || 0,
+        status: earning.status === "settled" ? "Paid" : "Pending",
+        date: earning.settled_at || earning.created_at,
+      });
+      earningsBySupervisor.set(earning.supervisor_id, records);
+    }
+  }
 
   return rows.map(row => {
     const userId = resource === "supervisors" ? row.id : row.user_id;
@@ -78,9 +144,24 @@ async function addDirectoryDetails(resource, rows, role) {
         vehicle.is_active === false ? "Inactive" : null,
       ].filter(Boolean).join(" · ")).join(" | ") || "None saved";
     }
+    if (resource === "washers") {
+      const earningRecords = earningsByWasher.get(row.id) || [];
+      detail.total_earnings = Number(earningRecords.reduce((sum, earning) => sum + earning.amount, 0).toFixed(2));
+      detail.pending_earnings = Number(earningRecords.filter(earning => earning.status === "Pending").reduce((sum, earning) => sum + earning.amount, 0).toFixed(2));
+      detail.earning_records = earningRecords;
+    }
+    if (resource === "supervisors") {
+      const earningRecords = earningsBySupervisor.get(row.id) || [];
+      detail.total_earnings = Number(earningRecords.reduce((sum, earning) => sum + earning.amount, 0).toFixed(2));
+      detail.pending_earnings = Number(earningRecords.filter(earning => earning.status === "Pending").reduce((sum, earning) => sum + earning.amount, 0).toFixed(2));
+      detail.earning_records = earningRecords;
+    }
     // The current schema stores payout beneficiaries only for washers. Do not
     // imply that supervisors can receive payouts until their payout workflow exists.
-    if (resource === "supervisors") detail.payout_method = "Not configured";
+    if (resource === "supervisors") {
+      const payout = supervisorPayoutById.get(row.id);
+      detail.payout_method = payout ? payout.account_label : "Not configured";
+    }
     if (resource === "washers" && role === "super_admin") {
       const payout = payoutByWasher.get(row.id);
       detail.payout_method = payout ? "Bank transfer (RazorpayX)" : "Not configured";
@@ -100,10 +181,29 @@ export async function listResource(req, res, next) {
     if (!Number.isSafeInteger(page) || page < 1 || page > 100000) throw Object.assign(new Error("Invalid page."), { status: 400 });
     let query = db.from(spec.table).select(spec.columns.join(","), { count: "exact" }).order("id").range((page - 1) * 25, page * 25 - 1);
     if (spec.filter) query = query.eq(...spec.filter);
+    // The customer table can contain stale rows for accounts whose role has
+    // since changed. Never expose staff accounts in the customer directory.
+    if (req.params.resource === "customers") {
+      const { data: customerProfiles, error: profilesError } = await db.from("profiles")
+        .select("id").eq("role", "customer");
+      if (profilesError) throw profilesError;
+      const customerUserIds = (customerProfiles || []).map(profile => profile.id);
+      if (!customerUserIds.length) {
+        return res.json({ success: true, title: spec.title, columns: [...spec.columns, ...(spec.detailColumns || [])], fields: spec.fields || null, rows: [], count: 0, page, pageSize: 25 });
+      }
+      query = query.in("user_id", customerUserIds);
+    }
     const { data, count, error } = await query;
     if (error) throw error;
-    const rows = await addDirectoryDetails(req.params.resource, data || [], req.profile?.role);
-    const detailColumns = (spec.detailColumns || []).filter(column => column !== "payout_method" || req.profile?.role === "super_admin");
+    let directoryRows = data || [];
+    if (req.params.resource === "customers") {
+      const profilesResult = await db.from("profiles").select("id,role").in("id", directoryRows.map(row => row.user_id).filter(Boolean));
+      if (profilesResult.error) throw profilesResult.error;
+      const roles = new Map((profilesResult.data || []).map(profile => [profile.id, profile.role]));
+      directoryRows = directoryRows.filter(row => roles.get(row.user_id) === "customer");
+    }
+    const rows = await addDirectoryDetails(req.params.resource, directoryRows, req.profile?.role);
+    const detailColumns = (spec.detailColumns || []).filter(column => column !== "payout_method" || req.profile?.role === "super_admin" || req.params.resource === "supervisors");
     const columns = [...spec.columns, ...detailColumns];
     if (req.params.resource === "washers" && req.profile?.role === "super_admin") columns.push("payout_method", "payout_destination", "payout_updated_at");
     res.json({ success: true, title: spec.title, columns, fields: spec.fields || null, rows, count: count || 0, page, pageSize: 25 });

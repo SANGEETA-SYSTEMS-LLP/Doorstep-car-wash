@@ -14,6 +14,8 @@ const { default: app } =
 
 const { processExpiredAssignments } =
   await import("./services/booking/assignmentTimeoutService.js");
+const { processUnpaidBookingExpiry } =
+  await import("./services/booking/unpaidBookingExpiryService.js");
 
 const PORT =
   process.env.PORT || 5000;
@@ -44,6 +46,15 @@ setInterval(() => {
     });
 }, 60 * 1000);
 
+let expiringUnpaidBookings = false;
+setInterval(() => {
+  if (expiringUnpaidBookings) return;
+  expiringUnpaidBookings = true;
+  processUnpaidBookingExpiry()
+    .catch((error) => console.error("Unpaid booking expiry processor:", error.message))
+    .finally(() => { expiringUnpaidBookings = false; });
+}, 60 * 1000).unref();
+
 // Reconcile asynchronous provider outcomes. Never initiates an unsubmitted transfer.
 const { reconcilePendingFinance } = await import("./services/finance/financeReconciliationService.js");
 let reconcilingFinance = false;
@@ -52,4 +63,14 @@ setInterval(async () => {
   reconcilingFinance = true;
   try { await reconcilePendingFinance(); } catch { console.error("Finance reconciliation unavailable; verify migration and credentials."); }
   finally { reconcilingFinance = false; }
+}, 60000).unref();
+
+const { reconcilePendingBookingCancellationRefunds } = await import("./services/booking/cancellationRefundService.js");
+let reconcilingCancellationRefunds = false;
+setInterval(async () => {
+  if (reconcilingCancellationRefunds) return;
+  reconcilingCancellationRefunds = true;
+  try { await reconcilePendingBookingCancellationRefunds(); }
+  catch (error) { console.error("Cancellation refund reconciliation unavailable:", error.message); }
+  finally { reconcilingCancellationRefunds = false; }
 }, 60000).unref();

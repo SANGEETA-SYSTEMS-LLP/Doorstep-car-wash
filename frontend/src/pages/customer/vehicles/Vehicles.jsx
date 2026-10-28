@@ -49,7 +49,7 @@ function Vehicles() {
       );
     } catch (error) {
       console.error(error);
-      setError("Unable to remove vehicle.");
+      setError(error?.message || "Unable to remove vehicle.");
     }
   };
 

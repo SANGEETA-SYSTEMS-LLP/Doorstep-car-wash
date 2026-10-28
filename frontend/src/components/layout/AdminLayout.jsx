@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-const adminLinks = [["", "Overview"], ["societies", "Societies"], ["zones", "Service zones"], ["services", "Services"], ["packages", "Packages & pricing"], ["customers", "Customers"], ["washers", "Washers"], ["supervisors", "Supervisors"], ["bookings", "Bookings"], ["payments", "Payments"], ["earnings", "Earnings"], ["settlements", "Settlements"], ["tickets", "Support tickets"]];
+const adminLinks = [["", "Overview"], ["societies", "Societies"], ["zones", "Service zones"], ["services", "Services"], ["packages", "Packages & pricing"], ["customers", "Customers"], ["washers", "Washers"], ["supervisors", "Supervisors"], ["bookings", "Bookings"], ["payments", "Payments"], ["settlements", "Settlements"], ["tickets", "Support tickets"]];
 export default function AdminLayout({ mode = "admin" }) {
   const { profile, logout } = useAuth();
   const navigate = useNavigate();

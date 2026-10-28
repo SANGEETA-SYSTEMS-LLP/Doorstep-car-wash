@@ -26,10 +26,12 @@ Deploy the updated backend with them. The second migration removes browser write
 
 ## Backend configuration
 
+Customer cancellation is available before service starts. It retains the recorded platform fee and returns the remaining captured online amount through Razorpay. Apply `backend/database/add_customer_booking_cancellation_refunds.sql` before enabling the cancel action. In Razorpay webhook settings, enable `refund.processed` and `refund.failed` in addition to `payment.captured` so the cancellation ledger and customer history receive final refund status.
+
 Set these privately in backend/.env (examples are in backend/.env.example):
 
 - RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET: valid payment-gateway test credentials first.
-- RAZORPAY_WEBHOOK_SECRET: matches your payment.captured webhook configuration at /api/payments/webhook.
+- RAZORPAY_WEBHOOK_SECRET: matches your payment.captured, refund.processed, and refund.failed webhook configuration at /api/payments/webhook.
 - RAZORPAYX_KEY_ID, RAZORPAYX_KEY_SECRET, RAZORPAYX_ACCOUNT_NUMBER: your enabled RazorpayX account and API credentials; gateway keys alone are not sufficient.
 - FINANCE_RECONCILIATION_ENABLED=true: every minute, fetches status for up to 50 submitted pending operations and updates earnings on processed/reversed outcomes. Keep one long-running backend/worker active. Unsubmitted or ambiguous requests remain available for explicit retry from the ledger.
 - INVOICE_BUSINESS_NAME and INVOICE_BUSINESS_ADDRESS: required before the first invoice is issued.

@@ -16,6 +16,7 @@ import {
   getServicePhotos,
   confirmService,
 } from "../../controllers/customers/bookings/customerBookingController.js";
+import { cancelCustomerBooking } from "../../controllers/customers/bookingCancellationController.js";
 
 const router =
   express.Router();
@@ -25,6 +26,13 @@ router.get(
   requireAuth,
   allowRoles("customer"),
   getCustomerBookingDetails
+);
+
+router.post(
+  "/bookings/:bookingId/cancel",
+  requireAuth,
+  allowRoles("customer"),
+  cancelCustomerBooking
 );
 
 router.get(

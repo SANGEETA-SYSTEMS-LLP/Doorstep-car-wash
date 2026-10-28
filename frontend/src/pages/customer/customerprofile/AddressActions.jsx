@@ -21,7 +21,7 @@ export default function AddressActions({ address, userId }) {
     finally { setSaving(false); }
   }
   async function remove() {
-    if (saving || !window.confirm("Delete this saved address? This cannot be undone.")) return;
+    if (saving || !window.confirm("Remove this saved address? Past bookings will keep their saved location details.")) return;
     setSaving(true); setError("");
     try { await deleteSavedAddress(userId, address.id); window.dispatchEvent(new Event("customer-address-saved")); }
     catch (failure) { setError(failure.message || "Unable to delete address."); }
@@ -34,6 +34,6 @@ export default function AddressActions({ address, userId }) {
       <SignupAddress value={draft} onChange={setDraft} disabled={saving} onBusy={setLocating}/>
       <label className="block text-sm font-medium">Tower / block<input value={draft.tower || ""} maxLength={100} disabled={saving || locating} onChange={event => setDraft({...draft,tower:event.target.value})} className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-3"/></label>
       <div className="flex flex-wrap gap-3"><button disabled={saving || locating} className="rounded-xl bg-blue-700 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">{saving ? "Saving…" : "Save changes"}</button><button type="button" disabled={saving || locating} onClick={() => {setEditing(false);setError("");}} className="rounded-xl border border-slate-200 px-4 py-3 text-sm">Cancel</button></div>
-    </form> : <div className="flex gap-4"><button type="button" onClick={edit} disabled={saving} className="inline-flex items-center gap-2 py-2 text-sm font-semibold text-blue-700"><Pencil size={16}/>Edit</button><button type="button" onClick={remove} disabled={saving} className="inline-flex items-center gap-2 py-2 text-sm font-semibold text-red-700 disabled:opacity-50"><Trash2 size={16}/>{saving ? "Deleting…" : "Delete"}</button></div>}
+    </form> : <div className="flex gap-4"><button type="button" onClick={edit} disabled={saving} className="inline-flex items-center gap-2 py-2 text-sm font-semibold text-blue-700"><Pencil size={16}/>Edit</button><button type="button" onClick={remove} disabled={saving} className="inline-flex items-center gap-2 py-2 text-sm font-semibold text-red-700 disabled:opacity-50"><Trash2 size={16}/>{saving ? "Removing…" : "Remove"}</button></div>}
   </div>;
 }

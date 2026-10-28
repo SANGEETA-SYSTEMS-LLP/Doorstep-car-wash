@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import SupervisorWasherDirectory from "../pages/supervisor/washers/SupervisorWasherDirectory";
 import AddWasher from "../pages/supervisor/washers/AddWasher";
 import WasherReviews from "../pages/supervisor/washers/WasherReviews";
@@ -9,6 +10,7 @@ import Invoice from "../pages/finance/invoices/Invoice";
 import OperationsMap from "../pages/supervisor/operations/OperationsMap";
 import ResetPassword from "../pages/public/resetpassword/ResetPassword";
 import { Navigate, Route, Routes, useParams, useLocation } from "react-router-dom";
+import { apiRequest } from "../api/apiClient";
 import ProtectedRoute from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
 import DashboardRedirect from "../pages/public/DashboardRedirect";
@@ -66,6 +68,8 @@ import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
 import AdminRoleDashboard from "../pages/admin/dashboard/AdminRoleDashboard";
 import ResourcePage from "../pages/admin/resources/ResourcePage";
 
+let lastReportedPagePath = null;
+
 function LegacyAccountantRedirect() {
   const {resource} = useParams();
   const {search, hash} = useLocation();
@@ -77,6 +81,16 @@ function LegacyAccountantHomeRedirect() {
   return <Navigate to={"/accountant" + search + hash} replace />;
 }
 function AppRoutes() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    if (lastReportedPagePath === pathname) return;
+    lastReportedPagePath = pathname;
+    apiRequest("/telemetry/page-view", {
+      method: "POST",
+      body: JSON.stringify({ path: pathname }),
+    }).catch(() => {});
+  }, [pathname]);
+
   return (
     <Routes>
       <Route path="/reset-password" element={<ResetPassword />} />
@@ -327,6 +341,7 @@ function AppRoutes() {
         <Route path="finance" element={<RoleRoute allowedRoles={["super_admin"]}><FinanceOperations /></RoleRoute>} />
         <Route path="reports" element={<Reports />} />
         <Route path="invoices" element={<Invoice />} />
+        <Route path="earnings" element={<Navigate to="/admin/washers" replace />} />
         <Route path=":resource" element={<ResourcePage />} />
       </Route>
 
@@ -337,6 +352,7 @@ function AppRoutes() {
         <Route path="accountant" element={<AccountantDashboard base="/sub-admin" />} />
         <Route path="reports" element={<Reports />} />
         <Route path="invoices" element={<Invoice />} />
+        <Route path="earnings" element={<Navigate to="/sub-admin/washers" replace />} />
         <Route path=":resource" element={<ResourcePage base="admin" />} />
       </Route>
 

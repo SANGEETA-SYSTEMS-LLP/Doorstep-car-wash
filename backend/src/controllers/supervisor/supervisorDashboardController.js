@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "../../config/supabase.js";
+import { boundQueryToSupervisorArea, isWithinSupervisorArea } from "../../services/supervisor/supervisorServiceArea.js";
 
 export async function getSupervisorDashboard(
   req,
@@ -17,49 +18,31 @@ export async function getSupervisorDashboard(
       "service_completed",
     ];
 
-    const {
-      count: activeJobs,
-      error: activeError,
-    } = await supabaseAdmin
+    let activeQuery = supabaseAdmin
       .from("bookings")
-      .select(
-        "id",
-        {
-          count: "exact",
-        }
-      )
-      .limit(0)
-      .in(
-        "status",
-        activeStatuses
-      );
+      .select("id,latitude,longitude").in("status", activeStatuses);
+    if (req.profile?.role === "supervisor") activeQuery = boundQueryToSupervisorArea(activeQuery, req.supervisorArea);
+    const { data: activeRows, error: activeError } = await activeQuery;
 
     if (activeError) {
       throw activeError;
     }
 
-    const {
-      count: escalations,
-      error: escalationError,
-    } = await supabaseAdmin
+    let escalationQuery = supabaseAdmin
       .from("bookings")
-      .select(
-        "id",
-        {
-          count: "exact",
-        }
-      )
-      .limit(0)
-      .or("requires_supervisor.eq.true,status.eq.support_escalated");
+      .select("id,latitude,longitude").or("requires_supervisor.eq.true,status.eq.support_escalated");
+    if (req.profile?.role === "supervisor") escalationQuery = boundQueryToSupervisorArea(escalationQuery, req.supervisorArea);
+    const { data: escalationRows, error: escalationError } = await escalationQuery;
 
     if (escalationError) {
       throw escalationError;
     }
 
-    const { count: pendingExtraCharges, error: extraChargeError } = await supabaseAdmin
+    let extraQuery = supabaseAdmin
       .from("extra_charge_requests")
-      .select("id", { count: "exact" }).limit(0)
+      .select("id,booking:bookings(latitude,longitude)")
       .eq("status", "pending");
+    const { data: extraRows, error: extraChargeError } = await extraQuery;
 
     if (extraChargeError) {
       throw extraChargeError;
@@ -67,12 +50,21 @@ export async function getSupervisorDashboard(
 
     const dayStart = startOfTodayIso();
     const dayEnd = new Date(Date.parse(dayStart) + 86400000).toISOString();
-    const completed = await supabaseAdmin
+    let completedQuery = supabaseAdmin
       .from("bookings")
-      .select("id", { count: "exact" }).limit(0)
-      .gte("service_completed_at", dayStart).lt("service_completed_at", dayEnd);
+      .select("id,latitude,longitude").gte("service_completed_at", dayStart).lt("service_completed_at", dayEnd);
+    if (req.profile?.role === "supervisor") completedQuery = boundQueryToSupervisorArea(completedQuery, req.supervisorArea);
+    const completed = await completedQuery;
     if (completed.error) throw completed.error;
-    const completedToday = completed.count;
+    const isSupervisor = req.profile?.role === "supervisor";
+    const inArea = rows => (rows || []).filter(row => isWithinSupervisorArea(row, req.supervisorArea)).length;
+    const activeJobs = isSupervisor ? inArea(activeRows) : (activeRows || []).length;
+    const escalations = isSupervisor ? inArea(escalationRows) : (escalationRows || []).length;
+    const pendingExtraCharges = isSupervisor ? (extraRows || []).filter(row => {
+      const booking = Array.isArray(row.booking) ? row.booking[0] : row.booking;
+      return isWithinSupervisorArea(booking, req.supervisorArea);
+    }).length : (extraRows || []).length;
+    const completedToday = isSupervisor ? inArea(completed.data) : (completed.data || []).length;
 
     return res.json({
       success: true,

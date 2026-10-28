@@ -2,6 +2,33 @@ import {
   supabaseAdmin,
 } from "../../config/supabase.js";
 
+async function createSupervisorEarning({ bookingId, washerId, gross, percentage, platformFee, gstAmount, commissionBase }) {
+  const { data: existing, error: existingError } = await supabaseAdmin.from("supervisor_earnings")
+    .select("id").eq("booking_id", bookingId).maybeSingle();
+  if (existingError) throw existingError;
+  if (existing) return existing;
+  const { data: washer, error: washerError } = await supabaseAdmin
+    .from("washers").select("id,supervisor_id").eq("id", washerId).maybeSingle();
+  if (washerError) throw washerError;
+  if (!washer?.supervisor_id) return null;
+  const { data: supervisor, error: supervisorError } = await supabaseAdmin
+    .from("profiles").select("id,role,is_active").eq("id", washer.supervisor_id).maybeSingle();
+  if (supervisorError) throw supervisorError;
+  if (supervisor?.role !== "supervisor" || supervisor.is_active === false) return null;
+  const { error } = await supabaseAdmin.from("supervisor_earnings").upsert({
+    booking_id: bookingId, supervisor_id: supervisor.id, washer_id: washer.id,
+    gross_amount: gross,
+    platform_fee_amount: platformFee,
+    gst_amount: gstAmount,
+    commission_base_amount: commissionBase,
+    supervisor_amount: Number((commissionBase * (percentage / 100)).toFixed(2)),
+    commission_percent: percentage,
+    status: "pending",
+  }, { onConflict: "booking_id", ignoreDuplicates: true });
+  if (error) throw error;
+  return { booking_id: bookingId, supervisor_id: supervisor.id };
+}
+
 export async function createWasherEarning(
   bookingId
 ) {
@@ -15,6 +42,9 @@ export async function createWasherEarning(
       assigned_washer_id,
       service_amount,
       extra_charge,
+      platform_fee,
+      tax_amount,
+      total_amount,
       status,
 
       package:service_packages (
@@ -96,6 +126,14 @@ export async function createWasherEarning(
   const gross =
     serviceAmount + extraCharge;
 
+  const platformFee = Number(booking.platform_fee || 0);
+  const gstAmount = Number(booking.tax_amount || 0);
+  const paidTotal = Number(booking.total_amount || 0);
+  if (![platformFee, gstAmount, paidTotal].every(Number.isFinite) || platformFee < 0 || gstAmount < 0 || paidTotal < 0) {
+    throw new Error("Booking total, platform fee and GST must be valid non-negative amounts.");
+  }
+  const commissionBase = Math.max(0, paidTotal - platformFee - gstAmount);
+
   const washerAmount =
     Number(
       (
@@ -141,8 +179,10 @@ export async function createWasherEarning(
   if (existingEarningError) {
     throw existingEarningError;
   }
-
-  if (existingEarning) return existingEarning;
+  if (existingEarning) {
+    await createSupervisorEarning({ bookingId: booking.id, washerId: booking.assigned_washer_id, gross, percentage, platformFee, gstAmount, commissionBase });
+    return existingEarning;
+  }
 
   const {
     data,
@@ -166,6 +206,8 @@ export async function createWasherEarning(
   if (earningError) {
     throw earningError;
   }
+
+  await createSupervisorEarning({ bookingId: booking.id, washerId: booking.assigned_washer_id, gross, percentage, platformFee, gstAmount, commissionBase });
 
   return data;
 }

@@ -1,6 +1,8 @@
 import {
   useAuth,
 } from "../../../context/AuthContext";
+import PayoutDetails from "../../washer/washerprofile/PayoutDetails";
+import SupervisorServiceArea from "./SupervisorServiceArea";
 
 export default function SupervisorProfile() {
   const {
@@ -62,6 +64,8 @@ export default function SupervisorProfile() {
           </div>
         </div>
       </div>
+      {profile?.role === "supervisor" && <SupervisorServiceArea />}
+      <PayoutDetails supervisor />
     </div>
   );
 }

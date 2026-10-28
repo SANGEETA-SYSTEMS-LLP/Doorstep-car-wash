@@ -44,6 +44,10 @@ function Register() {
       setError("Passwords do not match.");
       return;
     }
+    if (form.password.length < 12 || form.password.length > 128) {
+      setError("Use a password between 12 and 128 characters.");
+      return;
+    }
 
     const addressComplete = validServiceAddress(address) && address.city?.trim() && address.state?.trim() && /^\d{6}$/.test(address.postalCode || "");
     if (accountType === "washer" && !addressComplete) {

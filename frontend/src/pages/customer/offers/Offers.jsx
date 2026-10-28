@@ -53,7 +53,7 @@ function Offers() {
 
         {error && <p role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p>}
         {loading ? <p role="status" className="mt-8 text-sm text-slate-600">Loading available offers…</p> : null}
-        {!loading && !error && offers.length === 0 ? <p className="mt-8 rounded-xl border border-slate-200 bg-white p-5 text-slate-600">There are no offers available right now.</p> : null}
+        {!loading && !error && offers.length === 0 ? <p className="mt-8 rounded-xl border border-slate-200 bg-white p-5 text-slate-600">You’ve used all the current offers. New offers will appear here when available.</p> : null}
 
         <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {offers.map((offer, index) => (

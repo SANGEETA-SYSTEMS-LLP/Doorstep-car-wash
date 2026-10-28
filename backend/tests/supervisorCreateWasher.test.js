@@ -16,7 +16,7 @@ mock.module("../src/config/supabase.js", { namedExports: { supabaseAdmin: {
 } } });
 mock.module("../src/services/washer/washerSignupService.js", { namedExports: { provisionPendingWasher: async () => {} } });
 const { addSupervisorWasher } = await import("../src/controllers/supervisor/supervisorWasherController.js");
-const body = { name: "Washer One", password: "Test-password-123", phone: "9876543210", email: "washer@example.com", location: { address: "Bhubaneswar Odisha 751001", latitude: 20.27, longitude: 85.84 } };
+const body = { name: "Washer One", password: "Test-password-1234", phone: "9876543210", email: "washer@example.com", location: { address: "Bhubaneswar Odisha 751001", latitude: 20.27, longitude: 85.84 } };
 async function invoke(value = body, role = "supervisor") {
   const res = { status(code) { this.code = code; return this; }, json(data) { this.body = data; return this; } };
   await addSupervisorWasher({ body: value, profile: { role }, user: { id: "supervisor" } }, res);
@@ -50,5 +50,6 @@ test("missing, short and oversized passwords are rejected before account creatio
   for (const password of [undefined, "short", "x".repeat(129)]) {
     assert.equal((await invoke({ ...body, password })).code, 400);
   }
+  assert.equal((await invoke({ ...body, password: "shortpass" })).code, 400);
   assert.equal(created.length, before);
 });

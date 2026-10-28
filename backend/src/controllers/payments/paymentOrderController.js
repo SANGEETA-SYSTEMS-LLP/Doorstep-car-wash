@@ -133,6 +133,21 @@ export async function createPaymentOrder(
       .single();
 
     if (paymentError) {
+      if (paymentError.code === "23505") {
+        const { data: winner, error: winnerError } = await supabaseAdmin.from("payments")
+          .select("id,status,amount,provider_order_id")
+          .eq("booking_id", booking.id)
+          .in("status", ["created", "paid"])
+          .maybeSingle();
+        if (winnerError) throw winnerError;
+        if (winner?.status === "paid") return res.status(409).json({ message: "This booking is already paid." });
+        if (winner && Number(winner.amount) === amount && winner.provider_order_id) {
+          return res.json({ success: true, paymentId: winner.id, orderId: winner.provider_order_id,
+            amount: amountPaise, currency: "INR", keyId: process.env.RAZORPAY_KEY_ID,
+            bookingNumber: booking.booking_number });
+        }
+        return res.status(409).json({ message: "Another checkout is being created for this booking. Retry shortly." });
+      }
       throw paymentError;
     }
 

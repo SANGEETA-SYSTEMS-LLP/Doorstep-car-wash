@@ -15,7 +15,7 @@ export default function ResetPassword() {
     event.preventDefault();
     if (saving) return;
     setError("");
-    if (password.length < 8) return setError("Use at least 8 characters.");
+    if (password.length < 12 || password.length > 128) return setError("Use a password between 12 and 128 characters.");
     if (password !== confirmation) return setError("Passwords do not match.");
     setSaving(true);
     try {
@@ -43,10 +43,10 @@ export default function ResetPassword() {
           <form onSubmit={submit} className="mt-6 space-y-5">
             {error && <p role="alert" className="text-red-700">{error}</p>}
             <label className="block text-sm font-semibold">New password
-              <input required minLength={8} type="password" autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 p-3" />
+              <input required minLength={12} maxLength={128} type="password" autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 p-3" />
             </label>
             <label className="block text-sm font-semibold">Confirm password
-              <input required minLength={8} type="password" autoComplete="new-password" value={confirmation} onChange={e => setConfirmation(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 p-3" />
+              <input required minLength={12} maxLength={128} type="password" autoComplete="new-password" value={confirmation} onChange={e => setConfirmation(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 p-3" />
             </label>
             <button disabled={saving} className="w-full rounded-xl bg-blue-600 p-3 font-semibold text-white disabled:opacity-50">{saving ? "Saving..." : "Update password"}</button>
           </form>

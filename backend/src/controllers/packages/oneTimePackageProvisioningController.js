@@ -20,7 +20,9 @@ export async function ensureOneTimeWashPackages(req, res, next) {
       const type = normalizeVehicleType(pack.vehicle_type || "");
       const name = normalizeVehicleType(pack.name || "");
       const isMonthlyPlan = monthlyTiers.some(tier => name.startsWith(normalizeVehicleType(tier.name)));
-      return !isMonthlyPlan && (candidates.has(type) || ["all", "all vehicles", "all car types", "one time"].includes(type));
+      const isRemovedOneTimePackage = Number(pack.price) === 399
+        && ["interior cleaning", "complete detailing", "basic car wash"].includes(name);
+      return !isRemovedOneTimePackage && !isMonthlyPlan && (candidates.has(type) || ["all", "all vehicles", "all car types", "one time"].includes(type));
     });
     res.json({ packages, vehicleType: vehicle.vehicle_type });
   } catch (error) { next(error); }

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 
 const WasherContext = createContext(null);
 
@@ -16,36 +16,15 @@ const initialWasherState = {
 };
 
 export function WasherProvider({ children }) {
+  // Job snapshots may include customer names, phone numbers, and addresses.
+  // Keep them in memory only; the API is the source of truth after reload.
   const [washerState, setWasherState] = useState(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem("carWashWasherState") || "null");
-      return {
-        ...initialWasherState,
-        ...(saved && typeof saved === "object" ? saved : {}),
-        activeJob:
-          saved?.activeJob &&
-          typeof saved.activeJob === "object"
-          ? { ...saved.activeJob, earning: null }
-          : null,
-        completedTasks: Array.isArray(saved?.completedTasks)
-          ? saved.completedTasks.filter((task) => typeof task === "string")
-          : [],
-        online: localStorage.getItem("carWashWasherOnline") === "true",
-      };
-    } catch (error) {
-      console.error("Unable to load washer availability:", error);
-      return initialWasherState;
-    }
+      localStorage.removeItem("carWashWasherState");
+      localStorage.removeItem("carWashWasherOnline");
+    } catch { /* Storage may be unavailable; the in-memory state is still safe. */ }
+    return initialWasherState;
   });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("carWashWasherOnline", String(washerState.online));
-      localStorage.setItem("carWashWasherState", JSON.stringify(washerState));
-    } catch (error) {
-      console.error("Unable to save washer availability:", error);
-    }
-  }, [washerState]);
 
   const restoreJob = useCallback((job) => {
     const completed = ["service_completed", "completed"].includes(job.status);

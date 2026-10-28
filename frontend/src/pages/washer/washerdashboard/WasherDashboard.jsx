@@ -64,6 +64,7 @@ export default function WasherDashboard() {
   const navigate = useNavigate();
   const online = data?.washer?.status === "available";
   const jobs = data?.jobs || [];
+  const locationTracking = online || jobs.some(job => ["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started"].includes(job.status));
   const active = jobs.filter(job => ACTIVE_STATUSES.includes(job.status));
   const todayJobs = jobs.filter(job => job.scheduled_date === dateKey);
   const pendingCount = jobs.filter(job => job.status === "washer_assigned").length;
@@ -79,17 +80,27 @@ export default function WasherDashboard() {
     .slice(0, 3);
 
   useEffect(() => {
-    if (!online || !navigator.geolocation) return;
+    if (!locationTracking || !navigator.geolocation) return;
     let activeWatch = true;
     let lastSent = 0;
-    const watch = navigator.geolocation.watchPosition(async ({ coords }) => {
-      if (Date.now() - lastSent < 10000) return;
+    let sending = false;
+    const sendPosition = async (coords) => {
+      if (!activeWatch || sending || Date.now() - lastSent < 10000) return;
       lastSent = Date.now();
+      sending = true;
       try { await sendWasherLocation(coords.toJSON ? coords.toJSON() : { latitude: coords.latitude, longitude: coords.longitude, heading: coords.heading, speed: coords.speed }); }
       catch (err) { if (activeWatch) setActionError(err.message); }
-    }, () => { if (activeWatch) setActionError("Allow location access to receive nearby requests."); }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 });
-    return () => { activeWatch = false; navigator.geolocation.clearWatch(watch); };
-  }, [online]);
+      finally { sending = false; }
+    };
+    const watch = navigator.geolocation.watchPosition(({ coords }) => { void sendPosition(coords); }, () => {
+      if (activeWatch) setActionError("Allow location access to receive nearby requests.");
+    }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 });
+    const heartbeat = setInterval(() => {
+      if (!activeWatch || sending) return;
+      navigator.geolocation.getCurrentPosition(({ coords }) => { void sendPosition(coords); }, () => {}, { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 });
+    }, 60000);
+    return () => { activeWatch = false; clearInterval(heartbeat); navigator.geolocation.clearWatch(watch); };
+  }, [locationTracking]);
 
   async function respond(offer, accepted) {
     if (busy) return;

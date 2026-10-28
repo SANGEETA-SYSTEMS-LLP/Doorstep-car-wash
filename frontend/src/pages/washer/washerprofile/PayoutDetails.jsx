@@ -5,8 +5,9 @@ import { apiRequest } from "../../../api/apiClient";
 const emptyForm = { method: "bank", name: "", accountNumber: "", confirmAccount: "", ifsc: "", vpa: "", confirmVpa: "" };
 const normalizeBankAccount = value => value.replace(/[\s-]/g, "");
 
-export default function PayoutDetails() {
-  const { data, loading, error, refresh } = useApi("/account/payout-account");
+export default function PayoutDetails({ supervisor = false }) {
+  const endpoint = supervisor ? "/account/supervisor-payout-account" : "/account/payout-account";
+  const { data, loading, error, refresh } = useApi(endpoint);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -21,9 +22,9 @@ export default function PayoutDetails() {
     setSaving(true);
     try {
       const account = form.method === "upi" ? { method: "upi", vpa: form.vpa.trim() } : { method: "bank", name: form.name, accountNumber: normalizeBankAccount(form.accountNumber), ifsc: form.ifsc.trim().toUpperCase() };
-      await apiRequest("/account/payout-account", { method: "PUT", body: JSON.stringify(account) });
+      await apiRequest(endpoint, { method: "PUT", body: JSON.stringify(account) });
       setForm({ ...emptyForm, method: form.method });
-      setMessage("Payout account saved. Return to your dashboard and go online to receive eligible job assignments. Supervisor verification is required.");
+      setMessage(supervisor ? "Payout account saved. Eligible supervisor commissions will be paid to this bank or UPI account." : "Payout account saved. Return to your dashboard and go online to receive eligible job assignments. Supervisor verification is required.");
       refresh();
     } catch (err) { setSaveError(err.message); }
     finally { setSaving(false); }
@@ -36,7 +37,7 @@ export default function PayoutDetails() {
 
   return <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
     <h2 className="text-xl font-bold">Payment & payout details</h2>
-    <p className="mt-2 text-sm text-slate-600">Customers pay securely through Razorpay. Add the bank account or UPI ID where you want to receive your washer earnings.</p>
+    <p className="mt-2 text-sm text-slate-600">{supervisor ? "Add the bank account or UPI ID where you want to receive commissions for paid jobs completed by washers linked to you." : "Customers pay securely through Razorpay. Add the bank account or UPI ID where you want to receive your washer earnings."}</p>
     {loading && <p role="status" className="mt-4">Loading payout account…</p>}
     {error && <p role="alert" className="mt-4 text-red-700">Could not check payout availability. Retry before entering payout details. <button type="button" className="underline" onClick={refresh}>Retry</button></p>}
     {data?.account && <p className="mt-4 rounded-xl bg-blue-50 p-4">Saved: {data.account.account_label}</p>}

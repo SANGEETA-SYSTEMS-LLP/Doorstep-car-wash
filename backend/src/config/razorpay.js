@@ -9,6 +9,10 @@ if (
   );
 }
 
+if (process.env.NODE_ENV === "production" && /test|example|placeholder|change[-_]?me/i.test(`${process.env.RAZORPAY_KEY_ID} ${process.env.RAZORPAY_KEY_SECRET}`)) {
+  throw new Error("Production Razorpay configuration must use live credentials.");
+}
+
 export const razorpay =
   new Razorpay({
     key_id:

@@ -3,6 +3,7 @@ import { Activity, ArrowUpRight, BadgeCheck, BriefcaseBusiness, CircleCheckBig, 
 import { Link } from "react-router-dom";
 import { getSupervisorDashboard, getSupervisorWasherRoster } from "../../../services/supervisor/supervisorService";
 import SupervisorWasherRoster from "../washers/SupervisorWasherRoster";
+import ServiceCompletionFeed from "../../../components/operations/ServiceCompletionFeed";
 
 const emptyStats = { activeJobs: 0, escalations: 0, pendingExtraCharges: 0, completedToday: 0 };
 const emptyRoster = { washers: 0, online: 0, verified: 0, pendingVerification: 0, inactive: 0, acceptedAssignments: 0, activeJobs: 0, totalEarnings: 0, pendingPayout: 0 };
@@ -73,6 +74,8 @@ export default function SupervisorDashboard() {
       <Metric label="Escalations" value={stats.escalations} note="Require operations attention" icon={TriangleAlert} tone="amber" loading={loading} />
       <Metric label="Completed today" value={stats.completedToday} note={`${stats.pendingExtraCharges} extra charges awaiting review`} icon={CircleCheckBig} tone="slate" loading={loading} />
     </section>
+
+    <ServiceCompletionFeed />
 
     <section aria-label="Washer earnings breakdown" className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-900/[0.03] sm:p-6">
       <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Finance overview</p><h2 className="mt-1 text-xl font-bold text-slate-950">Washer earnings breakdown</h2><p className="mt-1 text-sm text-slate-500">Gross service value, platform commission, washer earnings, and payout status across the roster.</p></div>

@@ -58,6 +58,15 @@ export async function createReview(
     const washer =
       await getBookingWasher(booking);
 
+    const { data: existingReview, error: existingReviewError } = await supabaseAdmin
+      .from("reviews")
+      .select("id")
+      .eq("booking_id", booking.id)
+      .limit(1)
+      .maybeSingle();
+    if (existingReviewError) throw existingReviewError;
+    if (existingReview) return res.status(409).json({ message: "This booking has already been rated." });
+
     const {
       data: review,
       error: reviewError,
@@ -80,10 +89,11 @@ export async function createReview(
           comment?.trim() ||
           null,
       })
-      .select("*")
+      .select("id, booking_id, customer_id, washer_id, rating, comment, created_at")
       .single();
 
     if (reviewError) {
+      if (reviewError.code === "23505") return res.status(409).json({ message: "This booking has already been rated." });
       throw reviewError;
     }
 

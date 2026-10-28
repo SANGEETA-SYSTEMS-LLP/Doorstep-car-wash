@@ -2,6 +2,7 @@ import { supabaseAdmin } from "../../config/supabase.js";
 import { provisionPendingWasher } from "../../services/washer/washerSignupService.js";
 import { validWasherLocation } from "../../services/washer/washerLocationService.js";
 import { referenceId } from "../../../../shared/referenceId.mjs";
+import { isWithinSupervisorArea, SUPERVISOR_SERVICE_RADIUS_KM } from "../../services/supervisor/supervisorServiceArea.js";
 
 export async function addSupervisorWasher(req, res) {
   if (!["supervisor", "sub_admin", "super_admin"].includes(req.profile?.role)) return res.status(403).json({ message: "Sign in with a supervisor or administrator account to add washers." });
@@ -12,7 +13,8 @@ export async function addSupervisorWasher(req, res) {
   const mobile = typeof phone === "string" ? phone.replace(/[\s()-]/g, "") : "";
   if (fullName.length < 2 || fullName.length > 100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail) || mail.length > 254 || !/^\+?[0-9]{10,15}$/.test(mobile)) return res.status(400).json({ message: "Enter a valid washer name, email and phone number." });
   if (!validWasherLocation(location) || !Number.isFinite(radius) || radius <= 0 || radius > 100) return res.status(400).json({ message: "Select a map location, enter a complete address and a service radius up to 100 km." });
-  if (typeof password !== "string" || password.length < 8 || password.length > 128) return res.status(400).json({ message: "Enter a password between 8 and 128 characters." });
+  if (req.profile?.role === "supervisor" && !isWithinSupervisorArea({ latitude: location.latitude, longitude: location.longitude }, req.supervisorArea)) return res.status(400).json({ message: `Add this washer within your saved ${SUPERVISOR_SERVICE_RADIUS_KM} km service area.` });
+  if (typeof password !== "string" || password.length < 12 || password.length > 128) return res.status(400).json({ message: "Enter a password between 12 and 128 characters." });
   let createdUser;
   try {
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
@@ -33,11 +35,11 @@ export async function addSupervisorWasher(req, res) {
     if (createdUser) {
       const rollback = await supabaseAdmin.auth.admin.deleteUser(createdUser.id);
       if (rollback.error) {
-        console.error("Washer account cleanup failed:", createdUser.id, rollback.error.message);
+        console.error("Washer account cleanup failed", { code: rollback.error.code });
         return res.status(500).json({ message: "Account was created but setup is incomplete. Contact support before retrying.", accountId: createdUser.id });
       }
     }
-    console.error("Create supervisor washer:", error.message);
+    console.error("Create supervisor washer failed", { name: error?.name || "Error", code: error?.code });
     return res.status(500).json({ message: "Unable to complete washer account setup. Please try again." });
   }
 }
@@ -71,10 +73,15 @@ export async function linkSupervisorWasher(req, res) {
     if (washer.supervisor_id && washer.supervisor_id !== req.user.id) return res.status(409).json({ message: "This washer is already linked to another supervisor." });
     const [authResult, locationResult] = await Promise.all([
       supabaseAdmin.auth.admin.getUserById(washer.user_id),
-      supabaseAdmin.from("washer_locations").select("latitude,longitude,updated_at").eq("washer_id", washer.id).maybeSingle(),
+      supabaseAdmin.from("washer_locations").select("latitude,longitude,service_latitude,service_longitude,updated_at").eq("washer_id", washer.id).maybeSingle(),
     ]);
     if (authResult.error) throw authResult.error;
     if (locationResult.error) throw locationResult.error;
+    const serviceLocation = locationResult.data && {
+      latitude: locationResult.data.service_latitude ?? locationResult.data.latitude,
+      longitude: locationResult.data.service_longitude ?? locationResult.data.longitude,
+    };
+    if (req.profile?.role === "supervisor" && !isWithinSupervisorArea(serviceLocation, req.supervisorArea)) return res.status(400).json({ message: "This washer's service location is outside your area." });
     let update = supabaseAdmin.from("washers").update({ supervisor_id: req.user.id }).eq("id", washer.id).eq("is_active", true);
     update = washer.supervisor_id ? update.eq("supervisor_id", req.user.id) : update.is("supervisor_id", null);
     const linked = await update.select("id").maybeSingle();
@@ -82,7 +89,7 @@ export async function linkSupervisorWasher(req, res) {
     if (!linked.data) return res.status(409).json({ message: "Washer details changed. Refresh and try again." });
     return res.json({ success: true, washer: { ...washer, supervisor_id: req.user.id, referenceId: referenceId("WSH", washer.user_id), name: profile.full_name, phone: profile.phone, email: authResult.data?.user?.email || null, location: locationResult.data } });
   } catch (error) {
-    console.error("Link supervisor washer:", error.message);
+    console.error("Link supervisor washer failed", { name: error?.name || "Error", code: error?.code });
     return res.status(500).json({ message: "Unable to link washer. Please try again." });
   }
 }

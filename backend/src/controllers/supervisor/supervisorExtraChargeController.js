@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "../../config/supabase.js";
+import { isWithinSupervisorArea } from "../../services/supervisor/supervisorServiceArea.js";
 
 export async function getPendingExtraCharges(
   req,
@@ -19,6 +20,8 @@ export async function getPendingExtraCharges(
           booking_number,
           customer_id,
           service_address,
+            latitude,
+            longitude,
           total_amount
         ),
         washer:washers (
@@ -41,10 +44,12 @@ export async function getPendingExtraCharges(
       throw error;
     }
 
+    const requests = req.profile?.role === "supervisor"
+      ? (data || []).filter(request => isWithinSupervisorArea(request.booking, req.supervisorArea))
+      : data || [];
     return res.json({
       success: true,
-      requests:
-        data || [],
+      requests,
     });
   } catch (error) {
     return res.status(500).json({
@@ -65,6 +70,13 @@ export async function reviewExtraCharge(req, res) {
 
     const status = action === "approve" ? "approved" : "rejected";
     const now = new Date().toISOString();
+    if (req.profile?.role === "supervisor") {
+      const { data: existing, error: lookupError } = await supabaseAdmin.from("extra_charge_requests")
+        .select("booking:bookings(latitude,longitude)").eq("id", requestId).maybeSingle();
+      if (lookupError) throw lookupError;
+      const booking = Array.isArray(existing?.booking) ? existing.booking[0] : existing?.booking;
+      if (!existing || !isWithinSupervisorArea(booking, req.supervisorArea)) return res.status(404).json({ message: "Charge request not found in your service area." });
+    }
     const { data, error } = await supabaseAdmin
       .from("extra_charge_requests")
       .update({

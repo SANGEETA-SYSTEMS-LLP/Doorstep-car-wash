@@ -59,7 +59,7 @@ router.post(
 
 router.post(
   "/bookings/:bookingId/photos",
-  uploadServicePhotos.array("photos", 5),
+  uploadServicePhotos,
   validateServicePhotoSignatures,
   uploadPhotos
 );

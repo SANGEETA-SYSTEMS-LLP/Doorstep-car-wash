@@ -23,6 +23,8 @@ import {
   assignSupervisorWasher,
 } from "../../controllers/supervisor/supervisorController.js";
 import { validateService } from "../../controllers/serviceOperations/serviceValidationController.js";
+import { getSupervisorServiceArea, saveSupervisorServiceArea } from "../../controllers/supervisor/supervisorServiceAreaController.js";
+import { requireSupervisorServiceArea } from "../../services/supervisor/supervisorServiceArea.js";
 
 const router =
   express.Router();
@@ -35,6 +37,10 @@ router.use(
     "super_admin"
   )
 );
+
+router.get("/service-area", getSupervisorServiceArea);
+router.put("/service-area", saveSupervisorServiceArea);
+router.use(requireSupervisorServiceArea);
 
 router.get(
   "/dashboard",

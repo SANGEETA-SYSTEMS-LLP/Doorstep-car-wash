@@ -34,7 +34,6 @@ const adminLinks = [
   { label: "Packages and pricing", path: "/admin/packages", icon: Package },
   { label: "Service areas", path: "/admin/zones", icon: MapPinned },
   { label: "Payments", path: "/admin/payments", icon: Banknote },
-  { label: "Earnings", path: "/admin/earnings", icon: CircleDollarSign },
   { label: "Settlements", path: "/admin/settlements", icon: CircleDollarSign },
 ];
 

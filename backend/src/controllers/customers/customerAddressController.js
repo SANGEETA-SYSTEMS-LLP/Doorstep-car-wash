@@ -60,8 +60,33 @@ export async function deleteAddress(req, res, next) {
   try {
     if (!uuid(req.params.id)) throw fail("Invalid address.");
     const customerId = await owner(req);
-    const { data, error } = await db.from("customer_addresses").delete().eq("id", req.params.id).eq("customer_id", customerId).select("id").maybeSingle();
-    if (error?.code === "23503") throw fail("This address is linked to a booking and cannot be deleted. Add a new address for future bookings.", 409);
+    const { data: address, error: addressError } = await db.from("customer_addresses").select("*")
+      .eq("id", req.params.id).eq("customer_id", customerId).maybeSingle();
+    if (addressError) throw addressError;
+    if (!address) throw fail("Address not found.", 404);
+
+    // Preserve an immutable location snapshot on each booking before clearing
+    // its foreign key, so the customer can remove even a previously used address.
+    const addressLine = [address.address_line, address.tower, address.flat_number,
+      address.landmark, address.city, address.state, address.postal_code].filter(Boolean).join(", ");
+    const { data: linkedBookings, error: bookingsError } = await db.from("bookings")
+      .select("id,service_address,latitude,longitude,tower,flat_number,landmark")
+      .eq("address_id", req.params.id);
+    if (bookingsError) throw bookingsError;
+    const unlinkResults = await Promise.all((linkedBookings || []).map(booking => db.from("bookings").update({
+      address_id: null,
+      service_address: booking.service_address || addressLine || address.address_line,
+      latitude: booking.latitude ?? address.latitude,
+      longitude: booking.longitude ?? address.longitude,
+      tower: booking.tower ?? address.tower,
+      flat_number: booking.flat_number ?? address.flat_number,
+      landmark: booking.landmark ?? address.landmark,
+    }).eq("id", booking.id).eq("address_id", req.params.id)));
+    const unlinkError = unlinkResults.find(result => result.error)?.error;
+    if (unlinkError) throw unlinkError;
+
+    const { data, error } = await db.from("customer_addresses").delete()
+      .eq("id", req.params.id).eq("customer_id", customerId).select("id").maybeSingle();
     if (error) throw error;
     if (!data) throw fail("Address not found.", 404);
     res.json(data);

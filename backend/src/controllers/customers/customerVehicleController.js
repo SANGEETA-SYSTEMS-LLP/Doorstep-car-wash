@@ -49,8 +49,9 @@ export async function deleteCustomerVehicle(req, res, next) {
   try {
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(req.params.id)) throw failure("Invalid vehicle.");
     const owner = await customerId(req);
-    const { data, error } = await db.from("vehicles").delete().eq("id", req.params.id).eq("customer_id", owner).select("id").maybeSingle();
-    if (error?.code === "23503") throw failure("This vehicle is linked to a booking and cannot be deleted.", 409);
+    // Keep the row for booking history while removing it from the customer's garage.
+    const { data, error } = await db.from("vehicles").update({ is_active: false, is_default: false })
+      .eq("id", req.params.id).eq("customer_id", owner).eq("is_active", true).select("id").maybeSingle();
     if (error) throw error;
     if (!data) throw failure("Vehicle not found.", 404);
     res.json(data);

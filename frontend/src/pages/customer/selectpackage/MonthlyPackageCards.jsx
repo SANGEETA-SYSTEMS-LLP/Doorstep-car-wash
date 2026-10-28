@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BadgeCheck, Check, Droplets, Sparkles } from "lucide-react";
+import { BadgeCheck, Check, Droplets, Sparkles, ArrowRight } from "lucide-react";
 
 const plans = [
   { name: "Basic", washes: 4, key: "basic" },
@@ -51,12 +51,10 @@ export default function MonthlyPackageCards({ packages = [], loading, error, veh
           </article>;
         })}
       </div>
-      <aside className="mt-5 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-        <h3 className="text-sm font-bold text-slate-900">Plan details</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-600">Plan wash allowances are shown above. Each wash covers the exterior of one registered vehicle. Interior cleaning, vacuuming, polishing, and detailing are not included.</p>
-        <p className="mt-3 border-t border-slate-100 pt-3 text-xs leading-5 text-slate-500">Prices are proposed retail prices and may vary after local market validation. GST extra; applicable tax will be shown according to the business tax configuration.</p>
-        <button type="button" onClick={() => onContinue?.(selectedPackage)} disabled={!selectedPackage || checking} className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-56">{checking ? "Checking plan…" : `Continue with ${selectedPlan?.name || "plan"}`}</button>
-      </aside>
+      <div className="sticky bottom-3 z-10 mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        <div className="min-w-0"><p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Your monthly plan</p><p className="mt-1 truncate font-semibold text-slate-900">{selectedPackage?.name || "Choose a plan"}{selectedPackage ? ` · ${money(Number(selectedPackage.price))}/month` : ""}</p></div>
+        <button type="button" onClick={() => onContinue?.(selectedPackage)} disabled={!selectedPackage || checking} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50 sm:px-6">{checking ? "Checking plan…" : "Choose date & time"}<ArrowRight size={17} /></button>
+      </div>
     </>}
   </section>;
 }

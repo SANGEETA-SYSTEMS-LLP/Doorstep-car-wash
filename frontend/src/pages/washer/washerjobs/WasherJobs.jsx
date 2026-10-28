@@ -1,27 +1,60 @@
 import { useState } from "react";
-import { BriefcaseBusiness, CheckCircle2, Clock3, RefreshCw } from "lucide-react";
+import { BriefcaseBusiness, CheckCircle2, Clock3, RefreshCw, Send } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import useWasherWorkspace from "../../../hooks/useWasherWorkspace";
 import WasherBookingCard from "../../../components/washer/WasherBookingCard";
-import { ACTIVE_STATUSES } from "../../../services/washer/washerWorkspaceService";
+import { ACTIVE_STATUSES, getWasherJob, toActiveJob } from "../../../services/washer/washerWorkspaceService";
+import { acceptAssignment, rejectAssignment } from "../../../services/booking/assignmentService";
+import { useWasher } from "../../../context/WasherContext";
 
 const completedStatuses = ["completed", "customer_confirmed", "payment_completed", "closed"];
 const filters = [
   { label: "All jobs", key: "All", icon: BriefcaseBusiness },
+  { label: "New requests", key: "Requests", icon: Send },
   { label: "Active", key: "Active", icon: Clock3 },
   { label: "Completed", key: "Completed", icon: CheckCircle2 },
 ];
 
 export default function WasherJobs() {
+  const navigate = useNavigate();
+  const { acceptJob, updateJobStatus } = useWasher();
   const { data, loading, error, errorStatus, refresh } = useWasherWorkspace();
   const [filter, setFilter] = useState("All");
+  const [busy, setBusy] = useState("");
+  const [actionError, setActionError] = useState("");
   const allJobs = data?.jobs || [];
-  const jobs = allJobs.filter(job => filter === "All"
+  const assignments = data?.assignments || [];
+  const jobs = filter === "Requests" ? assignments.map(offer => ({ ...offer.booking, assignment: offer })) : allJobs.filter(job => filter === "All"
     || (filter === "Active" ? ACTIVE_STATUSES.includes(job.status) : completedStatuses.includes(job.status)));
   const counts = {
     All: allJobs.length,
+    Requests: assignments.length,
     Active: allJobs.filter(job => ACTIVE_STATUSES.includes(job.status)).length,
     Completed: allJobs.filter(job => completedStatuses.includes(job.status)).length,
   };
+
+  async function respond(offer, accepted) {
+    if (busy) return;
+    setBusy(offer.id);
+    setActionError("");
+    try {
+      if (accepted) {
+        await acceptAssignment(offer.id);
+        const { booking } = await getWasherJob(offer.booking_id);
+        acceptJob(toActiveJob(booking));
+        updateJobStatus(booking.status);
+        refresh();
+        navigate("/washer/jobs/" + booking.id);
+      } else {
+        await rejectAssignment(offer.id);
+        refresh();
+      }
+    } catch (err) {
+      setActionError(err.message || "Unable to update this request.");
+    } finally {
+      setBusy("");
+    }
+  }
 
   return <main className="mx-auto max-w-7xl space-y-7 p-5 lg:p-8">
     <header className="flex flex-wrap items-end justify-between gap-4">
@@ -47,8 +80,8 @@ export default function WasherJobs() {
       </button>)}
     </section>
 
-    {error && <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">
-      <p className="font-semibold">{error}</p>
+    {(error || actionError) && <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">
+      <p className="font-semibold">{actionError || error}</p>
       {errorStatus === 403 && <p className="mt-1">Ask your supervisor to confirm this account has the washer role and an active washer profile.</p>}
       <button type="button" onClick={refresh} className="mt-3 font-semibold underline">Try again</button>
     </div>}
@@ -59,13 +92,13 @@ export default function WasherJobs() {
     </div>}
 
     {!loading && !error && jobs.length > 0 && <div className="grid items-start gap-5 xl:grid-cols-2">
-      {jobs.map(booking => <WasherBookingCard key={booking.id} booking={booking} />)}
+      {jobs.map(booking => <WasherBookingCard key={booking.id} booking={booking} assignment={booking.assignment} busy={busy === booking.assignment?.id} onAccept={() => respond(booking.assignment, true)} onReject={() => respond(booking.assignment, false)} />)}
     </div>}
 
     {!loading && !error && !jobs.length && <section className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
       <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-700"><BriefcaseBusiness size={24} /></span>
-      <h2 className="mt-4 text-lg font-bold text-slate-900">{allJobs.length ? `No ${filter.toLowerCase()} jobs` : "No assigned jobs yet"}</h2>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">{allJobs.length ? "Try another filter to see more of your work." : "When a booking is assigned to you, you’ll find its schedule and customer details here."}</p>
+      <h2 className="mt-4 text-lg font-bold text-slate-900">{allJobs.length || assignments.length ? `No ${filter === "Requests" ? "new requests" : filter.toLowerCase()} jobs` : "No assigned jobs yet"}</h2>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">{allJobs.length || assignments.length ? "Try another filter to see more of your work." : "New requests and accepted bookings will appear here when they’re available."}</p>
     </section>}
   </main>;
 }

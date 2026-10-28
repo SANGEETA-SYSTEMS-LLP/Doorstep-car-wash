@@ -1,5 +1,6 @@
 import { supabaseAdmin, razorpay, createWasherEarning } from "./paymentDependencies.js";
 import { validateCapturedPayment } from "../../services/payments/paymentValidation.js";
+import { assignWasherToBooking } from "../../services/booking/bookingAssignmentService.js";
 import crypto from "node:crypto";
 
 export async function razorpayWebhook(
@@ -12,9 +13,9 @@ export async function razorpayWebhook(
         "x-razorpay-signature"
       ];
 
-    if (!signature) {
+    if (typeof signature !== "string" || !/^[a-f0-9]{64}$/i.test(signature)) {
       return res.status(400).send(
-        "Missing signature"
+        "Invalid signature"
       );
     }
 
@@ -74,6 +75,34 @@ export async function razorpayWebhook(
         req.body.toString("utf8")
       );
 
+    if (["refund.processed", "refund.failed"].includes(event.event)) {
+      const refund = event.payload?.refund?.entity;
+      if (refund?.id && refund?.payment_id && refund?.notes?.cancellation_id) {
+        const { data: cancellation, error: cancellationError } = await supabaseAdmin
+          .from("booking_cancellations").select("id,payment_id,refund_amount_paise")
+          .eq("id", refund.notes.cancellation_id).maybeSingle();
+        if (cancellationError) throw cancellationError;
+        if (cancellation) {
+          const { data: payment, error: paymentError } = await supabaseAdmin.from("payments")
+            .select("provider_payment_id").eq("id", cancellation.payment_id).maybeSingle();
+          if (paymentError) throw paymentError;
+          if (!payment || payment.provider_payment_id !== refund.payment_id
+            || Number(refund.amount) !== Number(cancellation.refund_amount_paise)
+            || refund.currency !== "INR") {
+            throw new Error("Refund webhook does not match the saved cancellation.");
+          }
+          const status = event.event === "refund.processed" ? "refund_processed" : "refund_failed";
+          const { error: updateError } = await supabaseAdmin.from("booking_cancellations").update({
+            provider_refund_id: refund.id,
+            provider_status: refund.status || event.event.slice("refund.".length),
+            status,
+            updated_at: new Date().toISOString(),
+          }).eq("id", cancellation.id);
+          if (updateError) throw updateError;
+        }
+      }
+    }
+
     if (
       event.event ===
       "payment.captured"
@@ -116,6 +145,9 @@ export async function razorpayWebhook(
                 provider_payment_id:
                   entity.id,
 
+                provider_method:
+                  typeof entity.method === "string" ? entity.method : null,
+
                 paid_at: now,
 
                 updated_at: now,
@@ -150,9 +182,16 @@ export async function razorpayWebhook(
             throw bookingUpdateError;
           }
 
+          const { error: reviveExpiredBookingError } = await supabaseAdmin.from("bookings")
+            .update({ status: "pending", updated_at: now })
+            .eq("id", payment.booking_id)
+            .eq("status", "expired");
+          if (reviveExpiredBookingError) throw reviveExpiredBookingError;
+
           await createWasherEarning(
             payment.booking_id
           );
+          await assignWasherToBooking(payment.booking_id);
         }
       }
     }

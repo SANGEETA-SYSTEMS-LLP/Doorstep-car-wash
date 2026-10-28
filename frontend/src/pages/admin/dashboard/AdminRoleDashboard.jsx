@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import ServiceCompletionFeed from "../../../components/operations/ServiceCompletionFeed";
 
 const links = [
   ["Live operations map", "operations"],
@@ -26,6 +27,7 @@ export default function AdminRoleDashboard({ base = "/admin" }) {
           </Link>
         ))}
       </div>
+      <div className="mt-7"><ServiceCompletionFeed /></div>
     </section>
   );
 }

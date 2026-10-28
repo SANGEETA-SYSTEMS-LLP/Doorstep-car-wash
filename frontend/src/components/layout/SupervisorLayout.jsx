@@ -1,6 +1,9 @@
 import {
   Outlet,
+  Navigate,
+  useLocation,
 } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import SupervisorSidebar
   from "./SupervisorSidebar";
@@ -9,10 +12,32 @@ import {
   useAuth,
 } from "../../context/AuthContext";
 import { ShieldCheck } from "lucide-react";
+import { apiRequest } from "../../api/apiClient";
 
 export default function SupervisorLayout() {
   const { profile } =
     useAuth();
+  const location = useLocation();
+  const [areaState, setAreaState] = useState({ path: "", status: "checking" });
+  useEffect(() => {
+    if (profile?.role !== "supervisor" || location.pathname.endsWith("/profile")) return;
+    let active = true;
+    setAreaState({ path: location.pathname, status: "checking" });
+    apiRequest("/supervisor/service-area")
+      .then(result => {
+        if (active) setAreaState({ path: location.pathname, status: result?.area ? "ready" : "missing" });
+      })
+      .catch(() => {
+        if (active) setAreaState({ path: location.pathname, status: "missing" });
+      });
+    return () => { active = false; };
+  }, [profile?.role, location.pathname]);
+
+  if (profile?.role === "supervisor" && !location.pathname.endsWith("/profile")) {
+    const status = areaState.path === location.pathname ? areaState.status : "checking";
+    if (status === "checking") return <div className="grid min-h-screen place-items-center bg-slate-50 text-sm text-slate-600">Checking your service area…</div>;
+    if (status === "missing") return <Navigate to="/supervisor/profile" replace state={{ areaSetupRequired: true }} />;
+  }
 
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip bg-[#f5f8fb] lg:flex-row">

@@ -16,8 +16,8 @@ function useSupervisorJobDetails(bookingId) {
   const [success, setSuccess] = useState("");
   const [validating, setValidating] = useState(false);
 
-  const loadJob = useCallback(async () => {
-    setLoading(true);
+  const loadJob = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     setError("");
     try {
       const response = await getSupervisorJobDetails(bookingId);
@@ -27,7 +27,7 @@ function useSupervisorJobDetails(bookingId) {
     } catch (loadError) {
       setError(loadError.message || "Unable to load booking details.");
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [bookingId]);
 
@@ -46,7 +46,8 @@ function useSupervisorJobDetails(bookingId) {
           setError("Live booking updates are unavailable. Refresh to check the latest status.");
         }
       });
-    return () => supabase.removeChannel(channel);
+    const locationRefresh = setInterval(() => { void loadJob(true); }, 15000);
+    return () => { clearInterval(locationRefresh); supabase.removeChannel(channel); };
   }, [bookingId, loadJob]);
 
   const handleAssign = async (washerId) => {

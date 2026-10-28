@@ -4,6 +4,7 @@ import useApi from "../../../hooks/useApi";
 import { apiRequest } from "../../../api/apiClient";
 import OperationHistory from "./OperationHistory";
 import PendingWasherPayments from "./PendingWasherPayments";
+import SupervisorPayouts from "./SupervisorPayouts";
 
 const inputClass = "w-full rounded-lg border border-slate-300 bg-white p-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
 const money = paise => `₹${(Number(paise || 0) / 100).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -131,7 +132,7 @@ export default function FinanceOperations() {
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white"><div className="border-b border-slate-100 p-5"><h3 className="font-bold text-slate-900">Washer payout records</h3><p className="mt-1 text-sm text-slate-500">Pending, processed, and reconciled transfers.</p></div>{payoutOperationsError && <p role="alert" className="p-4 text-sm text-red-700">{payoutOperationsError}</p>}<OperationHistory rows={payoutOperations?.rows} kind="payout" busy={busy} perform={perform} />{pagination(payoutPage, setPayoutPage, payoutOperations)}</div>
 
-      <aside className="rounded-xl border border-amber-200 bg-amber-50 p-5"><div className="flex items-start gap-3"><span className="rounded-lg bg-white p-2 text-amber-700"><Banknote size={18} /></span><div><h3 className="font-bold text-amber-950">Supervisor payments</h3><p className="mt-1 text-sm leading-6 text-amber-900">Supervisor payout accounts and settlement records are not configured in this app yet. No supervisor payments can be initiated or marked paid from this page until that workflow is added.</p></div></div></aside>
+      <SupervisorPayouts />
     </section>
 
     <section aria-labelledby="customer-refunds-heading" className="space-y-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-6">

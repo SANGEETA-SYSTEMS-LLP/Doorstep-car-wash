@@ -12,12 +12,30 @@ function limiter({ windowMs, limit, message, skipSuccessfulRequests = false, byU
   });
 }
 
-// This process-local limit is a baseline for a single API instance. Production
-// deployments with multiple instances should also enforce limits at the edge.
+// These process-local limits are a baseline for one API instance. Production
+// deployments with multiple instances must also enforce limits at the edge.
 export const apiRateLimit = limiter({
   windowMs: 15 * 60 * 1000,
   limit: 600,
   message: "Too many requests. Please wait and try again.",
+});
+
+export const pageViewRateLimit = limiter({
+  windowMs: 15 * 60 * 1000,
+  limit: 120,
+  message: "Too many page view events. Please wait and try again.",
+});
+
+export const authAttemptRateLimit = limiter({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  message: "Too many authentication attempts. Please wait and try again.",
+});
+
+export const authAbuseRateLimit = limiter({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  message: "Too many sign-in or password-reset attempts. Please wait and try again.",
 });
 
 export const publicLookupRateLimit = limiter({
