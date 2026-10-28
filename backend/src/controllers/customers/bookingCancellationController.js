@@ -17,6 +17,7 @@ export async function cancelCustomerBooking(req, res, next) {
 
     const refundAmount = Number(cancellation.refund_amount_paise || 0) / 100;
     const platformFeeRetained = Number(cancellation.platform_fee_paise || 0) / 100;
+    const latePaymentWatch = cancellation.provider_status === "awaiting_payment";
     if (cancellation.status === "refund_pending" && cancellation.payment_id) {
       try {
         Object.assign(cancellation, await processCancellationRefund(cancellation));
@@ -49,6 +50,8 @@ export async function cancelCustomerBooking(req, res, next) {
           ? "Booking cancelled, but the refund could not be confirmed. Contact support with your booking reference."
           : cancellation.status === "refund_pending"
             ? "Booking cancelled. Your refund is pending provider confirmation."
+            : latePaymentWatch
+              ? "Booking cancelled. If the payment that was processing completes, it will be refunded automatically to the original payment method, excluding the platform fee."
             : "Booking cancelled. No online payment refund was due.",
     });
   } catch (error) {

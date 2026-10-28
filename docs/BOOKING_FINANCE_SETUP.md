@@ -28,13 +28,15 @@ Deploy the updated backend with them. The second migration removes browser write
 
 Customer cancellation is available before service starts. It retains the recorded platform fee and returns the remaining captured online amount through Razorpay. Apply `backend/database/add_customer_booking_cancellation_refunds.sql` before enabling the cancel action. In Razorpay webhook settings, enable `refund.processed` and `refund.failed` in addition to `payment.captured` so the cancellation ledger and customer history receive final refund status.
 
+`backend/database/repair_customer_cancellation_pending_payments.sql` updates the cancellation RPC so customers can cancel while an online payment is still pending. It records the open payment against the cancellation and automatically initiates a refund if that payment is captured after cancellation. Apply this repair after the cancellation/refund migration and deploy the matching backend code together.
+
 Set these privately in backend/.env (examples are in backend/.env.example):
 
 - RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET: valid payment-gateway test credentials first.
 - RAZORPAY_WEBHOOK_SECRET: matches your payment.captured, refund.processed, and refund.failed webhook configuration at /api/payments/webhook.
 - RAZORPAYX_KEY_ID, RAZORPAYX_KEY_SECRET, RAZORPAYX_ACCOUNT_NUMBER: your enabled RazorpayX account and API credentials; gateway keys alone are not sufficient.
 - FINANCE_RECONCILIATION_ENABLED=true: every minute, fetches status for up to 50 submitted pending operations and updates earnings on processed/reversed outcomes. Keep one long-running backend/worker active. Unsubmitted or ambiguous requests remain available for explicit retry from the ledger.
-- INVOICE_BUSINESS_NAME and INVOICE_BUSINESS_ADDRESS: required before the first invoice is issued.
+- INVOICE_BUSINESS_ADDRESS: required before the first invoice is issued. In Vercel, configure it for the backend service and redeploy. The configured seller name defaults to `doorstep car wash`; set INVOICE_BUSINESS_NAME to override it.
 
 Restart the backend after changes. Create and verify each beneficiary in RazorpayX, then link its bank fund-account ID to the correct washer from the finance page. This application verifies the provider account exists and is active; staff must verify beneficiary ownership before linking. Provider onboarding, account activation, sufficient balance and network/IP settings must also be ready.
 

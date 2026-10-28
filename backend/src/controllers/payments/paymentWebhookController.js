@@ -1,6 +1,7 @@
 import { supabaseAdmin, createWasherEarning } from "./paymentDependencies.js";
 import { validateCapturedPayment } from "../../services/payments/paymentValidation.js";
 import { assignWasherToBooking } from "../../services/booking/bookingAssignmentService.js";
+import { refundLateCapturedBookingPayment } from "../../services/booking/cancellationRefundService.js";
 import crypto from "node:crypto";
 
 export async function razorpayWebhook(
@@ -157,6 +158,17 @@ export async function razorpayWebhook(
             if (paymentUpdateError) {
               throw paymentUpdateError;
             }
+          }
+
+          const { data: currentBooking, error: currentBookingError } = await supabaseAdmin.from("bookings")
+            .select("id,status,platform_fee")
+            .eq("id", payment.booking_id)
+            .maybeSingle();
+          if (currentBookingError) throw currentBookingError;
+          if (!currentBooking) throw new Error("Booking not found after payment capture.");
+          if (currentBooking.status === "cancelled") {
+            await refundLateCapturedBookingPayment({ ...payment, provider_payment_id: entity.id }, currentBooking);
+            return res.status(200).send("OK");
           }
 
           const {

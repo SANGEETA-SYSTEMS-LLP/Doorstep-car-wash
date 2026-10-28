@@ -46,6 +46,58 @@ export async function processCancellationRefund(cancellation) {
   return updated;
 }
 
+// A Razorpay order can finish capturing after the customer has cancelled while
+// checkout was still open. Refund that late capture against the existing
+// cancellation record instead of reviving the cancelled booking or assigning it.
+export async function refundLateCapturedBookingPayment(payment, booking) {
+  if (!payment?.id || !booking?.id || booking.status !== "cancelled") return null;
+
+  const { data: cancellation, error: cancellationError } = await db.from("booking_cancellations")
+    .select("id,booking_id,payment_id,refund_amount_paise,platform_fee_paise,status,provider_refund_id")
+    .eq("booking_id", booking.id)
+    .maybeSingle();
+  if (cancellationError) throw cancellationError;
+  if (!cancellation || cancellation.payment_id !== payment.id) return null;
+  if (["refund_pending", "refund_processed", "refund_failed"].includes(cancellation.status)) {
+    return cancellation.status === "refund_pending" ? processCancellationRefund(cancellation) : cancellation;
+  }
+
+  const paidPaise = Math.round(Number(payment.amount) * 100);
+  const platformFeePaise = Math.round(Math.max(Number(booking.platform_fee) || 0, 0) * 100);
+  if (!Number.isSafeInteger(paidPaise) || paidPaise < 0 || !Number.isSafeInteger(platformFeePaise)) {
+    throw new Error("Cancelled booking payment amounts are invalid.");
+  }
+  const refundAmountPaise = Math.max(paidPaise - platformFeePaise, 0);
+  if (refundAmountPaise === 0) {
+    const { data: updated, error: updateError } = await db.from("booking_cancellations").update({
+      provider_status: "capture_received_no_refund_due",
+      updated_at: new Date().toISOString(),
+    }).eq("id", cancellation.id).eq("status", "cancelled").select("*").maybeSingle();
+    if (updateError) throw updateError;
+    if (updated) return updated;
+    const { data: latest, error: latestError } = await db.from("booking_cancellations")
+      .select("*").eq("id", cancellation.id).maybeSingle();
+    if (latestError) throw latestError;
+    return latest || cancellation;
+  }
+
+  const { data: updated, error: updateError } = await db.from("booking_cancellations").update({
+    refund_amount_paise: refundAmountPaise,
+    platform_fee_paise: platformFeePaise,
+    status: "refund_pending",
+    provider_status: "capture_received_after_cancellation",
+    updated_at: new Date().toISOString(),
+  }).eq("id", cancellation.id).eq("status", "cancelled").select("*").maybeSingle();
+  if (updateError) throw updateError;
+  if (!updated) {
+    const { data: latest, error: latestError } = await db.from("booking_cancellations")
+      .select("*").eq("id", cancellation.id).maybeSingle();
+    if (latestError) throw latestError;
+    return latest || cancellation;
+  }
+  return processCancellationRefund(updated);
+}
+
 export async function reconcilePendingBookingCancellationRefunds() {
   const { data, error } = await db.from("booking_cancellations")
     .select("id,booking_id,payment_id,refund_amount_paise,provider_refund_id,status")

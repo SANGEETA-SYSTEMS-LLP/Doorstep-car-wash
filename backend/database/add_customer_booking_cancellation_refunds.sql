@@ -37,6 +37,7 @@ DECLARE
   v_payment public.payments%rowtype;
   v_cancel public.booking_cancellations%rowtype;
   v_has_payment boolean := false;
+  v_payment_paid boolean := false;
   v_paid_paise bigint := 0;
   v_fee_paise bigint := 0;
   v_refund_paise bigint := 0;
@@ -58,20 +59,14 @@ BEGIN
     RAISE EXCEPTION 'This booking can no longer be cancelled online.' USING errcode = '55000';
   END IF;
 
-  PERFORM 1 FROM public.payments
-   WHERE booking_id = p_booking_id AND status = 'created'
-   FOR UPDATE;
-  IF FOUND THEN
-    RAISE EXCEPTION 'Payment is still processing. Wait for payment confirmation, then retry cancellation.' USING errcode = '55000';
-  END IF;
-
   SELECT * INTO v_payment FROM public.payments
-   WHERE booking_id = p_booking_id AND status = 'paid'
+   WHERE booking_id = p_booking_id AND status IN ('created', 'paid')
      AND lower(coalesce(payment_method::text, '')) NOT IN ('cod', 'cash')
    ORDER BY paid_at DESC NULLS LAST, created_at DESC
    LIMIT 1 FOR UPDATE;
   v_has_payment := FOUND;
-  IF v_has_payment THEN
+  v_payment_paid := v_has_payment AND v_payment.status = 'paid';
+  IF v_payment_paid THEN
     IF nullif(v_payment.provider_payment_id, '') IS NULL THEN
       RAISE EXCEPTION 'Paid payment is missing its provider reference; contact support before cancelling.' USING errcode = '55000';
     END IF;
@@ -82,12 +77,13 @@ BEGIN
 
   INSERT INTO public.booking_cancellations (
     booking_id, customer_id, payment_id, refund_amount_paise,
-    platform_fee_paise, status
+    platform_fee_paise, status, provider_status
   ) VALUES (
     p_booking_id, v_customer_id,
     CASE WHEN v_has_payment THEN v_payment.id ELSE NULL END,
     v_refund_paise, v_fee_paise,
-    CASE WHEN v_refund_paise > 0 THEN 'refund_pending' ELSE 'cancelled' END
+    CASE WHEN v_payment_paid AND v_refund_paise > 0 THEN 'refund_pending' ELSE 'cancelled' END,
+    CASE WHEN v_has_payment AND NOT v_payment_paid THEN 'awaiting_payment' ELSE NULL END
   ) RETURNING * INTO v_cancel;
 
   UPDATE public.bookings SET status = 'cancelled', updated_at = now()

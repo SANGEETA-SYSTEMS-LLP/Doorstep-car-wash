@@ -58,10 +58,14 @@ export async function getInvoice(req,res,next) {
   if(readError) throw readError;
   if(existing) return res.json({invoice:existing});
   if(!["completed","closed","payment_completed","customer_confirmed"].includes(booking.status)) return res.status(409).json({message:"An invoice is available after service completion."});
-  if(!process.env.INVOICE_BUSINESS_NAME || !process.env.INVOICE_BUSINESS_ADDRESS) return res.status(503).json({message:"Configure the business name and address before issuing invoices."});
+  const invoiceBusinessName = process.env.INVOICE_BUSINESS_NAME || "doorstep car wash";
+  if(!process.env.INVOICE_BUSINESS_ADDRESS) return res.status(503).json({
+    code:"INVOICE_SELLER_DETAILS_REQUIRED",
+    message:"Invoice setup is incomplete. Set INVOICE_BUSINESS_ADDRESS in the backend deployment environment, then redeploy. The configured seller name is doorstep car wash.",
+  });
   const {data:profile,error:profileError} = await db.from("profiles").select("full_name").eq("id",customer.user_id).single();
   if(profileError) throw profileError;
-  const snapshot={seller:{name:process.env.INVOICE_BUSINESS_NAME,address:process.env.INVOICE_BUSINESS_ADDRESS},customerName:profile.full_name,currency:"INR",booking};
+  const snapshot={seller:{name:invoiceBusinessName,address:process.env.INVOICE_BUSINESS_ADDRESS},customerName:profile.full_name,currency:"INR",booking};
   const {error:insertError} = await db.from("booking_invoices").upsert({booking_id:booking.id,snapshot},{onConflict:"booking_id",ignoreDuplicates:true});
   if(insertError) throw insertError;
   const {data:invoice,error:finalError} = await db.from("booking_invoices").select("*").eq("booking_id",booking.id).single();

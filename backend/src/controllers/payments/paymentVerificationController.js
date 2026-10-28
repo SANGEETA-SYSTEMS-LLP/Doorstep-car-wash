@@ -2,6 +2,7 @@ import { supabaseAdmin, getRazorpay, createWasherEarning } from "./paymentDepend
 import { customerIdForUser } from "./paymentDependencies.js";
 import { validateCapturedPayment } from "../../services/payments/paymentValidation.js";
 import { assignWasherToBooking } from "../../services/booking/bookingAssignmentService.js";
+import { refundLateCapturedBookingPayment } from "../../services/booking/cancellationRefundService.js";
 import crypto from "node:crypto";
 
 export async function verifyPayment(
@@ -36,7 +37,8 @@ export async function verifyPayment(
         booking:bookings (
           id,
           customer_id,
-          status
+          status,
+          platform_fee
         )
       `)
       .eq(
@@ -132,6 +134,23 @@ export async function verifyPayment(
 
     if (updatePaymentError) {
       throw updatePaymentError;
+    }
+
+    const { data: currentBooking, error: currentBookingError } = await supabaseAdmin.from("bookings")
+      .select("id,status,platform_fee")
+      .eq("id", payment.booking_id)
+      .maybeSingle();
+    if (currentBookingError) throw currentBookingError;
+    if (!currentBooking) throw new Error("Booking not found after payment capture.");
+    if (currentBooking.status === "cancelled") {
+      const cancellation = await refundLateCapturedBookingPayment({ ...payment, provider_payment_id: razorpay_payment_id, amount: captured.amount / 100 }, currentBooking);
+      return res.json({
+        success: true,
+        bookingId: payment.booking_id,
+        status: "cancelled",
+        refundStatus: cancellation?.status || "not_applicable",
+        message: "This booking was cancelled. Any captured payment is being returned to the original payment method, excluding the platform fee.",
+      });
     }
 
     const { error: reviveExpiredBookingError } = await supabaseAdmin.from("bookings")
