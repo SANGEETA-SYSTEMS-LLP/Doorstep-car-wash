@@ -356,6 +356,7 @@ function AppRoutes() {
         <Route path="super-admin" element={<Navigate to="/admin" replace />} />
         <Route path="sub-admin" element={<AdminRoleDashboard />} />
         <Route path="finance" element={<RoleRoute allowedRoles={["super_admin"]}><FinanceOperations /></RoleRoute>} />
+        <Route path="settlements" element={<Navigate to="/admin/finance" replace />} />
         <Route path="reports" element={<Reports />} />
         <Route path="invoices" element={<Invoice />} />
         <Route path="earnings" element={<Navigate to="/admin/washers" replace />} />

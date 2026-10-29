@@ -1,5 +1,5 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
-import { Banknote, ChartColumn, CircleDollarSign, FileText, LayoutDashboard, Wallet } from "lucide-react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Banknote, ChartColumn, CircleDollarSign, FileText, LayoutDashboard, LogOut, Wallet } from "lucide-react";
 import ResponsiveNavigation from "./ResponsiveNavigation";
 import { WashNowBrand } from "./WashNowBrand";
 import { useAuth } from "../../context/AuthContext";
@@ -15,9 +15,19 @@ const navigation = [
 ];
 
 export default function AccountantLayout() {
-  const { profile } = useAuth();
+  const { logout, profile } = useAuth();
+  const navigate = useNavigate();
   const role = profile?.role;
   const links = navigation.filter(item => !item.roles || item.roles.includes(role));
+
+  async function handleLogout() {
+    try {
+      await logout();
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Accountant logout:", error);
+    }
+  }
 
   return (
     <div className="flex min-h-screen min-w-0 overflow-x-clip bg-slate-50 lg:flex-row">
@@ -47,7 +57,10 @@ export default function AccountantLayout() {
       <main className="min-w-0 flex-1">
         <header className="sticky top-0 z-20 flex min-h-[76px] flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 bg-[#f8faf9] px-4 py-3 sm:px-6 lg:px-8">
           <div><p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">WashNow · Finance</p><h1 className="mt-0.5 text-sm font-bold text-slate-900 sm:text-base">Accounting workspace</h1></div>
-          <span className="max-w-[45vw] truncate rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold capitalize text-slate-600 sm:max-w-none">{profile?.full_name || "Accountant"} · {role?.replaceAll("_", " ") || "accountant"}</span>
+          <div className="flex items-center gap-2">
+            <span className="hidden max-w-[45vw] truncate rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold capitalize text-slate-600 sm:inline-block sm:max-w-none">{profile?.full_name || "Accountant"} · {role?.replaceAll("_", " ") || "accountant"}</span>
+            <button type="button" onClick={handleLogout} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-red-200 bg-white px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-50"><LogOut size={16} />Logout</button>
+          </div>
         </header>
         <div className="mx-auto min-w-0 w-full max-w-[1720px] p-4 sm:p-6 xl:p-8">
           <Outlet />

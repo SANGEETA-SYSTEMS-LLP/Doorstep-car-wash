@@ -149,6 +149,7 @@ function BookingDetailsContent({ navigate, booking }) {
 
             <Card title="Payment Summary">
               <Price label="Service Amount" value={`₹${Number(booking.service_amount).toLocaleString("en-IN")}`} />
+              {Number(booking.extra_charge) > 0 && <Price label="Approved Extra Charge" value={`₹${Number(booking.extra_charge).toLocaleString("en-IN")}`} />}
               <Price label="Platform Fee" value={`₹${Number(booking.platform_fee).toLocaleString("en-IN")}`} />
               <Price label="Discount" value={`-₹${Number(booking.discount_amount).toLocaleString("en-IN")}`} />
 

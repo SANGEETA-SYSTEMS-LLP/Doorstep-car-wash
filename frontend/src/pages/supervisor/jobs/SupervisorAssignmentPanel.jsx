@@ -1,10 +1,14 @@
 import { RefreshCw } from "lucide-react";
 
 function SupervisorAssignmentPanel({ washers, canAssign, loading, assigningId, onRefresh, onAssign }) {
+  const eligibleCount = washers.filter((washer) => washer.eligible).length;
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-5">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-semibold text-gray-900">Washers and assignment</h2>
+        <div>
+          <h2 className="font-semibold text-gray-900">Washers and assignment</h2>
+          {canAssign && <p className="mt-1 text-xs font-medium text-green-700">{eligibleCount} available for this booking</p>}
+        </div>
         <button
           onClick={onRefresh}
           disabled={loading}
@@ -13,7 +17,7 @@ function SupervisorAssignmentPanel({ washers, canAssign, loading, assigningId, o
           <RefreshCw size={15} /> Refresh
         </button>
       </div>
-      <p className="mt-2 text-sm text-gray-500">Review the booking details, then send an offer. Customer washer details appear after the washer accepts. Offers can go up to 7 km. The washer can request an extra travel charge during service; the customer must approve it. Working hours and required service skills still need to be configured.</p>
+      <p className="mt-2 text-sm text-gray-500">Verified washers linked to your account appear here automatically when they are online and eligible for this booking. Review the details, then send an offer. Customer washer details appear after the washer accepts. The washer can request an extra travel charge during service; the customer must approve it. Working hours and required service skills still need to be configured.</p>
       {!canAssign && (
         <p className="mt-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
           This booking has already been accepted or is not eligible for assignment.
@@ -21,7 +25,7 @@ function SupervisorAssignmentPanel({ washers, canAssign, loading, assigningId, o
       )}
       {canAssign && washers.length === 0 && (
         <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
-          No washer records were returned for this supervisor view. Refresh the list or check that the washer has a washer profile; matching location alone does not create a washer account record.
+          No washers are linked to your supervisor account yet. Verify a washer once or link an existing washer account; linked washers will appear here automatically when online and eligible for this booking.
         </p>
       )}
       {canAssign && (
@@ -36,7 +40,6 @@ function SupervisorAssignmentPanel({ washers, canAssign, loading, assigningId, o
                   <p className="mt-1 text-sm text-gray-600">{washer.address || "Washer address not saved"}</p>
                   <p className="mt-1 text-sm capitalize text-gray-600">{washer.status?.replaceAll("_", " ")}</p>
                   <p className="mt-1 text-sm text-gray-500">{washer.serviceAddressMatched ? "Same service address as customer" : washer.distanceKm == null ? "Distance unavailable" : `${washer.distanceKm} km away`}</p>
-                  {washer.extendedRadius && <p className="mt-2 rounded bg-green-50 p-2 text-sm text-green-800">Outside the normal {washer.serviceRadiusKm || 5} km radius. The customer must approve any travel charge requested by the washer.</p>}
                   <p className="mt-1 text-sm text-gray-500">
                     Rating: {washer.rating ?? 0} · Jobs completed: {washer.jobs_completed ?? 0}
                   </p>

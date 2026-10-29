@@ -18,6 +18,20 @@ export function isWithinSupervisorArea(point, area) {
   return distance != null && distance <= SUPERVISOR_SERVICE_RADIUS_KM;
 }
 
+// A washer may be based outside the supervisor's 7 km pin radius while still
+// being able to serve bookings inside the supervisor's area. Link eligibility
+// therefore uses the intersection of the two service ranges; each individual
+// booking is still checked against the washer's actual radius before dispatch.
+export function washerCanServeSupervisorArea(point, serviceRadiusKm, area) {
+  if (!area || point?.latitude == null || point?.longitude == null) return false;
+  const distance = calculateDistanceKm(area.latitude, area.longitude, point.latitude, point.longitude);
+  const configuredRadius = Number(serviceRadiusKm);
+  const washerRadius = Number.isFinite(configuredRadius) && configuredRadius > 0
+    ? Math.min(Math.max(configuredRadius, 5), SUPERVISOR_SERVICE_RADIUS_KM)
+    : 5;
+  return distance != null && distance <= SUPERVISOR_SERVICE_RADIUS_KM + washerRadius;
+}
+
 export function boundQueryToSupervisorArea(query, area, latitudeColumn = "latitude", longitudeColumn = "longitude") {
   const lat = Number(area.latitude);
   const lon = Number(area.longitude);

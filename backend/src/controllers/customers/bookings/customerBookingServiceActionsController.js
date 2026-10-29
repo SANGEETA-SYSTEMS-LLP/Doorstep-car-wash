@@ -15,9 +15,9 @@ export async function getPendingExtraCharges(req, res) {
 
     const { data, error } = await supabaseAdmin
       .from("extra_charge_requests")
-      .select("*")
+      .select("id,booking_id,washer_id,reason,requested_amount,status,created_at,reviewed_at")
       .eq("booking_id", bookingId)
-      .eq("status", "approved");
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
 

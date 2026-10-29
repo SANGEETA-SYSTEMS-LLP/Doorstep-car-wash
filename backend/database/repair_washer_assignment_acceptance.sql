@@ -41,7 +41,7 @@ BEGIN
     RETURN false;
   END IF;
 
-  SELECT id, status, is_active, is_verified, service_radius_km, current_address
+  SELECT id, status, is_active, is_verified, current_address
     INTO v_washer
     FROM public.washers
    WHERE id = p_washer_id;
@@ -89,10 +89,9 @@ BEGIN
     v_distance_km := 0;
   END IF;
 
-  -- Supervisors may offer jobs within the normal radius or an extended 7 km cap.
-  IF v_distance_km > least(greatest(coalesce(nullif(v_washer.service_radius_km, 0), 5), 5), 7) THEN
-    RETURN false;
-  END IF;
+  -- Washer distance is shown to supervisors for context. Do not block offers
+  -- by the profile radius; online status, live location, payout, and schedule
+  -- checks below still apply.
 
   SELECT duration_minutes INTO v_package
     FROM public.service_packages WHERE id = v_booking.package_id;

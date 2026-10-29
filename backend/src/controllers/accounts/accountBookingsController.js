@@ -33,7 +33,7 @@ export async function getMyBookings(req, res, next) {
     const bookings = [];
     for (let offset = 0; ; offset += 1000) {
       let query = db.from("bookings").select(`
-        id,booking_number,status,scheduled_date,scheduled_start_time,scheduled_time,total_amount,created_at,updated_at,
+        id,booking_number,status,scheduled_date,scheduled_start_time,scheduled_time,total_amount,extra_charge,created_at,updated_at,
         service_address,tower,assigned_washer_id,
         vehicle:vehicles(id,brand,model,vehicle_number,vehicle_type,colour),
         package:service_packages(id,name,description,price,duration_minutes)
@@ -44,7 +44,7 @@ export async function getMyBookings(req, res, next) {
       if (missingHiddenColumn(error)) {
         supportsHiddenColumn = false;
         const fallback = await db.from("bookings").select(`
-          id,booking_number,status,scheduled_date,scheduled_start_time,scheduled_time,total_amount,created_at,updated_at,
+          id,booking_number,status,scheduled_date,scheduled_start_time,scheduled_time,total_amount,extra_charge,created_at,updated_at,
           service_address,tower,assigned_washer_id,
           vehicle:vehicles(id,brand,model,vehicle_number,vehicle_type,colour),
           package:service_packages(id,name,description,price,duration_minutes)
@@ -57,7 +57,7 @@ export async function getMyBookings(req, res, next) {
       // without the optional joins instead of failing the whole history page.
       if (error && ["PGRST200", "PGRST201", "PGRST204", "42703", "42P01"].includes(error.code)) {
         let fallback = db.from("bookings").select(`
-          id,booking_number,status,scheduled_date,scheduled_start_time,scheduled_time,total_amount,created_at,updated_at,
+          id,booking_number,status,scheduled_date,scheduled_start_time,scheduled_time,total_amount,extra_charge,created_at,updated_at,
           service_address,tower,assigned_washer_id
         `).eq("customer_id", customer.data.id)
           .order("created_at", { ascending: false }).order("id", { ascending: false }).range(offset, offset + 999);

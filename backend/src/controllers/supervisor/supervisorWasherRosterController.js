@@ -1,5 +1,5 @@
 import { supabaseAdmin as db } from "../../config/supabase.js";
-import { getSupervisorAreaBookingIds, isWithinSupervisorArea } from "../../services/supervisor/supervisorServiceArea.js";
+import { getSupervisorAreaBookingIds } from "../../services/supervisor/supervisorServiceArea.js";
 
 async function allRows(table, columns, filters = []) {
   const rows = [];
@@ -18,15 +18,7 @@ export async function getSupervisorWasherRoster(req, res, next) {
     const washerFilters = req.profile?.role === "supervisor"
       ? [["eq", "supervisor_id", req.user.id]]
       : [];
-    let washers = await allRows("washers", "id,user_id,supervisor_id,status,is_active,is_verified,rating,jobs_completed,current_address", washerFilters);
-    if (req.profile?.role === "supervisor") {
-      const points = await allRows("washer_locations", "washer_id,latitude,longitude,service_latitude,service_longitude");
-      const localIds = new Set(points.filter(point => isWithinSupervisorArea({
-        latitude: point.service_latitude ?? point.latitude,
-        longitude: point.service_longitude ?? point.longitude,
-      }, req.supervisorArea)).map(point => point.washer_id));
-      washers = washers.filter(washer => localIds.has(washer.id));
-    }
+    const washers = await allRows("washers", "id,user_id,supervisor_id,status,is_active,is_verified,rating,jobs_completed,current_address", washerFilters);
     const userIds = [...new Set(washers.map(washer => washer.user_id).filter(Boolean))];
     const profiles = [];
     for (let offset = 0; offset < userIds.length; offset += 500) {

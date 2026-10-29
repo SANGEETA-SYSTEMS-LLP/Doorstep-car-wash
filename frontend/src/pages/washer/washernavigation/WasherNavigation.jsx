@@ -35,7 +35,12 @@ function WasherNavigation() {
     const watchId = navigator.geolocation.watchPosition(
       async (position) => {
         if (cancelled) return;
-        setCurrentLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude });
+        setCurrentLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          updatedAt: position.timestamp,
+        });
         const now = Date.now();
         if (now - lastSentRef.current < 5000) return;
         lastSentRef.current = now;

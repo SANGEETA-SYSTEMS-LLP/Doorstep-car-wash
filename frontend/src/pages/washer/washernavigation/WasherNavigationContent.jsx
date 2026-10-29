@@ -45,7 +45,8 @@ function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived, cu
             <ServiceMap location={activeJob?.location} washerLocation={currentLocation} path={route.path} className="h-[520px]" />
             <div className="space-y-3 p-5">
               <p>Driving distance: {route.distance} km · ETA: {route.eta} min</p>
-              {route.error && <p role="status" className="text-sm text-amber-800">Driving route unavailable.</p>}
+              {currentLocation?.accuracy != null && <p className="text-xs text-slate-500">Washer GPS accuracy: ±{Math.round(currentLocation.accuracy)} m</p>}
+              {route.error && <p role="status" className="text-sm text-amber-800">{route.error}</p>}
               {destination ? <a className="inline-block rounded-xl bg-green-600 px-5 py-3 font-semibold text-white" target="_blank" rel="noreferrer" href={"https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=" + encodeURIComponent(destination.lat + "," + destination.lng)}>Open Google Maps navigation</a> : <p role="alert">This booking is missing destination coordinates.</p>}
             </div>
           </section>

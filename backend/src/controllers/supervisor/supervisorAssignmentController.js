@@ -23,19 +23,15 @@ export async function assignSupervisorWasher(req, res) {
     if (req.profile?.role === "supervisor") {
       const [{ data: booking, error: bookingError }, { data: washer, error: washerError }] = await Promise.all([
         supabaseAdmin.from("bookings").select("id,latitude,longitude").eq("id", bookingId).maybeSingle(),
-        supabaseAdmin.from("washers").select("id,location:washer_locations(latitude,longitude,service_latitude,service_longitude)").eq("id", washerId).maybeSingle(),
+        supabaseAdmin.from("washers").select("id,supervisor_id").eq("id", washerId).maybeSingle(),
       ]);
       if (bookingError) throw bookingError;
       if (washerError) throw washerError;
       if (!booking || !isWithinSupervisorArea(booking, req.supervisorArea)) {
         return res.status(404).json({ success: false, message: "Booking not found in your service area." });
       }
-      const location = Array.isArray(washer?.location) ? washer.location[0] : washer?.location;
-      if (!washer || !isWithinSupervisorArea({
-        latitude: location?.service_latitude ?? location?.latitude,
-        longitude: location?.service_longitude ?? location?.longitude,
-      }, req.supervisorArea)) {
-        return res.status(400).json({ success: false, message: "Choose a washer located in your service area." });
+      if (!washer || washer.supervisor_id !== req.user.id) {
+        return res.status(403).json({ success: false, message: "Choose a washer linked to your supervisor account." });
       }
     }
 

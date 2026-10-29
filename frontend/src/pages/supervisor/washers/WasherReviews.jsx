@@ -48,7 +48,7 @@ export default function WasherReviews() {
     try {
       await apiRequest(`/supervisor/washers/${encodeURIComponent(washer.id)}/verify`, { method: "PATCH" });
       setWashers(rows => rows.filter(row => row.id !== washer.id));
-      setNotice(`${washer.profile?.full_name || "Washer"} verified. They can now choose to go online; job offers also require service eligibility.`);
+      setNotice(`${washer.profile?.full_name || "Washer"} verified and added to your washer list. Their name will appear automatically for bookings when they are online and eligible.`);
     } catch (err) {
       setError(err.message || "Unable to verify this washer.");
     } finally {

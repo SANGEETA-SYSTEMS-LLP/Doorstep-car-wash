@@ -118,6 +118,7 @@ function ServiceCompleted() {
           vehicle={booking.vehicle?.name}
           packageName={booking.package?.name}
           price={servicePrice}
+          extraCharge={booking.extra_charge}
         />
 
         {/* PHOTOS */}

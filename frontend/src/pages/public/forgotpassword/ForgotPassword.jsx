@@ -1,4 +1,5 @@
 import { supabase } from "../../../services/auth/supabase";
+import { getPasswordResetRedirectUrl } from "../../../services/auth/passwordResetUrl";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -22,7 +23,7 @@ function ForgotPassword() {
     setError("");
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: window.location.origin + "/reset-password",
+        redirectTo: getPasswordResetRedirectUrl(),
       });
       if (resetError) throw resetError;
       setSent(true);

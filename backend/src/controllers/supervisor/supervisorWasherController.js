@@ -2,7 +2,7 @@ import { supabaseAdmin } from "../../config/supabase.js";
 import { provisionPendingWasher } from "../../services/washer/washerSignupService.js";
 import { validWasherLocation } from "../../services/washer/washerLocationService.js";
 import { referenceId } from "../../../../shared/referenceId.mjs";
-import { isWithinSupervisorArea, SUPERVISOR_SERVICE_RADIUS_KM } from "../../services/supervisor/supervisorServiceArea.js";
+import { isWithinSupervisorArea, washerCanServeSupervisorArea, SUPERVISOR_SERVICE_RADIUS_KM } from "../../services/supervisor/supervisorServiceArea.js";
 
 export async function addSupervisorWasher(req, res) {
   if (!["supervisor", "sub_admin", "super_admin"].includes(req.profile?.role)) return res.status(403).json({ message: "Sign in with a supervisor or administrator account to add washers." });
@@ -81,7 +81,9 @@ export async function linkSupervisorWasher(req, res) {
       latitude: locationResult.data.service_latitude ?? locationResult.data.latitude,
       longitude: locationResult.data.service_longitude ?? locationResult.data.longitude,
     };
-    if (req.profile?.role === "supervisor" && !isWithinSupervisorArea(serviceLocation, req.supervisorArea)) return res.status(400).json({ message: "This washer's service location is outside your area." });
+    if (req.profile?.role === "supervisor" && !washerCanServeSupervisorArea(serviceLocation, washer.service_radius_km, req.supervisorArea)) {
+      return res.status(400).json({ message: "This washer's service range does not reach your supervisor area." });
+    }
     let update = supabaseAdmin.from("washers").update({ supervisor_id: req.user.id }).eq("id", washer.id).eq("is_active", true);
     update = washer.supervisor_id ? update.eq("supervisor_id", req.user.id) : update.is("supervisor_id", null);
     const linked = await update.select("id").maybeSingle();

@@ -2,16 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
 import { getBookingById } from "../../../services/booking/bookingService";
+import { getCustomerServicePhotos } from "../../../services/booking/customerBookingService";
 import ExtraChargeRequests from "./ExtraChargeRequests";
 import ServiceProgressContent from "./ServiceProgressContent";
 
 function ServiceProgress() {
-  const { booking, updateStatus } = useBooking();
+  const { booking, updateBooking, updateStatus } = useBooking();
   const washer = booking.washer;
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [beforePhotos, setBeforePhotos] = useState([]);
+  const [photoError, setPhotoError] = useState("");
   const statusUpdater = useRef(updateStatus);
+  const bookingUpdater = useRef(updateBooking);
   statusUpdater.current = updateStatus;
+  bookingUpdater.current = updateBooking;
   useEffect(() => {
     const bookingId = booking.databaseBookingId;
     if (!bookingId) { setError("Booking details are unavailable."); return; }
@@ -19,13 +24,33 @@ function ServiceProgress() {
     const applyBooking = (data) => {
       if (!active) return;
       statusUpdater.current(data.status);
+      bookingUpdater.current({
+        extra_charge: data.extra_charge,
+        total_amount: data.total_amount,
+        service_amount: data.service_amount,
+        platform_fee: data.platform_fee,
+        tax_amount: data.tax_amount,
+      });
       if (data.status === "service_completed") navigate("/customer/service-completed", { replace: true });
     };
     const refresh = async () => {
-      try {
-        const data = await getBookingById(bookingId);
-        if (active) { setError(""); applyBooking(data); }
-      } catch (error) { if (active) setError(error.message || "Unable to load booking."); }
+      const [bookingResult, photoResult] = await Promise.allSettled([
+        getBookingById(bookingId),
+        getCustomerServicePhotos(bookingId),
+      ]);
+      if (!active) return;
+      if (bookingResult.status === "fulfilled") {
+        setError("");
+        applyBooking(bookingResult.value);
+      } else {
+        setError(bookingResult.reason?.message || "Unable to load booking.");
+      }
+      if (photoResult.status === "fulfilled") {
+        setBeforePhotos((photoResult.value.photos || []).filter(photo => photo.photo_type === "before"));
+        setPhotoError("");
+      } else {
+        setPhotoError(photoResult.reason?.message || "Unable to load service photos.");
+      }
     };
     refresh();
     const timer = setInterval(refresh, 15000);
@@ -54,9 +79,25 @@ function ServiceProgress() {
       </header>
 
       {error && <p role="alert" className="p-6 text-red-600">{error}</p>}
-      <ExtraChargeRequests key={booking.databaseBookingId} bookingId={booking.databaseBookingId} />
+      <ExtraChargeRequests
+        key={booking.databaseBookingId}
+        bookingId={booking.databaseBookingId}
+        onBookingUpdate={data => bookingUpdater.current({
+          extra_charge: data.extra_charge,
+          total_amount: data.total_amount,
+          service_amount: data.service_amount,
+          platform_fee: data.platform_fee,
+          tax_amount: data.tax_amount,
+        })}
+      />
 
-      <ServiceProgressContent booking={booking} washer={washer} />
+      <ServiceProgressContent
+        booking={booking}
+        washer={washer}
+        beforePhotos={beforePhotos}
+        photoError={photoError}
+        onPhotoError={() => setPhotoError("A photo could not be displayed. It will be refreshed automatically.")}
+      />
     </div>
   );
 }

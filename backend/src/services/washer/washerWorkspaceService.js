@@ -36,16 +36,24 @@ export async function hydrateWasherJobs(bookings, washer) {
     const address = addresses.get(booking.address_id);
     const paymentRows = (payments || []).filter(p => p.booking_id === booking.id);
     const payment = paymentRows.find(p => ["paid", "captured", "success", "completed"].includes(p.status)) || paymentRows[0];
-    const fullAddress = address
-      ? [address.address_line, address.tower, address.flat_number, address.landmark, address.city, address.state, address.postal_code].filter(Boolean).join(", ")
-      : booking.service_address || [booking.tower, booking.flat_number, booking.landmark].filter(Boolean).join(", ");
+    const fullAddress = [
+      booking.service_address || address?.address_line,
+      booking.tower || address?.tower,
+      booking.flat_number || address?.flat_number,
+      booking.landmark || address?.landmark,
+      address?.city,
+      address?.state,
+      address?.postal_code,
+    ].filter(Boolean).join(", ");
     return {
       ...booking,
       customer: { name: profile?.full_name || "Customer", phone: profile?.phone || null, referenceId: referenceId("CUS", customer?.user_id) },
       washerReferenceId: washer.referenceId,
       vehicle: vehicles.get(booking.vehicle_id) || null,
       package: packages.get(booking.package_id) || null,
-      location: { name: address?.address_line || booking.service_address || "Service location", address: fullAddress || "Address unavailable", latitude: address?.latitude ?? booking.latitude ?? null, longitude: address?.longitude ?? booking.longitude ?? null },
+      // A booking's saved coordinates are its service-location snapshot. The
+      // customer's address can be edited later and must not move this job.
+      location: { name: booking.service_address || address?.address_line || "Service location", address: fullAddress || "Address unavailable", latitude: booking.latitude ?? address?.latitude ?? null, longitude: booking.longitude ?? address?.longitude ?? null },
       payment: { status: payment?.status || "Not recorded", method: payment?.payment_method || "Not recorded" },
     };
   });

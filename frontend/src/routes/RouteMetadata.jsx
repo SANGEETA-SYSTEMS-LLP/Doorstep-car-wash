@@ -39,12 +39,12 @@ export default function RouteMetadata({ pathname }) {
   useEffect(() => {
     const publicPage = publicPages[pathname];
     const utilityPage = utilityPages[pathname];
-    const title = publicPage?.title || utilityPage?.[0] || "WashNow Account";
+    const title = publicPage?.title || utilityPage?.[0] || "WashNow";
     const description = publicPage?.description || utilityPage?.[1] || "Manage your WashNow account and doorstep car wash bookings.";
     const indexable = Boolean(publicPage);
     const canonicalUrl = `${SITE_URL}${pathname === "/" ? "/" : pathname}`;
 
-    document.title = title;
+    document.title = "WashNow";
     setMeta('meta[name="description"]', "content", description);
     setMeta('meta[name="robots"]', "content", indexable ? "index, follow, max-image-preview:large" : "noindex, nofollow");
     setMeta('meta[property="og:type"]', "content", "website");

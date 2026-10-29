@@ -20,7 +20,7 @@ Location access needs HTTPS or localhost and browser permission. Washer tracking
 
 ## Password recovery
 
-In Supabase Authentication URL Configuration, allow http://localhost:5173/reset-password and your deployed origin/reset-password. Configure the Site URL and production mail delivery. The forgot-password page now sends a real Supabase recovery request; the reset-password route updates the authenticated user's password. Email delivery and the allowed redirect must be verified with a test account.
+In Vercel, set the frontend environment variable `VITE_SITE_URL` to the public production origin (for example, `https://doorstep-car-wash-gold.vercel.app`) and redeploy. In Supabase Authentication URL Configuration, set the Site URL to that production origin and add its `/reset-password` URL to the redirect allow list. Keep `http://localhost:5173/reset-password` in the allow list for local development. Recovery requests now explicitly target the configured production URL (with a production fallback); local development continues to use its current origin. Supabase will only honor redirect URLs included in its allow list. Configure production mail delivery and verify with a test account.
 
 ## Checks
 

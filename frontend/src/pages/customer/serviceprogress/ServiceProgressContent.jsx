@@ -3,7 +3,7 @@ import { Car, Clock3, Droplets, Image, ShieldCheck, UserRound } from "lucide-rea
 import PhotoPlaceholder from "./PhotoPlaceholder";
 
 
-function ServiceProgressContent({ booking, washer }) {
+function ServiceProgressContent({ booking, washer, beforePhotos = [], photoError, onPhotoError }) {
   return (
     <main className="mx-auto max-w-7xl p-6 lg:p-8">
         {/* PROGRESS HERO */}
@@ -121,12 +121,32 @@ function ServiceProgressContent({ booking, washer }) {
                 </h3>
               </div>
 
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                <PhotoPlaceholder text="Front View" />
-                <PhotoPlaceholder text="Rear View" />
-                <PhotoPlaceholder text="Interior" />
-                <PhotoPlaceholder text="Side View" />
-              </div>
+              {photoError && <p role="status" className="mt-3 text-sm text-amber-800">{photoError}</p>}
+              {beforePhotos.length > 0 ? (
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  {beforePhotos.map((photo, index) => (
+                    <img
+                      key={photo.id}
+                      src={photo.url}
+                      alt={`Vehicle before service photo ${index + 1}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="aspect-video w-full rounded-xl object-cover"
+                      onError={onPhotoError}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <p className="mt-3 text-sm text-slate-500">Before-service photos will appear here after the washer uploads them.</p>
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    <PhotoPlaceholder text="Front View" />
+                    <PhotoPlaceholder text="Rear View" />
+                    <PhotoPlaceholder text="Interior" />
+                    <PhotoPlaceholder text="Side View" />
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="flex gap-3 rounded-2xl bg-green-50 p-5">

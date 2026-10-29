@@ -1,22 +1,24 @@
 import { supabaseAdmin as db } from "../../config/supabase.js";
-import { isWithinSupervisorArea } from "../../services/supervisor/supervisorServiceArea.js";
+import { washerCanServeSupervisorArea } from "../../services/supervisor/supervisorServiceArea.js";
 
 const validUuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 
 export async function listWasherReviews(req, res, next) {
   try {
     const { data: washers, error } = await db.from("washers")
-      .select("id,user_id,status,is_active,is_verified,service_radius_km,current_address,location:washer_locations(latitude,longitude,service_latitude,service_longitude,updated_at)")
+      .select("id,user_id,supervisor_id,status,is_active,is_verified,service_radius_km,current_address,location:washer_locations(latitude,longitude,service_latitude,service_longitude,updated_at)")
       .eq("is_active", true)
       .eq("is_verified", false)
       .order("user_id");
     if (error) throw error;
     const scopedWashers = req.profile?.role === "supervisor" ? (washers || []).filter(washer => {
+      if (washer.supervisor_id === req.user.id) return true;
+      if (washer.supervisor_id) return false;
       const location = Array.isArray(washer.location) ? washer.location[0] : washer.location;
-      return isWithinSupervisorArea(location && {
+      return washerCanServeSupervisorArea(location && {
         latitude: location.service_latitude ?? location.latitude,
         longitude: location.service_longitude ?? location.longitude,
-      }, req.supervisorArea);
+      }, washer.service_radius_km, req.supervisorArea);
     }) : washers || [];
     const userIds = [...new Set(scopedWashers.map(washer => washer.user_id).filter(Boolean))];
     const [profilesResult, authUsers] = await Promise.all([
@@ -46,19 +48,32 @@ export async function verifyWasher(req, res, next) {
   try {
     if (!validUuid.test(req.params.washerId || "")) return res.status(400).json({ message: "Invalid washer ID." });
     const { data: washer, error } = await db.from("washers")
-      .select("id,user_id,is_active,is_verified,current_address,location:washer_locations(latitude,longitude,service_latitude,service_longitude)")
+      .select("id,user_id,supervisor_id,is_active,is_verified,current_address,service_radius_km,location:washer_locations(latitude,longitude,service_latitude,service_longitude)")
       .eq("id", req.params.washerId)
       .maybeSingle();
     if (error) throw error;
     if (!washer || !washer.is_active) return res.status(404).json({ message: "Active washer account not found." });
+    if (req.profile?.role === "supervisor" && washer.supervisor_id && washer.supervisor_id !== req.user.id) {
+      return res.status(409).json({ message: "This washer is already linked to another supervisor." });
+    }
     const washerLocation = Array.isArray(washer.location) ? washer.location[0] : washer.location;
-    if (req.profile?.role === "supervisor" && !isWithinSupervisorArea(washerLocation && {
+    if (req.profile?.role === "supervisor" && !washer.supervisor_id && !washerCanServeSupervisorArea(washerLocation && {
       latitude: washerLocation.service_latitude ?? washerLocation.latitude,
       longitude: washerLocation.service_longitude ?? washerLocation.longitude,
-    }, req.supervisorArea)) {
-      return res.status(404).json({ message: "Washer not found in your service area." });
+    }, washer.service_radius_km, req.supervisorArea)) {
+      return res.status(400).json({ message: "The washer's service range does not reach your supervisor area." });
     }
-    if (washer.is_verified) return res.json({ success: true, washer: { id: washer.id, is_verified: true } });
+    if (washer.is_verified) {
+      if (req.profile?.role !== "supervisor" || washer.supervisor_id === req.user.id) {
+        return res.json({ success: true, washer: { id: washer.id, is_verified: true, supervisor_id: washer.supervisor_id } });
+      }
+      const { data, error: linkError } = await db.from("washers").update({ supervisor_id: req.user.id })
+        .eq("id", washer.id).is("supervisor_id", null).eq("is_active", true).eq("is_verified", true)
+        .select("id,is_verified,supervisor_id").maybeSingle();
+      if (linkError) throw linkError;
+      if (!data) return res.status(409).json({ message: "Washer details changed. Refresh and try again." });
+      return res.json({ success: true, washer: data });
+    }
 
     const [profileResult, locationResult] = await Promise.all([
       db.from("profiles").select("full_name,phone,is_active,role").eq("id", washer.user_id).maybeSingle(),
@@ -77,10 +92,20 @@ export async function verifyWasher(req, res, next) {
       && Math.abs(Number(location.latitude)) <= 90 && Math.abs(Number(location.longitude)) <= 180;
     if (!complete) return res.status(409).json({ message: "The washer must complete their name, phone, full service address, and map location before verification." });
 
-    const { data, error: updateError } = await db.from("washers")
-      .update({ is_verified: true, status: "offline", updated_at: new Date().toISOString() })
-      .eq("id", washer.id).eq("is_active", true).eq("is_verified", false)
-      .select("id,is_verified,status").maybeSingle();
+    let verificationUpdate = db.from("washers").update({
+        is_verified: true,
+        status: "offline",
+        ...(req.profile?.role === "supervisor" ? { supervisor_id: req.user.id } : {}),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", washer.id).eq("is_active", true).eq("is_verified", false);
+    if (req.profile?.role === "supervisor") {
+      verificationUpdate = washer.supervisor_id
+        ? verificationUpdate.eq("supervisor_id", req.user.id)
+        : verificationUpdate.is("supervisor_id", null);
+    }
+    const { data, error: updateError } = await verificationUpdate
+      .select("id,is_verified,status,supervisor_id").maybeSingle();
     if (updateError) throw updateError;
     if (!data) return res.status(409).json({ message: "Washer status changed during review. Refresh and try again." });
     return res.json({ success: true, washer: data });

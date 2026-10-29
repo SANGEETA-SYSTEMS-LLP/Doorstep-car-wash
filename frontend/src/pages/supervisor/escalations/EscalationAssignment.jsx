@@ -25,7 +25,7 @@ function EscalationAssignment({ booking, washers, canAssign, loading, assigningI
       )}
       {canAssign && washers.length === 0 && (
         <div className="mt-4 rounded-lg bg-amber-50 p-4 text-sm text-amber-800">
-          No eligible washers with location data were found within their service radius.
+          No washers are currently available. Check that linked washers are online, verified, have a recent location and payout details, and do not have a schedule conflict.
         </div>
       )}
       {canAssign && washers.length > 0 && (

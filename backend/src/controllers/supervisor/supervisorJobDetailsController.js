@@ -51,7 +51,7 @@ export async function getSupervisorJobDetails(req, res) {
       !booking.assigned_washer_id &&
       ["pending", "confirmed", "finding_washer", "support_escalated"].includes(booking.status)
     ) {
-      const { data, error } = await supabaseAdmin
+      let washerQuery = supabaseAdmin
         .from("washers")
         .select(`
           id,
@@ -71,6 +71,8 @@ export async function getSupervisorJobDetails(req, res) {
             updated_at
           )
         `);
+      if (req.profile?.role === "supervisor") washerQuery = washerQuery.eq("supervisor_id", req.user.id);
+      const { data, error } = await washerQuery;
 
       if (error) throw error;
       washers = data || [];
@@ -117,10 +119,6 @@ export async function getSupervisorJobDetails(req, res) {
     for (const washer of washers) {
       const profile = profiles.get(washer.user_id);
       const location = Array.isArray(washer.location) ? washer.location[0] : washer.location;
-      if (req.profile?.role === "supervisor" && !isWithinSupervisorArea({
-        latitude: location?.service_latitude ?? location?.latitude,
-        longitude: location?.service_longitude ?? location?.longitude,
-      }, req.supervisorArea)) continue;
       const reasons = [];
       const washerLatitude = location?.service_latitude ?? location?.latitude;
       const washerLongitude = location?.service_longitude ?? location?.longitude;
@@ -129,14 +127,12 @@ export async function getSupervisorJobDetails(req, res) {
       const measuredDistanceKm = calculateDistanceKm(booking.latitude, booking.longitude, washerLatitude, washerLongitude);
       const distanceKm = measuredDistanceKm;
       const age = (Date.now() - Date.parse(location?.updated_at || "")) / 60000;
-      const radius = Number(washer.service_radius_km || 5);
       if (!washer.is_active || !profile?.is_active) reasons.push("Washer account is inactive or incomplete.");
       if (!washer.is_verified) reasons.push("Supervisor verification required.");
       if (!payoutWasherIds.has(washer.id)) reasons.push("Washer must save payout account details before assignment.");
       if (washer.status !== "available") reasons.push(washer.status === "busy" ? "Washer is currently busy." : "Washer must go online.");
       if (booking.latitude == null || booking.longitude == null) reasons.push("Booking map coordinates are missing.");
       if (distanceKm == null) reasons.push("Valid booking and washer map locations are required.");
-      else if (!Number.isFinite(radius) || radius <= 0 || distanceKm > Math.min(Math.max(radius, 5), 7)) reasons.push(`Booking is ${Number.isFinite(radius) ? `outside the ${radius} km radius and the 7 km extended limit` : "outside the service radius"}.`);
       if (!Number.isFinite(age) || age > 15) reasons.push("Washer must refresh their live location.");
       if (exclusionReasonByWasherId.has(washer.id)) reasons.push(exclusionReasonByWasherId.get(washer.id));
       if (await washerHasScheduleConflict(washer.id, booking, bookingPackage)) reasons.push("Washer has a conflicting booking.");
@@ -148,8 +144,6 @@ export async function getSupervisorJobDetails(req, res) {
         latitude: washerLatitude, longitude: washerLongitude,
         locationUpdatedAt: location?.updated_at,
         distanceKm: distanceKm == null ? null : Number(distanceKm.toFixed(2)),
-        serviceRadiusKm: radius,
-        extendedRadius: distanceKm != null && distanceKm > radius && distanceKm <= 7,
         serviceAddressMatched: sameServiceAddress,
         eligible: reasons.length === 0, reasons,
       });

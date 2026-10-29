@@ -106,6 +106,7 @@ function BookingHistoryCard({ booking, onDetails, onDelete, deleting, onCancel, 
                 ? `₹${amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                 : "-"}
             </p>
+            {Number(booking.extra_charge) > 0 && <p className="mt-1 text-xs font-medium text-green-700">Includes extra charge ₹{Number(booking.extra_charge).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>}
           </div>
           <div className="flex flex-wrap items-center justify-end gap-1">
             {cancellable && <button type="button" onClick={onCancel} disabled={cancelling} className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50 disabled:opacity-50">

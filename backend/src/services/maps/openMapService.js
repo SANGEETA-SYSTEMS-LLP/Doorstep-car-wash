@@ -1,5 +1,8 @@
 const cache=new Map(); let pending=false, nextRequest=0;
 const DEFAULT_GEOCODING_BASE_URL="https://nominatim.openstreetmap.org";
+// Public OSRM demo endpoint for low-volume development use. Production should
+// configure OSRM_BASE_URL to a provider or OSRM instance it operates.
+const DEFAULT_ROUTING_BASE_URL="https://router.project-osrm.org";
 const DEFAULT_GEOCODING_USER_AGENT="DoorstepCarWash/1.0 (car-wash address search)";
 function configuredProviderBase(value, name) {
  if (!value) return null;
@@ -37,8 +40,7 @@ async function geocode(endpoint,params) {
 export async function searchPlaces(q){return (await geocode("search",{q,limit:5})).map(normalizeAddress);}
 export async function reversePlace(lat,lon){return normalizeAddress(await geocode("reverse",{lat,lon}));}
 export async function drivingRoute(fromLat,fromLon,toLat,toLon){
- const base=configuredProviderBase(process.env.OSRM_BASE_URL, "OSRM_BASE_URL");
- if(!base)throw Object.assign(new Error("Driving routes are not configured. Location markers are still available."),{status:503});
+ const base=configuredProviderBase(process.env.OSRM_BASE_URL, "OSRM_BASE_URL") || new URL(DEFAULT_ROUTING_BASE_URL);
  const url=new URL("route/v1/driving/"+fromLon+","+fromLat+";"+toLon+","+toLat, base.href.replace(/\/$/,"")+"/");
  url.searchParams.set("overview", "full"); url.searchParams.set("geometries", "geojson");
  if (url.origin !== base.origin || !url.pathname.startsWith(base.pathname.replace(/\/$/, "") + "/")) throw new Error("Routing provider URL is invalid.");
