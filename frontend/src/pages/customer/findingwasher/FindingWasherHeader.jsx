@@ -3,7 +3,7 @@ function FindingWasherHeader({ booking, washerFound }) {
     <header className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
+          <p className="text-xs font-bold uppercase tracking-wider text-green-600">
             Booking {booking.bookingId || "Pending"}
           </p>
           <h1 className="mt-1 text-xl font-bold">

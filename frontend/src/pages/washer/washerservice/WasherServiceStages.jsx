@@ -14,13 +14,13 @@ function WasherServiceStages({
     <>
       {stage === "before" && (
         <div className="mx-auto mt-8 max-w-3xl space-y-4">
-          <section className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
-            <p className="text-xs font-bold uppercase tracking-wider text-blue-700">Washer arrived · Contact customer</p>
+          <section className="rounded-2xl border border-green-200 bg-green-50 p-5">
+            <p className="text-xs font-bold uppercase tracking-wider text-green-700">Washer arrived · Contact customer</p>
             <p className="mt-2 font-semibold text-slate-900">{activeJob?.customer?.name || "Customer"}</p>
             {activeJob?.customer?.phone ? (
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                 <a href={`tel:${String(activeJob.customer.phone).replace(/[^+0-9]/g, "")}`} className="text-lg font-semibold text-slate-800">{activeJob.customer.phone}</a>
-                <a href={`tel:${String(activeJob.customer.phone).replace(/[^+0-9]/g, "")}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800"><Phone size={18} />Call customer</a>
+                <a href={`tel:${String(activeJob.customer.phone).replace(/[^+0-9]/g, "")}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-green-700 px-5 py-3 font-semibold text-white hover:bg-green-800"><Phone size={18} />Call customer</a>
               </div>
             ) : <p className="mt-2 text-sm text-slate-600">Customer phone number is unavailable.</p>}
           </section>

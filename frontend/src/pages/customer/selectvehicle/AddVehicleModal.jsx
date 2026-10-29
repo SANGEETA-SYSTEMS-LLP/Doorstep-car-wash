@@ -3,7 +3,7 @@ import Input from "./Input";
 function AddVehicleModal({ onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-5">
-      <div className="w-full max-w-lg rounded-3xl bg-white p-7 shadow-2xl">
+      <div className="w-full max-w-lg rounded-lg border border-slate-200 bg-[#fbfcfb] p-7 shadow-md">
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-2xl font-bold">
@@ -57,7 +57,7 @@ function AddVehicleModal({ onClose }) {
 
           <button
             onClick={onClose}
-            className="flex-1 rounded-xl bg-blue-600 py-3 font-semibold text-white"
+            className="flex-1 rounded-xl bg-green-600 py-3 font-semibold text-white"
           >
             Add Vehicle
           </button>

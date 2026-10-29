@@ -13,14 +13,14 @@ function PaymentOption({
       onClick={onClick}
       className={`flex w-full items-center gap-4 rounded-2xl border-2 bg-white p-5 text-left transition ${
         active
-          ? "border-blue-600 shadow-sm shadow-blue-100"
+          ? "border-green-600 shadow-sm shadow-green-100"
           : "border-slate-200 hover:border-slate-300"
       }`}
     >
       <div
         className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
           active
-            ? "bg-blue-50 text-blue-600"
+            ? "bg-green-50 text-green-600"
             : "bg-slate-100 text-slate-500"
         }`}
       >
@@ -40,7 +40,7 @@ function PaymentOption({
       <div
         className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
           active
-            ? "border-blue-600 bg-blue-600"
+            ? "border-green-600 bg-green-600"
             : "border-slate-300"
         }`}
       >

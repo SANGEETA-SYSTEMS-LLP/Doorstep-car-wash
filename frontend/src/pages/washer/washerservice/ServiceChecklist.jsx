@@ -1,4 +1,4 @@
-import { Check, Clock3, Sparkles } from "lucide-react";
+import { Check, Clock3, Droplets } from "lucide-react";
 import ExtraChargeRequest from "./ExtraChargeRequest";
 
 function ServiceChecklist({ activeJob, checklist, loading, saving, retry, toggleTask, allTasksCompleted, moveToAfterPhotos }) {
@@ -8,7 +8,7 @@ function ServiceChecklist({ activeJob, checklist, loading, saving, retry, toggle
             <div className="rounded-3xl border border-slate-200 bg-white p-6 lg:p-7">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
+                  <p className="text-xs font-bold uppercase tracking-wider text-green-600">
                     Service In Progress
                   </p>
 
@@ -17,8 +17,8 @@ function ServiceChecklist({ activeJob, checklist, loading, saving, retry, toggle
                   </h2>
                 </div>
 
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                  <Sparkles />
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50 text-green-600">
+                  <Droplets />
                 </div>
               </div>
 
@@ -39,7 +39,7 @@ function ServiceChecklist({ activeJob, checklist, loading, saving, retry, toggle
                       className={`flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition ${
                         completed
                           ? "border-green-200 bg-green-50"
-                          : "border-slate-200 bg-white hover:border-blue-300"
+                          : "border-slate-200 bg-white hover:border-green-300"
                       }`}
                     >
                       <div
@@ -73,17 +73,17 @@ function ServiceChecklist({ activeJob, checklist, loading, saving, retry, toggle
               <button
                 disabled={!allTasksCompleted}
                 onClick={moveToAfterPhotos}
-                className="mt-7 w-full rounded-xl bg-blue-600 py-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                className="mt-7 w-full rounded-xl bg-green-600 py-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Finish Service Checklist
               </button>
             </div>
 
             <aside className="space-y-5">
-              <div className="rounded-3xl bg-blue-600 p-6 text-white">
+              <div className="rounded-3xl bg-green-600 p-6 text-white">
                 <Clock3 />
 
-                <p className="mt-4 text-sm text-blue-100">
+                <p className="mt-4 text-sm text-green-100">
                   Service status
                 </p>
 
@@ -91,7 +91,7 @@ function ServiceChecklist({ activeJob, checklist, loading, saving, retry, toggle
                   In progress
                 </p>
 
-                <p className="mt-2 text-xs text-blue-100">
+                <p className="mt-2 text-xs text-green-100">
                   {activeJob?.service || "Car Wash"} in progress
                 </p>
               </div>
@@ -108,7 +108,7 @@ function ServiceChecklist({ activeJob, checklist, loading, saving, retry, toggle
 
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full bg-green-500 transition-all"
+                    className="h-full bg-green-500 transition-[width]"
                     style={{
                       width: `${
                         (completedTasks.length /

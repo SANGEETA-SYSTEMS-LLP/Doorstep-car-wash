@@ -17,7 +17,7 @@ const links = [
 export default function AdminRoleDashboard({ base = "/admin" }) {
   return (
     <section>
-      <p className="text-sm font-semibold text-blue-700">ADMIN WORKSPACE</p>
+      <p className="text-sm font-semibold text-green-700">ADMIN WORKSPACE</p>
       <h1 className="mt-2 text-3xl font-bold text-slate-950">Sub Admin</h1>
       <p className="mt-3 text-slate-600">Manage daily operations, customers, and service settings.</p>
       <div className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

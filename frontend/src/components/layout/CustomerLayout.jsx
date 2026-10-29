@@ -9,7 +9,7 @@ function CustomerLayout() {
   const { user } = useAuth();
   const { pathname } = useLocation();
   return (
-    <div className="min-h-screen bg-[#f5f8fb]">
+    <div className="min-h-screen bg-[#f3f7f4]">
       <CustomerSidebar />
 
       <main className="min-w-0 min-h-screen lg:pl-64">

@@ -79,7 +79,7 @@ function WasherNavigation() {
   };
 
   if (loadedJobId !== jobId) {
-    return <div className="p-8"><p role={jobError ? "alert" : "status"}>{jobError || "Loading assigned booking..."}</p><button onClick={() => navigate("/washer/jobs")} className="mt-4 text-blue-700 underline">Back to bookings</button></div>;
+    return <div className="p-8"><p role={jobError ? "alert" : "status"}>{jobError || "Loading assigned booking..."}</p><button onClick={() => navigate("/washer/jobs")} className="mt-4 text-green-700 underline">Back to bookings</button></div>;
   }
 
   if (!activeJob) {
@@ -93,7 +93,7 @@ function WasherNavigation() {
           </p>
           <button
             onClick={() => navigate("/washer")}
-            className="mt-6 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white"
+            className="mt-6 rounded-xl bg-green-600 px-6 py-3 font-semibold text-white"
           >
             Go to Dashboard
           </button>

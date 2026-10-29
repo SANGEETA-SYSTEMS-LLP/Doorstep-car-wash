@@ -19,7 +19,7 @@ function VehicleForm({ navigate, loading, error, form, handleChange, handleSubmi
           name="vehicleType"
           value={form.vehicleType}
           onChange={handleChange}
-          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 outline-none focus:border-blue-500"
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 outline-none focus:border-green-500"
         >
           <option value="">Select vehicle type</option>
           <option value="hatchback">Hatchback</option>
@@ -40,7 +40,7 @@ function VehicleForm({ navigate, loading, error, form, handleChange, handleSubmi
             onChange={handleChange}
             maxLength={50}
             placeholder="e.g. Van, Pickup truck, Minibus"
-            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 outline-none focus:border-blue-500"
+            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 outline-none focus:border-green-500"
           />
         </div>
       )}
@@ -57,7 +57,7 @@ function VehicleForm({ navigate, loading, error, form, handleChange, handleSubmi
             value={form.colour}
             onChange={handleChange}
             placeholder="White"
-            className="w-full rounded-xl border border-slate-300 py-3.5 pl-12 pr-4 outline-none focus:border-blue-500"
+            className="w-full rounded-xl border border-slate-300 py-3.5 pl-12 pr-4 outline-none focus:border-green-500"
           />
         </div>
       </div>
@@ -75,7 +75,7 @@ function VehicleForm({ navigate, loading, error, form, handleChange, handleSubmi
           value={form.seatingCapacity}
           onChange={handleChange}
           placeholder="Enter total seats, including the driver"
-          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"
         />
         <p className="mt-1.5 text-xs text-slate-500">Enter a whole number from 2 to 20.</p>
       </div>
@@ -95,7 +95,7 @@ function VehicleForm({ navigate, loading, error, form, handleChange, handleSubmi
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 font-semibold text-white disabled:opacity-50"
+          className="flex w-full flex-1 items-center justify-center gap-2 rounded-xl bg-green-600 py-4 font-semibold text-white disabled:opacity-50"
         >
           <Save size={18} />
           {loading ? "Saving Vehicle..." : "Save Vehicle"}

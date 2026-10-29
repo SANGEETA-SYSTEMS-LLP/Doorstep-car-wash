@@ -91,3 +91,50 @@ export async function getCustomerBookingDetails(req, res) {
   }
 }
 
+export async function getCustomerBookingByNumber(req, res) {
+  try {
+    const bookingNumber = typeof req.params.bookingNumber === "string" ? req.params.bookingNumber.trim() : "";
+    if (!/^[A-Z0-9-]{3,64}$/i.test(bookingNumber)) {
+      return res.status(400).json({ message: "Invalid booking number." });
+    }
+    const { data: customer, error: customerError } = await supabaseAdmin.from("customers")
+      .select("id").eq("user_id", req.user.id).maybeSingle();
+    if (customerError) throw customerError;
+    if (!customer) return res.status(404).json({ message: "Booking not found." });
+    const { data: booking, error } = await supabaseAdmin.from("bookings")
+      .select("id,booking_number,status,scheduled_date,scheduled_start_time,service_address,total_amount,vehicle_id,package_id")
+      .eq("booking_number", bookingNumber).eq("customer_id", customer.id).maybeSingle();
+    if (error) throw error;
+    if (!booking) return res.status(404).json({ message: "Booking not found." });
+    return res.json({ success: true, booking });
+  } catch (error) {
+    console.error("Get customer booking by number failed", {
+      name: typeof error?.name === "string" ? error.name : "Error",
+      code: typeof error?.code === "string" ? error.code : undefined,
+    });
+    return res.status(500).json({ message: "Unable to load booking details." });
+  }
+}
+
+export async function getTrackingWasherLocation(req, res) {
+  if (!uuidPattern.test(req.params.bookingId || "")) return res.status(400).json({ message: "Invalid booking ID." });
+  try {
+    const booking = await getCustomerBooking(req.params.bookingId, req.user.id);
+    if (!booking) return res.status(404).json({ message: "Booking not found." });
+    if (!booking.assigned_washer_id || !["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started"].includes(booking.status)) {
+      return res.json({ location: null });
+    }
+    const { data, error } = await supabaseAdmin.from("washer_locations")
+      .select("latitude,longitude,heading,speed,updated_at")
+      .eq("washer_id", booking.assigned_washer_id).maybeSingle();
+    if (error) throw error;
+    return res.json({ location: data || null });
+  } catch (error) {
+    console.error("Customer washer location lookup failed", {
+      name: typeof error?.name === "string" ? error.name : "Error",
+      code: typeof error?.code === "string" ? error.code : undefined,
+    });
+    return res.status(500).json({ message: "Unable to load the washer's location." });
+  }
+}
+

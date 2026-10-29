@@ -43,7 +43,7 @@ function CustomerHomeLocation({ location, loading }) {
             </p>
             <Link
               to="/customer/select-location"
-              className="mt-4 font-semibold text-blue-700 hover:underline"
+              className="mt-4 font-semibold text-green-700 hover:underline"
             >
               Add a service location
             </Link>
@@ -74,7 +74,7 @@ function CustomerHomeLocation({ location, loading }) {
 
           <Link
             to="/customer/select-location"
-            className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 font-semibold text-white"
+            className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-3.5 font-semibold text-white"
           >
             Start Booking
             <ArrowRight size={18} />

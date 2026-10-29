@@ -40,8 +40,8 @@ export default function PayoutDetails({ supervisor = false }) {
     <p className="mt-2 text-sm text-slate-600">{supervisor ? "Add the bank account or UPI ID where you want to receive commissions for paid jobs completed by washers linked to you." : "Customers pay securely through Razorpay. Add the bank account or UPI ID where you want to receive your washer earnings."}</p>
     {loading && <p role="status" className="mt-4">Loading payout account…</p>}
     {error && <p role="alert" className="mt-4 text-red-700">Could not check payout availability. Retry before entering payout details. <button type="button" className="underline" onClick={refresh}>Retry</button></p>}
-    {data?.account && <p className="mt-4 rounded-xl bg-blue-50 p-4">Saved: {data.account.account_label}</p>}
-    {providerUnavailable && <p role="status" className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">You can securely save your payout details now. Transfers will be available after the platform administrator configures RazorpayX.</p>}
+    {data?.account && <p className="mt-4 rounded-xl bg-green-50 p-4">Saved: {data.account.account_label}</p>}
+    {providerUnavailable && <p role="status" className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-900">You can securely save your payout details now. Transfers will be available after the platform administrator configures RazorpayX.</p>}
     <form onSubmit={save} className="mt-5 grid gap-4 sm:grid-cols-2">
       <label className="text-sm font-semibold">Payout method
         <select value={form.method} disabled={saving || loading || Boolean(error)} onChange={event => setForm({ ...emptyForm, method: event.target.value })} className="mt-2 w-full rounded-xl border bg-white p-3 disabled:bg-slate-100"><option value="bank">Bank transfer</option><option value="upi">UPI</option></select>
@@ -51,7 +51,7 @@ export default function PayoutDetails({ supervisor = false }) {
       </label>)}
       {saveError && <p role="alert" className="text-red-700 sm:col-span-2">{saveError === "Payment provider credentials are not configured." ? "Your details could not be saved due to a server configuration issue. Contact platform support." : saveError}</p>}
       {message && <p role="status" className="text-green-700 sm:col-span-2">{message}</p>}
-      <button disabled={saving || loading || Boolean(error)} className="rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white disabled:opacity-50">{saving ? "Saving…" : "Save payout account"}</button>
+      <button disabled={saving || loading || Boolean(error)} className="rounded-xl bg-green-700 px-5 py-3 font-semibold text-white disabled:opacity-50">{saving ? "Saving…" : "Save payout account"}</button>
     </form>
   </section>;
 }

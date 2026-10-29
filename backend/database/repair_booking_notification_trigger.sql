@@ -1,5 +1,30 @@
 -- Repair the booking notification trigger in the existing Supabase project.
--- The booking status is an enum; cast it to text before using a text fallback.
+-- Add the selected payment method and keep notification event values valid for
+-- the deployed booking_status enum.
+ALTER TABLE public.bookings
+  ADD COLUMN IF NOT EXISTS payment_method text;
+
+DO $backfill$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'payments' AND column_name = 'payment_method'
+  ) THEN
+    EXECUTE $sql$
+      UPDATE public.bookings AS b
+      SET payment_method = (
+        SELECT payments.payment_method::text
+        FROM public.payments
+        WHERE payments.booking_id = b.id
+        ORDER BY payments.created_at DESC
+        LIMIT 1
+      )
+      WHERE b.payment_method IS NULL
+    $sql$;
+  END IF;
+END
+$backfill$;
+
 BEGIN;
 
 CREATE OR REPLACE FUNCTION public.create_customer_booking_notification()
@@ -17,7 +42,9 @@ BEGIN
     RETURN NEW;
   END IF;
 
-  notification_type := COALESCE(NEW.status::text, 'booking_update');
+  -- event_type is backed by booking_status in deployed schemas. The fallback
+  -- must therefore be a real enum label, not the UI-only "booking_update".
+  notification_type := COALESCE(NEW.status::text, 'pending');
   notification_title := CASE NEW.status::text
     WHEN 'pending' THEN 'Booking received'
     WHEN 'payment_completed' THEN 'Payment confirmed'
@@ -92,7 +119,8 @@ NOTIFY pgrst, 'reload schema';
 
 -- Verify the deployed function contains the enum-to-text cast.
 SELECT p.proname,
-       pg_get_functiondef(p.oid) ILIKE '%new.status::text%booking_update%' AS cast_fix_present
+       pg_get_functiondef(p.oid) ILIKE '%notification_type := COALESCE(NEW.status::text, ''pending'')%'
+         AS cast_fix_present
 FROM pg_proc p
 JOIN pg_namespace n ON n.oid = p.pronamespace
 WHERE n.nspname = 'public'

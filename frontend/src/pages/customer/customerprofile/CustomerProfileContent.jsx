@@ -6,7 +6,7 @@ function CustomerProfileContent({ saved, saving, error, emailVerified, profile, 
   return (
     <div className="min-h-screen bg-slate-50 p-6 lg:p-8">
       <div className="mx-auto max-w-5xl">
-        <p className="font-semibold text-blue-600">
+        <p className="font-semibold text-green-600">
           ACCOUNT
         </p>
 
@@ -22,11 +22,11 @@ function CustomerProfileContent({ saved, saving, error, emailVerified, profile, 
           <aside>
             <div className="rounded-3xl border border-slate-200 bg-white p-7 text-center">
               <div className="relative mx-auto w-fit">
-                <div className="flex h-28 w-28 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                <div className="flex h-28 w-28 items-center justify-center rounded-full bg-green-100 text-green-700">
                   <UserRound size={48} />
                 </div>
 
-                <button className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white shadow">
+                <button className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-green-600 text-white shadow">
                   <Camera size={16} />
                 </button>
               </div>
@@ -40,7 +40,7 @@ function CustomerProfileContent({ saved, saving, error, emailVerified, profile, 
               </p>
 
               <div className={`mt-6 rounded-xl p-3 text-sm font-semibold ${emailVerified ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"}`}>
-                {emailVerified ? "✓ Email verified" : "Email verification pending"}
+                {emailVerified ? "Email verified" : "Email verification pending"}
               </div>
             </div>
           </aside>
@@ -97,7 +97,7 @@ function CustomerProfileContent({ saved, saving, error, emailVerified, profile, 
               <button
                 type="submit"
                 disabled={saving}
-                className="mt-7 flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 font-semibold text-white disabled:cursor-wait disabled:opacity-60"
+                className="mt-7 flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3.5 font-semibold text-white disabled:cursor-wait disabled:opacity-60"
               >
                 <Save size={17} />
                 {saving ? "Saving..." : "Save Changes"}

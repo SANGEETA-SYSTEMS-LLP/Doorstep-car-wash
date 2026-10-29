@@ -31,7 +31,7 @@ function SupervisorServiceValidation({ job, validating, onValidate }) {
               <h3 className="mb-3 text-sm font-semibold text-gray-700">{title}</h3>
               <div className="grid grid-cols-2 gap-3">
                 {job.servicePhotos.filter((photo) => photo.photo_type === type).map((photo) => (
-                  <img key={photo.id} src={photo.url} alt={`${title} vehicle`} className="h-36 w-full rounded-lg object-cover" />
+                  <img key={photo.id} src={photo.url} alt={`${title} vehicle`} loading="lazy" decoding="async" className="h-36 w-full rounded-lg object-cover" />
                 ))}
               </div>
             </div>

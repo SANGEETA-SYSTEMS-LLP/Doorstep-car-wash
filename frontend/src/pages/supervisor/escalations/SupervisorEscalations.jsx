@@ -45,7 +45,7 @@ export default function SupervisorEscalations() {
 
   return (
     <div className="space-y-6">
-      <header className="rounded-3xl border border-amber-100 bg-gradient-to-r from-amber-50 to-white p-6 sm:p-8">
+      <header className="rounded-xl border border-amber-200 bg-[#fbfaf5] p-6 sm:p-8">
       <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber-800">Operations attention</p>
       <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
         No-washer escalations

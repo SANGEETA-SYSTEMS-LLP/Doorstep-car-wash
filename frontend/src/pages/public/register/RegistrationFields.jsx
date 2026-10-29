@@ -1,4 +1,5 @@
 import SignupAddress from "./SignupAddress";
+import { Link } from "react-router-dom";
 import { Mail, Phone, User } from "lucide-react";
 import Field from "./Field";
 import PasswordField from "./PasswordField";
@@ -21,14 +22,14 @@ function RegistrationFields({ accountType, address, setAddress, locationBusy, se
       </div>
       {["customer", "washer"].includes(accountType) && <SignupAddress value={address} onChange={setAddress} disabled={loading} onBusy={setLocationBusy} accountType={accountType} />}
       <label className="flex items-start gap-3 text-sm leading-6 text-slate-600">
-        <input type="checkbox" required className="mt-1 h-4 w-4 rounded border-slate-300 accent-blue-700 focus:ring-blue-600" />
+        <input type="checkbox" required className="mt-1 h-4 w-4 rounded border-slate-300 accent-green-700 focus:ring-green-600" />
         <span>
-          I agree to the <button type="button" className="font-semibold text-blue-700 hover:text-blue-900">Terms of Service</button>
+          I agree to the <Link to="/terms" className="font-semibold text-green-900 underline">Terms of Service</Link>
           {" "}and{" "}
-          <button type="button" className="font-semibold text-blue-700 hover:text-blue-900">Privacy Policy</button>.
+          <Link to="/privacy" className="font-semibold text-green-900 underline">Privacy Policy</Link>.
         </span>
       </label>
-      <button type="submit" disabled={loading || locationBusy} className="w-full rounded-xl bg-[#173b64] py-3.5 font-semibold text-white shadow-sm transition hover:bg-[#102b49] focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-50">
+      <button type="submit" disabled={loading || locationBusy} className="w-full rounded-xl bg-green-700 py-3.5 font-semibold text-white shadow-sm transition hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-200 disabled:cursor-not-allowed disabled:opacity-50">
         {loading ? "Submitting application…" : accountType === "washer" ? "Submit washer application" : "Create Account"}
       </button>
     </form>

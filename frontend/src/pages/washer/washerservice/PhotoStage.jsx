@@ -14,7 +14,7 @@ function PhotoStage({
   return (
     <section className="mx-auto mt-8 max-w-3xl rounded-3xl border border-slate-200 bg-white p-7">
       <div className="text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-600">
           <Camera />
         </div>
 
@@ -27,10 +27,10 @@ function PhotoStage({
         </p>
       </div>
 
-      <label className="mt-7 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 p-9 text-center hover:border-blue-400 hover:bg-blue-50">
+      <label className="mt-7 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 p-9 text-center hover:border-green-400 hover:bg-green-50">
         <ImagePlus
           size={30}
-          className="text-blue-600"
+          className="text-green-600"
         />
 
         <p className="mt-3 font-semibold">
@@ -69,7 +69,7 @@ function PhotoStage({
       <button
         disabled={disabled}
         onClick={onContinue}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
       >
         {buttonIcon}
         {buttonText}

@@ -25,11 +25,11 @@ function TrackingSidebar({ currentStatus, washer, distance, eta }) {
 
             {/* ETA */}
 
-            <div className="rounded-3xl bg-blue-600 p-6 text-white">
+            <div className="rounded-3xl bg-green-600 p-6 text-white">
               <div className="flex items-center gap-3">
                 <Clock3 size={22} />
 
-                <p className="text-sm font-semibold text-blue-100">
+                <p className="text-sm font-semibold text-green-100">
                   Estimated arrival
                 </p>
               </div>
@@ -38,9 +38,9 @@ function TrackingSidebar({ currentStatus, washer, distance, eta }) {
                 <>
                   <div className="mt-4 flex items-end gap-2">
                     <p className="text-4xl font-bold">{eta}</p>
-                    <p className="mb-1 text-blue-100">minutes</p>
+                    <p className="mb-1 text-green-100">minutes</p>
                   </div>
-                  <p className="mt-3 text-sm text-blue-100">
+                  <p className="mt-3 text-sm text-green-100">
                     Your washer is {distance} km away.
                   </p>
                 </>

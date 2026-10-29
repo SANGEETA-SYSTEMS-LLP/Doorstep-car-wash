@@ -28,7 +28,7 @@ function SupervisorBookingInformation({ job, address }) {
             value={
               <a
                 href={`tel:${String(job.customer.phone).replace(/[^+0-9]/g, "")}`}
-                className="text-blue-700 hover:underline"
+                className="text-green-700 hover:underline"
               >
                 {job.customer.phone}
               </a>

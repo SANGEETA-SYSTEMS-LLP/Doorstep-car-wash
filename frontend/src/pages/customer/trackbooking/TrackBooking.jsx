@@ -3,7 +3,6 @@ import useDrivingRoute from "../../../hooks/useDrivingRoute";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
-import { supabase } from "../../../services/auth/supabase";
 import { getWasherLocation } from "../../../services/washer/washerService";
 import TrackBookingLiveMap from "./TrackBookingLiveMap";
 import TrackingSidebar from "./TrackingSidebar";
@@ -47,42 +46,18 @@ function TrackBooking() {
     };
     refreshContact();
     const timer = setInterval(refreshContact, 15000);
-    const channel = supabase
-      .channel(`tracking-booking-${bookingId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "bookings",
-          filter: `id=eq.${bookingId}`,
-        },
-        (payload) => {
-          if (cancelled) return;
-          refreshContact();
-          const status = payload.new.status;
-          setCurrentStatus(status);
-          updateStatus(status);
-          if (status === "washer_arrived") navigate("/customer/washer-arrived", { replace: true });
-          if (["service_completed", "customer_confirmed", "payment_completed", "closed", "completed"].includes(status)) {
-            navigate("/customer/service-completed", { replace: true });
-          }
-        }
-      )
-      .subscribe();
-
     return () => {
       cancelled = true;
       clearInterval(timer);
-      supabase.removeChannel(channel);
     };
   }, [booking.databaseBookingId]);
 
   useEffect(() => {
-    const washerId = assignedWasher?.id;
+    const bookingId = booking.databaseBookingId;
     let active = true;
 
-    if (!washerId) {
+    if (!bookingId || !assignedWasher?.id) {
+      setWasherLocation(null);
       return () => {
         active = false;
       };
@@ -90,7 +65,7 @@ function TrackBooking() {
 
     const loadLocation = async () => {
       try {
-        const location = await getWasherLocation(washerId);
+        const location = await getWasherLocation(bookingId);
 
         if (active) {
           setWasherLocation(location);
@@ -103,30 +78,11 @@ function TrackBooking() {
     loadLocation();
     const locationPoll = setInterval(loadLocation, 15000);
 
-    const channel = supabase
-      .channel(`washer-location-${washerId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "washer_locations",
-          filter: `washer_id=eq.${washerId}`,
-        },
-        (payload) => {
-          if (active) {
-            setWasherLocation(payload.new);
-          }
-        }
-      )
-      .subscribe();
-
     return () => {
       active = false;
       clearInterval(locationPoll);
-      supabase.removeChannel(channel);
     };
-  }, [assignedWasher?.id]);
+  }, [booking.databaseBookingId, assignedWasher?.id]);
 
   const { distance, eta, path, error: routeError } = useDrivingRoute(washerLocation, booking.location);
 

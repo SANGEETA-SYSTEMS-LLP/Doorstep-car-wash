@@ -7,7 +7,7 @@ function StatCard({
 }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-50 text-green-600">
         {icon}
       </div>
 

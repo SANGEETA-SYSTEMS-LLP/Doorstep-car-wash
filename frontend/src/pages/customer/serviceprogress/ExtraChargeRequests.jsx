@@ -61,7 +61,7 @@ function ExtraChargeRequests({ bookingId }) {
     <section className="mx-auto max-w-7xl space-y-4 px-6 pt-6 lg:px-8" aria-label="Additional service requests">
       {loading && <p role="status" className="text-sm text-slate-500">Checking additional service requests...</p>}
       {error && <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-600">{error}</p>}
-      {notice && <p role="status" className="rounded-xl bg-blue-50 p-4 text-sm text-blue-700">{notice}</p>}
+      {notice && <p role="status" className="rounded-xl bg-green-50 p-4 text-sm text-green-700">{notice}</p>}
       {requests.map((request) => (
         <div key={request.id} className="rounded-2xl border border-amber-200 bg-white p-6">
           <h2 className="text-xl font-bold">Additional Service Request</h2>
@@ -71,7 +71,7 @@ function ExtraChargeRequests({ bookingId }) {
           <p className="mt-3 text-sm text-green-700">Supervisor verified this request.</p>
           <div className="mt-5 flex flex-wrap gap-3">
             <button type="button" disabled={responding !== null} onClick={() => respond(request, "reject")} className="rounded-xl border border-red-200 px-6 py-3 font-semibold text-red-600 disabled:opacity-50">Reject</button>
-            <button type="button" disabled={responding !== null} onClick={() => respond(request, "approve")} className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white disabled:opacity-50">
+            <button type="button" disabled={responding !== null} onClick={() => respond(request, "approve")} className="rounded-xl bg-green-600 px-6 py-3 font-semibold text-white disabled:opacity-50">
               {responding === request.id ? "Processing..." : "Approve ₹" + Number(request.requested_amount).toLocaleString("en-IN")}
             </button>
           </div>

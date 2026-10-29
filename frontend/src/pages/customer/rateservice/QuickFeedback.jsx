@@ -16,7 +16,7 @@ function QuickFeedback() {
           <button
             key={item}
             type="button"
-            className="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600"
+            className="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:border-green-500 hover:bg-green-50 hover:text-green-600"
           >
             {item}
           </button>

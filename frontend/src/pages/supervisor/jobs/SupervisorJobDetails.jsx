@@ -68,7 +68,7 @@ export default function SupervisorJobDetails() {
           <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950">Job details</h1>
           <p className="mt-1.5 text-sm text-slate-500">Booking #{job.booking_number}</p>
         </div>
-        <span className="rounded-full bg-blue-50 px-3.5 py-2 text-sm font-semibold capitalize text-blue-800 ring-1 ring-blue-100">
+        <span className="rounded-full bg-green-50 px-3.5 py-2 text-sm font-semibold capitalize text-green-800 ring-1 ring-green-100">
           {status}
         </span>
       </div>

@@ -1,4 +1,5 @@
 import ResponsiveNavigation from "./ResponsiveNavigation";
+import { WashNowMark } from "./WashNowBrand";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -52,9 +53,7 @@ function WasherSidebar() {
   return (
     <ResponsiveNavigation title="WashNow"><aside className="hidden min-h-screen w-64 shrink-0 flex-col border-r border-slate-200/80 bg-white lg:flex">
       <div className="flex h-20 items-center gap-3 border-b border-slate-100 px-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-700 to-cyan-700 text-white shadow-sm">
-          <Car size={21} />
-        </div>
+        <WashNowMark className="h-10 w-10" />
 
         <div>
           <p className="font-black tracking-tight text-slate-950">
@@ -80,7 +79,7 @@ function WasherSidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-xl border px-3.5 py-3 text-sm font-semibold transition ${
                   isActive
-                    ? "border-blue-100 bg-blue-50 text-blue-800 shadow-sm shadow-blue-900/[0.03]"
+                    ? "border-green-100 bg-green-50 text-green-800 shadow-sm shadow-green-900/[0.03]"
                     : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-950"
                 }`
               }
@@ -95,7 +94,7 @@ function WasherSidebar() {
 
       <div className="border-t border-slate-100 p-4">
         <div className="mb-3 flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-800 ring-2 ring-white">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 font-bold text-green-800 ring-2 ring-white">
             {initials}
           </div>
 

@@ -1,4 +1,5 @@
 import ResponsiveNavigation from "./ResponsiveNavigation";
+import { WashNowMark } from "./WashNowBrand";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -59,9 +60,7 @@ function CustomerSidebar() {
   return (
     <ResponsiveNavigation title="WashNow"><aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-slate-200/80 bg-white lg:flex">
       <div className="flex h-20 items-center gap-3 border-b border-slate-100 px-5">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-700 to-cyan-600 text-white shadow-sm shadow-blue-900/15">
-          <Car size={21} />
-        </div>
+        <WashNowMark />
 
         <div>
           <p className="font-black tracking-tight text-slate-950">WashNow</p>
@@ -84,14 +83,14 @@ function CustomerSidebar() {
               className={({ isActive }) =>
                 `group flex items-center gap-3 rounded-xl border px-3.5 py-3 text-sm font-semibold transition ${
                   isActive
-                    ? "border-blue-100 bg-blue-50 text-blue-800 shadow-sm shadow-blue-900/[0.03]"
-                    : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+                    ? "border-[#d5e9dc] bg-[#eaf4ed] text-[#183a2e] shadow-sm shadow-green-900/[0.03]"
+                    : "border-transparent text-slate-600 hover:bg-[#f2f7f3] hover:text-[#183a2e]"
                 }`
               }
             >
               <Icon size={19} />
               {item.name}
-              <ChevronRight size={15} className="ml-auto opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-50" />
+              <ChevronRight size={15} className="ml-auto opacity-0 transition-opacity group-hover:opacity-50" />
             </NavLink>
           );
         })}
@@ -99,7 +98,7 @@ function CustomerSidebar() {
 
       <div className="border-t border-slate-100 p-4">
         <div className="mb-3 flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-sm font-bold text-blue-900 shadow-sm ring-1 ring-slate-100">{initials}</span>
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-sm font-bold text-green-900 shadow-sm ring-1 ring-slate-100">{initials}</span>
           <div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-900">{displayName}</p><p className="mt-0.5 text-xs text-slate-500">Customer account</p></div>
         </div>
         <LinkButton />

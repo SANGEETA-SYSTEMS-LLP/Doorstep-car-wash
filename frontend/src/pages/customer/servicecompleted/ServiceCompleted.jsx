@@ -134,9 +134,9 @@ function ServiceCompleted() {
         <ValidationStatus completed={completed} />
         {completed && booking.databaseBookingId && <CompletionPayment bookingId={booking.databaseBookingId} onPaid={updateStatus} />}
         {confirmError && <p role="alert" className="mt-4 text-red-700">{confirmError}</p>}
-        {!completed && booking.databaseBookingId && (serviceValidated ? <button disabled={confirming} onClick={confirm} className="mt-5 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white disabled:opacity-50">{confirming ? "Confirming…" : "Confirm service received"}</button> : <p role="status" className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Your washer has uploaded the service photos. They will be available for confirmation after the washer completes the photo review.</p>)}
+        {!completed && booking.databaseBookingId && (serviceValidated ? <button disabled={confirming} onClick={confirm} className="mt-5 rounded-xl bg-green-600 px-6 py-3 font-semibold text-white disabled:opacity-50">{confirming ? "Confirming…" : "Confirm service received"}</button> : <p role="status" className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Your washer has uploaded the service photos. They will be available for confirmation after the washer completes the photo review.</p>)}
         {booking.status === "customer_confirmed" && <p className="mt-4 text-slate-600">Payment is optional. You can pay now or rate and close your booking without paying.</p>}
-        {["customer_confirmed", "payment_completed", "closed", "completed"].includes(booking.status) && <Link to="/customer/rate-service" className="mt-5 inline-block rounded-xl bg-blue-600 px-6 py-3 text-white">Rate your service</Link>}
+        {["customer_confirmed", "payment_completed", "closed", "completed"].includes(booking.status) && <Link to="/customer/rate-service" className="mt-5 inline-block rounded-xl bg-green-600 px-6 py-3 text-white">Rate your service</Link>}
       </main>
     </div>
   );

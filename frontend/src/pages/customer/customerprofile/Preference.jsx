@@ -6,7 +6,7 @@ function Preference({
 }) {
   return (
     <div className="flex items-center gap-4 py-5 first:pt-0 last:pb-0">
-      <div className="text-blue-600">
+      <div className="text-green-600">
         {icon}
       </div>
 

@@ -38,14 +38,14 @@ function CustomerHomeHeader() {
     .toUpperCase();
 
   return (
-    <header className="flex h-20 items-center justify-between border-b border-slate-200 bg-white px-6 lg:px-8">
+    <header className="flex h-20 items-center justify-between border-b border-[#dce8df] bg-white px-6 lg:px-8">
       <div>
         <p className="text-sm text-slate-500">{formattedDate}</p>
         <h1 className="text-xl font-bold">{greeting}, {firstName} 👋</h1>
       </div>
       <div className="flex items-center gap-4">
         <CustomerNotificationBell />
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#d9eee1] font-bold text-[#1d6244]">
           {initials}
         </div>
       </div>

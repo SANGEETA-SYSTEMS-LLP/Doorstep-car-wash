@@ -11,7 +11,7 @@ const issueOptions = [
 ];
 
 const fieldClassName =
-  "mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-normal text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 disabled:bg-slate-50";
+  "mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-normal text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-green-600 focus:ring-4 focus:ring-green-600/10 disabled:bg-slate-50";
 
 function TicketForm({
   form,
@@ -27,7 +27,7 @@ function TicketForm({
       className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
     >
       <div>
-        <p className="text-xs font-bold uppercase tracking-wider text-blue-700">
+        <p className="text-xs font-bold uppercase tracking-wider text-green-700">
           Contact support
         </p>
         <h2 className="mt-1 text-xl font-bold text-slate-950">
@@ -132,7 +132,7 @@ function TicketForm({
       <button
         type="submit"
         disabled={saving}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 py-3.5 font-semibold text-white shadow-sm transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-700/20 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-700 px-5 py-3.5 font-semibold text-white shadow-sm transition hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-700/20 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
       >
         <Send size={17} />
         {saving ? "Submitting request..." : "Submit support request"}

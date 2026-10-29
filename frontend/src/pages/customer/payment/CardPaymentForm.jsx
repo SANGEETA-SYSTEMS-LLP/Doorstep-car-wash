@@ -15,7 +15,7 @@ function CardPaymentForm() {
 
                     <input
                       placeholder="1234 5678 9012 3456"
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3.5 outline-none focus:border-blue-500"
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3.5 outline-none focus:border-green-500"
                     />
                   </div>
 
@@ -26,7 +26,7 @@ function CardPaymentForm() {
 
                     <input
                       placeholder="Enter card holder name"
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3.5 outline-none focus:border-blue-500"
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3.5 outline-none focus:border-green-500"
                     />
                   </div>
 
@@ -38,7 +38,7 @@ function CardPaymentForm() {
 
                       <input
                         placeholder="MM/YY"
-                        className="w-full rounded-xl border border-slate-300 px-4 py-3.5 outline-none focus:border-blue-500"
+                        className="w-full rounded-xl border border-slate-300 px-4 py-3.5 outline-none focus:border-green-500"
                       />
                     </div>
 
@@ -51,7 +51,7 @@ function CardPaymentForm() {
                         type="password"
                         maxLength={4}
                         placeholder="•••"
-                        className="w-full rounded-xl border border-slate-300 px-4 py-3.5 outline-none focus:border-blue-500"
+                        className="w-full rounded-xl border border-slate-300 px-4 py-3.5 outline-none focus:border-green-500"
                       />
                     </div>
                   </div>

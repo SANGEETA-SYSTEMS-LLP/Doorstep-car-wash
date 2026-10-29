@@ -73,7 +73,7 @@ export default function SupervisorServiceArea() {
 
   return <section className="rounded-2xl border border-amber-200 bg-white p-6 shadow-sm">
     <div className="mb-5">
-      <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Required for operations</p>
+      <p className="text-xs font-bold uppercase tracking-[0.16em] text-green-700">Required for operations</p>
       <h2 className="mt-2 text-xl font-bold text-slate-950">Your service area</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">Save your work address and map pin. You will receive booking and washer verification details within 7 km of this location.</p>
     </div>
@@ -82,7 +82,7 @@ export default function SupervisorServiceArea() {
     <form onSubmit={save} className="space-y-4">
       <fieldset disabled={busy} className="space-y-4">
         <AddressSearch disabled={busy} onSelect={(point, result) => selectAddress(point, result)} onError={message => setError(message)} />
-        <button type="button" onClick={useCurrentLocation} className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-blue-800">Use my current location</button>
+        <button type="button" onClick={useCurrentLocation} className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-green-800">Use my current location</button>
         <ServiceMap location={location.latitude != null && location.longitude != null ? { lat: Number(location.latitude), lng: Number(location.longitude) } : null} onSelect={point => {
           setLocation(current => ({ ...current, latitude: point.lat, longitude: point.lng }));
           setSaved(false);
@@ -97,7 +97,7 @@ export default function SupervisorServiceArea() {
       </fieldset>
       {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
       {saved && <p role="status" className="text-sm text-emerald-700">Service area saved. Booking and verification access is enabled for this area.</p>}
-      <button disabled={busy || location.latitude == null || location.longitude == null} className="rounded-xl bg-blue-800 px-5 py-3 font-semibold text-white disabled:opacity-50">{busy ? "Saving…" : "Save service area"}</button>
+      <button disabled={busy || location.latitude == null || location.longitude == null} className="rounded-xl bg-green-800 px-5 py-3 font-semibold text-white disabled:opacity-50">{busy ? "Saving…" : "Save service area"}</button>
     </form>
   </section>;
 }

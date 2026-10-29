@@ -39,18 +39,16 @@ const statRoutes = {
 };
 
 const shortcuts = [
-  { title: "Bookings", description: "Review customer requests and service progress.", path: "bookings", icon: ClipboardList, tone: "blue" },
-  { title: "Live operations", description: "See active service locations and washer activity.", path: "operations", icon: MapPinned, tone: "cyan" },
-  { title: "Customer support", description: "Pick up open tickets and follow up on issues.", path: "support", icon: LifeBuoy, tone: "violet" },
+  { title: "Bookings", description: "Review customer requests and service progress.", path: "bookings", icon: ClipboardList, tone: "green" },
+  { title: "Live operations", description: "See active service locations and washer activity.", path: "operations", icon: MapPinned, tone: "green" },
+  { title: "Customer support", description: "Pick up open tickets and follow up on issues.", path: "support", icon: LifeBuoy, tone: "green" },
   { title: "Packages and pricing", description: "Maintain the services customers can book.", path: "packages", icon: Package, tone: "amber" },
   { title: "Payment confirmations", description: "Review washer payouts and payment status.", path: "finance", icon: Banknote, tone: "emerald" },
   { title: "Reports", description: "Review operating and finance activity by date.", path: "reports", icon: FileText, tone: "slate" },
 ];
 
 const toneStyles = {
-  blue: "bg-blue-50 text-blue-700 ring-blue-100",
-  cyan: "bg-cyan-50 text-cyan-700 ring-cyan-100",
-  violet: "bg-violet-50 text-violet-700 ring-violet-100",
+  green: "bg-green-50 text-green-700 ring-green-100",
   amber: "bg-amber-50 text-amber-700 ring-amber-100",
   emerald: "bg-emerald-50 text-emerald-700 ring-emerald-100",
   slate: "bg-slate-100 text-slate-700 ring-slate-200",
@@ -62,19 +60,19 @@ function CountCard({ stat }) {
   return (
     <Link
       to={`/admin/${path}`}
-      className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-900/3 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-900/3 transition-colors hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="rounded-xl bg-slate-50 p-2.5 text-slate-600 ring-1 ring-slate-100 transition group-hover:bg-blue-50 group-hover:text-blue-700">
+        <span className="rounded-xl bg-slate-50 p-2.5 text-slate-600 ring-1 ring-slate-100 transition group-hover:bg-green-50 group-hover:text-green-700">
           <Icon size={19} aria-hidden="true" />
         </span>
-        <ArrowUpRight size={17} className="text-slate-300 transition group-hover:text-blue-600" aria-hidden="true" />
+        <ArrowUpRight size={17} className="text-slate-300 transition group-hover:text-green-600" aria-hidden="true" />
       </div>
       <p className="mt-5 text-sm font-medium text-slate-500">{stat.label}</p>
       <p className="mt-1 text-3xl font-bold tracking-tight tabular-nums text-slate-950">
         {Number(stat.count || 0).toLocaleString("en-IN")}
       </p>
-      <p className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-blue-700">
+      <p className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-green-700">
         Open records <ArrowUpRight size={13} aria-hidden="true" />
       </p>
     </Link>
@@ -90,12 +88,12 @@ export default function AdminDashboard() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-8">
-      <header className="relative overflow-hidden rounded-3xl bg-slate-950 px-6 py-7 text-white shadow-lg shadow-slate-900/10 sm:px-8 sm:py-9">
+      <header className="relative overflow-hidden rounded-3xl bg-green-900 px-6 py-7 text-white sm:px-8 sm:py-9">
         <div className="pointer-events-none absolute -right-12 -top-24 h-72 w-72 rounded-full border border-white/10" />
         <div className="pointer-events-none absolute -right-2 -top-14 h-52 w-52 rounded-full border border-white/10" />
         <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
           <div>
-            <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-blue-300">
+            <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-green-300">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> WashNow · Administration
             </p>
             <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Good to see you, {firstName}</h1>
@@ -115,14 +113,14 @@ export default function AdminDashboard() {
         </div>
         <div className="relative mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-white/10 pt-5 text-xs text-slate-300">
           <span className="inline-flex items-center gap-2"><CheckCircle2 size={15} className="text-emerald-400" aria-hidden="true" />Workspace access verified</span>
-          <span className="inline-flex items-center gap-2"><ClipboardList size={15} className="text-blue-300" aria-hidden="true" />{loading ? "Loading platform records" : `${totalRecords.toLocaleString("en-IN")} total records`}</span>
+          <span className="inline-flex items-center gap-2"><ClipboardList size={15} className="text-green-300" aria-hidden="true" />{loading ? "Loading platform records" : `${totalRecords.toLocaleString("en-IN")} total records`}</span>
         </div>
       </header>
 
       <section aria-labelledby="platform-overview">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Platform overview</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-green-700">Platform overview</p>
             <h2 id="platform-overview" className="mt-1 text-xl font-bold tracking-tight text-slate-950">Your operating footprint</h2>
           </div>
           <p className="text-xs text-slate-500">Record totals across the platform</p>
@@ -149,14 +147,14 @@ export default function AdminDashboard() {
 
       <section aria-labelledby="daily-management">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-          <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Workspaces</p><h2 id="daily-management" className="mt-1 text-xl font-bold tracking-tight text-slate-950">Daily management</h2></div>
+          <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-green-700">Workspaces</p><h2 id="daily-management" className="mt-1 text-xl font-bold tracking-tight text-slate-950">Daily management</h2></div>
           <p className="text-xs text-slate-500">Choose a workspace to continue</p>
         </div>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {visibleShortcuts.map(({ title, description, path, icon: Icon, tone }) => (
-            <Link key={path} to={`/admin/${path}`} className="group flex min-h-32 items-start gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-900/2 transition hover:border-slate-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <Link key={path} to={`/admin/${path}`} className="group flex min-h-32 items-start gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
               <span className={`shrink-0 rounded-xl p-2.5 ring-1 ${toneStyles[tone]}`}><Icon size={19} aria-hidden="true" /></span>
-              <span className="min-w-0 flex-1"><span className="flex items-center justify-between gap-2"><span className="font-semibold text-slate-900">{title}</span><ArrowUpRight size={16} className="shrink-0 text-slate-300 transition group-hover:text-blue-600" aria-hidden="true" /></span><span className="mt-1.5 block text-sm leading-5 text-slate-500">{description}</span></span>
+              <span className="min-w-0 flex-1"><span className="flex items-center justify-between gap-2"><span className="font-semibold text-slate-900">{title}</span><ArrowUpRight size={16} className="shrink-0 text-slate-300 transition group-hover:text-green-600" aria-hidden="true" /></span><span className="mt-1.5 block text-sm leading-5 text-slate-500">{description}</span></span>
             </Link>
           ))}
         </div>

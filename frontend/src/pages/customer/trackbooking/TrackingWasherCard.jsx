@@ -9,12 +9,12 @@ function TrackingWasherCard({ washer }) {
         Your Washer
       </p>
       <div className="mt-5 flex flex-wrap items-center gap-4">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-700">
           <UserRound size={30} />
         </div>
         <div className="min-w-0 flex-1">
           <h2 className="text-lg font-bold">{washer?.name || "Assigned Washer"}</h2>
-          {phone && <a href={`tel:${phone}`} className="mt-1 block break-all text-sm font-semibold text-blue-700">{washer.phone}</a>}
+          {phone && <a href={`tel:${phone}`} className="mt-1 block break-all text-sm font-semibold text-green-700">{washer.phone}</a>}
           <div className="mt-1 flex items-center gap-1 text-sm">
             <Star size={15} className="fill-amber-400 text-amber-400" />
             <span className="font-semibold">{washer?.rating || 0}</span>

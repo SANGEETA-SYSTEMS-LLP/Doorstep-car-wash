@@ -26,7 +26,7 @@ function ProfileInput({
           value={value}
           onChange={onChange}
           readOnly={readOnly}
-          className="w-full rounded-xl border border-slate-300 py-3.5 pl-12 pr-4 outline-none focus:border-blue-500 read-only:bg-slate-50 read-only:text-slate-500"
+          className="w-full rounded-xl border border-slate-300 py-3.5 pl-12 pr-4 outline-none focus:border-green-500 read-only:bg-slate-50 read-only:text-slate-500"
         />
       </div>
     </div>

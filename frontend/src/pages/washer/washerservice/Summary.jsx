@@ -6,7 +6,7 @@ function Summary({
 }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <div className="text-blue-600">
+      <div className="text-green-600">
         {icon}
       </div>
 

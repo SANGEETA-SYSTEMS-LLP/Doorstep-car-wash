@@ -29,7 +29,7 @@ function Payment() {
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-6">
           <div>
-            <p className="text-sm font-semibold text-blue-600">SECURE CHECKOUT</p>
+            <p className="text-sm font-semibold text-green-600">SECURE CHECKOUT</p>
             <h1 className="text-xl font-bold text-slate-900">Complete Payment</h1>
           </div>
           <div className="flex items-center gap-2 text-sm font-medium text-green-700">
@@ -50,7 +50,7 @@ function Payment() {
             <p className="mt-3 text-sm leading-6 text-slate-600">
               Opening Razorpay to complete your payment. Choose an available payment method securely in the gateway.
             </p>
-            <p role="status" className="mt-5 text-sm font-medium text-blue-700">
+            <p role="status" className="mt-5 text-sm font-medium text-green-700">
               {processing ? "Connecting to Razorpay…" : paymentError ? "Checkout needs your attention." : "Razorpay checkout is ready."}
             </p>
           </section>

@@ -70,7 +70,7 @@ function BookingReview() {
         </button>
 
         <div className="mt-7">
-          <p className="font-semibold text-blue-600">
+          <p className="font-semibold text-green-600">
             REVIEW BOOKING
           </p>
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   CalendarCheck2,
@@ -53,6 +53,7 @@ function BookingHistory() {
   const [cancellingId, setCancellingId] = useState("");
   const [actionError, setActionError] = useState("");
   const [actionNotice, setActionNotice] = useState("");
+  const scheduledExpiryRefreshes = useRef(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -83,6 +84,26 @@ function BookingHistory() {
       cancelled = true;
     };
   }, [reloadCount, user]);
+
+  useEffect(() => {
+    const now = Date.now();
+    const awaitingPayment = bookings.flatMap(booking => {
+      const online = !["cod", "cash"].includes(String(booking.payment?.payment_method || booking.payment_method || "").toLowerCase());
+      if (booking.status !== "pending" || !online || booking.payment?.status === "paid") return [];
+      const createdAt = Date.parse(booking.created_at || "");
+      if (!Number.isFinite(createdAt) || scheduledExpiryRefreshes.current.has(booking.id)) return [];
+      return [{ id: booking.id, expiresAt: createdAt + 30 * 60 * 1000 }];
+    });
+    if (!awaitingPayment.length) return undefined;
+
+    const nextExpiry = Math.min(...awaitingPayment.map(booking => booking.expiresAt));
+    const dueBookings = awaitingPayment.filter(booking => booking.expiresAt === nextExpiry);
+    const timer = setTimeout(() => {
+      dueBookings.forEach(booking => scheduledExpiryRefreshes.current.add(booking.id));
+      setReloadCount(count => count + 1);
+    }, Math.max(0, nextExpiry - now) + 250);
+    return () => clearTimeout(timer);
+  }, [bookings]);
 
   const counts = useMemo(() => ({
     all: bookings.length,
@@ -130,6 +151,11 @@ function BookingHistory() {
     setActionNotice("");
     try {
       const result = await cancelBookingRequest(booking.id);
+      if (result.bookingStatus === "expired") {
+        setBookings(previous => previous.filter(item => item.id !== booking.id));
+        setActionNotice(result.message);
+        return;
+      }
       setBookings(previous => previous.map(item => item.id === booking.id ? {
         ...item,
         status: "cancelled",
@@ -143,7 +169,12 @@ function BookingHistory() {
       const fee = Number(result.platformFeeRetained || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       setActionNotice(`${result.message} Refund amount: ₹${amount}. Platform fee retained: ₹${fee}.`);
     } catch (error) {
-      setActionError(error.message || "Unable to cancel this booking.");
+      if (error.status === 409) {
+        setActionNotice(`${error.message || "The booking status changed."} Refreshing your booking history.`);
+        setReloadCount(count => count + 1);
+      } else {
+        setActionError(error.message || "Unable to cancel this booking.");
+      }
     } finally {
       setCancellingId("");
     }
@@ -177,7 +208,7 @@ function BookingHistory() {
       <div className="mx-auto max-w-6xl">
         <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-700">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-green-700">
               Your activity
             </p>
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
@@ -190,7 +221,7 @@ function BookingHistory() {
           <button
             type="button"
             onClick={() => navigate("/customer/select-location")}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-green-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-green-800"
           >
             <Plus size={18} />
             Book a wash
@@ -204,19 +235,19 @@ function BookingHistory() {
           <SummaryCard
             icon={<ReceiptText size={19} />}
             label="Total bookings"
-            value={loading ? "—" : counts.all}
-            iconStyle="bg-blue-50 text-blue-700"
+            value={loading ? "-" : counts.all}
+            iconStyle="bg-green-50 text-green-700"
           />
           <SummaryCard
             icon={<CalendarCheck2 size={19} />}
             label="Upcoming"
-            value={loading ? "—" : counts.upcoming}
+            value={loading ? "-" : counts.upcoming}
             iconStyle="bg-amber-50 text-amber-700"
           />
           <SummaryCard
             icon={<History size={19} />}
             label="Completed services"
-            value={loading ? "—" : counts.completed}
+            value={loading ? "-" : counts.completed}
             iconStyle="bg-emerald-50 text-emerald-700"
           />
         </section>
@@ -250,7 +281,7 @@ function BookingHistory() {
                     onClick={() => setActiveFilter(filter.id)}
                     className={`shrink-0 border-b-2 px-3 py-3 text-sm font-semibold transition ${
                       activeFilter === filter.id
-                        ? "border-blue-700 text-blue-700"
+                        ? "border-green-700 text-green-700"
                         : "border-transparent text-slate-500 hover:text-slate-800"
                     }`}
                   >
@@ -331,7 +362,7 @@ function BookingHistory() {
                   <button
                     type="button"
                     onClick={() => navigate("/customer/select-location")}
-                    className="mt-5 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800"
+                    className="mt-5 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-800"
                   >
                     Book your first wash
                   </button>

@@ -15,7 +15,7 @@ export default function ServiceMap({location, washerLocation, onSelect, path, po
  useEffect(()=>{
   if(!map.current)return;
   const group=L.layerGroup().addTo(map.current), positions=[];
-  for(const [value,title,color] of [[location,"Service location","#2563eb"],[washerLocation,"Washer location","#059669"],...(points || []).map(point=>[point,point.title,"#7c3aed"])]) {
+  for(const [value,title,color] of [[location,"Service location","#26704c"],[washerLocation,"Washer location","#26704c"],...(points || []).map(point=>[point,point.title,"#26704c"])]) {
    const p=coordinates(value); if(!p)continue;
    positions.push([p.lat,p.lng]);
    const label=document.createElement("span");label.textContent=value.name || title || "Location";
@@ -23,7 +23,7 @@ export default function ServiceMap({location, washerLocation, onSelect, path, po
   }
   if(positions.length>1)map.current.fitBounds(positions,{padding:[50,50],maxZoom:16});
   else if(positions.length)map.current.setView(positions[0],16);
-  if(path?.length)L.polyline(path.map(p=>Array.isArray(p)?p:[p.lat,p.lng]),{color:"#2563eb",weight:5}).addTo(group);
+  if(path?.length)L.polyline(path.map(p=>Array.isArray(p)?p:[p.lat,p.lng]),{color:"#26704c",weight:5}).addTo(group);
   return ()=>group.remove();
  },[location,washerLocation,points,path]);
  return <div className={"relative z-0 overflow-hidden bg-slate-100 "+className}><div ref={container} className="h-full w-full" aria-label="Service location map"/></div>;

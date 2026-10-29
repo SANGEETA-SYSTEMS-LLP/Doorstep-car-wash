@@ -19,7 +19,7 @@ function ReviewForm({
     <div className="flex min-h-screen items-center justify-center bg-slate-50 p-5">
       <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-7 sm:p-9">
         <div className="text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-700">
             <UserRound size={30} />
           </div>
           <h1 className="mt-5 text-3xl font-bold">How was your service?</h1>
@@ -41,14 +41,14 @@ function ReviewForm({
             value={review}
             onChange={(event) => setReview(event.target.value)}
             placeholder="Tell us about your service experience..."
-            className="mt-2 w-full resize-none rounded-xl border border-slate-300 p-4 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            className="mt-2 w-full resize-none rounded-xl border border-slate-300 p-4 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"
           />
         </div>
         {error && <p role="alert" className="mt-4 text-sm text-red-600">{error}</p>}
         <button
           disabled={!rating || processing}
           onClick={submitReview}
-          className="mt-6 w-full rounded-xl bg-blue-600 py-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-6 w-full rounded-xl bg-green-600 py-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
           {processing ? "Processing..." : "Submit Review"}
         </button>

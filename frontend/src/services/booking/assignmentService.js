@@ -1,5 +1,4 @@
 import { apiRequest } from "../core/api";
-import { supabase } from "../auth/supabase";
 
 export async function findWasherForBooking(bookingId) {
   if (!bookingId) {
@@ -14,27 +13,14 @@ export async function findWasherForBooking(bookingId) {
 export async function acceptAssignment(
   assignmentId
 ) {
-  const { data, error } =
-    await supabase.rpc(
-      "accept_booking_assignment",
-      {
-        p_assignment_id:
-          assignmentId,
-      }
-    );
-
-  if (error) {
-    console.error(
-      "Accept assignment error:",
-      error
-    );
-
-    throw error;
-  }
+  if (!assignmentId) throw new Error("Assignment ID is required.");
+  const { data } = await apiRequest(`/assignments/${encodeURIComponent(assignmentId)}/accept`, {
+    method: "POST",
+  });
 
   // Earnings are finalized after service/payment, not during acceptance.
 
-  return data;
+  return data.assignment;
 }
 
 export async function rejectAssignment(assignmentId, reason = null) {

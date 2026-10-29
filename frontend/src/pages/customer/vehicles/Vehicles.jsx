@@ -55,8 +55,9 @@ function Vehicles() {
 
   if (loading) {
     return (
-      <div role="status" className="p-8">
-        Loading vehicles...
+      <div role="status" aria-label="Loading vehicles" className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
+        <span className="sr-only">Loading vehicles</span>
+        {[0, 1, 2].map(item => <div key={item} className="animate-pulse border border-slate-200 bg-[#fbfcfb] p-5"><div className="h-5 w-36 rounded bg-slate-200"/><div className="mt-4 h-4 w-28 rounded bg-slate-100"/><div className="mt-7 h-10 w-full rounded bg-slate-100"/></div>)}
       </div>
     );
   }
@@ -66,7 +67,7 @@ function Vehicles() {
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <p className="font-semibold text-blue-600">
+            <p className="font-semibold text-green-600">
               GARAGE
             </p>
 
@@ -83,7 +84,7 @@ function Vehicles() {
             onClick={() =>
               navigate("/customer/vehicles/add")
             }
-            className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white"
+            className="flex items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-semibold text-white"
           >
             <Plus size={18} />
             Add Vehicle
@@ -113,7 +114,7 @@ function Vehicles() {
 
             <button
               onClick={() => navigate("/customer/vehicles/add")}
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-semibold text-white"
             >
               <Plus size={18} />
               Add Vehicle

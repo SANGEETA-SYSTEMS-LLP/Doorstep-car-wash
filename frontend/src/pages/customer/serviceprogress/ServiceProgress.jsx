@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
-import { supabase } from "../../../services/auth/supabase";
 import { getBookingById } from "../../../services/booking/bookingService";
 import ExtraChargeRequests from "./ExtraChargeRequests";
 import ServiceProgressContent from "./ServiceProgressContent";
@@ -17,29 +16,20 @@ function ServiceProgress() {
     const bookingId = booking.databaseBookingId;
     if (!bookingId) { setError("Booking details are unavailable."); return; }
     let active = true;
-    let revision = 0;
     const applyBooking = (data) => {
       if (!active) return;
       statusUpdater.current(data.status);
       if (data.status === "service_completed") navigate("/customer/service-completed", { replace: true });
     };
     const refresh = async () => {
-      const version = revision;
       try {
         const data = await getBookingById(bookingId);
-        if (active && version === revision) { setError(""); applyBooking(data); }
+        if (active) { setError(""); applyBooking(data); }
       } catch (error) { if (active) setError(error.message || "Unable to load booking."); }
     };
-    const channel = supabase.channel("service-progress-" + bookingId)
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "bookings", filter: "id=eq." + bookingId }, (payload) => {
-        revision += 1;
-        applyBooking(payload.new);
-      }).subscribe((status) => {
-        if (status === "SUBSCRIBED") refresh();
-        if (active && (status === "CHANNEL_ERROR" || status === "TIMED_OUT")) setError("Live updates are unavailable. Please refresh to check the booking.");
-      });
     refresh();
-    return () => { active = false; supabase.removeChannel(channel); };
+    const timer = setInterval(refresh, 15000);
+    return () => { active = false; clearInterval(timer); };
   }, [booking.databaseBookingId, navigate]);
 
   return (
@@ -47,7 +37,7 @@ function ServiceProgress() {
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
+            <p className="text-xs font-bold uppercase tracking-wider text-green-600">
               {booking.bookingId || "Booking"}
             </p>
 
@@ -56,8 +46,8 @@ function ServiceProgress() {
             </h1>
           </div>
 
-          <div className="flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-blue-600" />
+          <div className="flex items-center gap-2 rounded-full bg-green-50 px-4 py-2 text-sm font-semibold text-green-700">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-green-600" />
             In Progress
           </div>
         </div>

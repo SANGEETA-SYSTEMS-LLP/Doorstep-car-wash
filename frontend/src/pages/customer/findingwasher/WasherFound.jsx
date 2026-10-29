@@ -9,7 +9,7 @@ function WasherFound({ onTrack }) {
       </p>
       <button
         onClick={onTrack}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 font-semibold text-white"
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-3.5 font-semibold text-white"
       >
         <Navigation size={18} />
         Track Washer

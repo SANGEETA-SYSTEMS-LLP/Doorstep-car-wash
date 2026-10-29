@@ -1,7 +1,7 @@
 import {
   MapPin,
   Car,
-  Sparkles,
+  Droplets,
   CalendarDays,
   CheckCircle2,
 } from "lucide-react";
@@ -9,7 +9,7 @@ import {
 const steps = [
   { id: 1, title: "Location", icon: MapPin },
   { id: 2, title: "Vehicle", icon: Car },
-  { id: 3, title: "Package", icon: Sparkles },
+  { id: 3, title: "Package", icon: Droplets },
   { id: 4, title: "Schedule", icon: CalendarDays },
   { id: 5, title: "Review", icon: CheckCircle2 },
 ];
@@ -32,7 +32,7 @@ function BookingSteps({ currentStep }) {
                     completed
                       ? "bg-green-600 text-white"
                       : active
-                      ? "bg-blue-600 text-white"
+                      ? "bg-green-600 text-white"
                       : "bg-slate-100 text-slate-400"
                   }`}
                 >

@@ -5,7 +5,7 @@ function SchedulePicker({ dates, slots, selectedDate, setSelectedDate, selectedT
   return (
     <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 lg:p-8">
       <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-50 text-green-600">
           <CalendarDays />
         </div>
         <div>
@@ -21,12 +21,12 @@ function SchedulePicker({ dates, slots, selectedDate, setSelectedDate, selectedT
               key={item.id}
               onClick={() => setSelectedDate(item.id)}
               className={`rounded-2xl border p-4 transition ${
-                active ? "border-blue-600 bg-blue-600 text-white" : "border-slate-200 hover:border-blue-300"
+                active ? "border-green-600 bg-green-600 text-white" : "border-slate-200 hover:border-green-300"
               }`}
             >
-              <p className={`text-xs ${active ? "text-blue-100" : "text-slate-400"}`}>{item.today ? "Today" : item.day}</p>
+              <p className={`text-xs ${active ? "text-green-100" : "text-slate-400"}`}>{item.today ? "Today" : item.day}</p>
               <p className="mt-1 text-2xl font-bold">{item.date}</p>
-              <p className={`text-xs ${active ? "text-blue-100" : "text-slate-400"}`}>{item.month} {item.year}</p>
+              <p className={`text-xs ${active ? "text-green-100" : "text-slate-400"}`}>{item.month} {item.year}</p>
             </button>
           );
         })}
@@ -34,7 +34,7 @@ function SchedulePicker({ dates, slots, selectedDate, setSelectedDate, selectedT
       <label className="mt-5 block text-sm font-semibold">Choose another date<input type="date" min={dates[0].iso} max={dates.at(-1).iso} value={dates.some(day => day.iso === selectedDate) ? selectedDate : ""} onChange={event => setSelectedDate(event.target.value)} className="ml-3 rounded-xl border border-slate-300 p-3" /></label>
       <div className="my-8 border-t border-slate-100" />
       <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-50 text-green-600">
           <Clock3 />
         </div>
         <div>
@@ -53,7 +53,7 @@ function SchedulePicker({ dates, slots, selectedDate, setSelectedDate, selectedT
               aria-pressed={active && !disabled}
               onClick={() => setSelectedTime(time)}
               className={`rounded-xl border px-3 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${
-                active && !disabled ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600 hover:border-blue-300"
+                active && !disabled ? "border-green-600 bg-green-50 text-green-700" : "border-slate-200 text-slate-600 hover:border-green-300"
               }`}
             >
               {time}

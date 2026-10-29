@@ -16,14 +16,14 @@ function LoginCredentialsForm({ showPassword, setShowPassword, email, setEmail, 
             onChange={(event) => setEmail(event.target.value)}
             required
             placeholder="you@example.com"
-            className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-12 pr-4 outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-100"
           />
         </div>
       </div>
       <div>
         <div className="mb-2 flex items-center justify-between">
           <label className="text-sm font-semibold text-slate-700">Password</label>
-          <Link to="/forgot-password" className="text-sm font-semibold text-blue-600 hover:text-blue-700">
+          <Link to="/forgot-password" className="text-sm font-semibold text-green-600 hover:text-green-700">
             Forgot password?
           </Link>
         </div>
@@ -36,7 +36,7 @@ function LoginCredentialsForm({ showPassword, setShowPassword, email, setEmail, 
             onChange={(event) => setPassword(event.target.value)}
             required
             placeholder="Enter your password"
-            className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-12 pr-12 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-12 pr-12 outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-100"
           />
           <button
             type="button"
@@ -54,7 +54,7 @@ function LoginCredentialsForm({ showPassword, setShowPassword, email, setEmail, 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-blue-600 py-3.5 font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-50"
+        className="w-full rounded-xl bg-green-600 py-3.5 font-semibold text-white shadow-sm transition hover:bg-green-700 disabled:opacity-50"
       >
         {loading ? "Signing In..." : "Login"}
       </button>

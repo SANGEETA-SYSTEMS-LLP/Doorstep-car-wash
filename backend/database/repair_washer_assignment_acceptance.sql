@@ -201,6 +201,80 @@ BEGIN
 END;
 $function$;
 
+-- Backend wrapper for the service-role API. The API resolves p_washer_id from
+-- the authenticated user before calling this function. Do not grant this to
+-- anon or authenticated because those roles could choose arbitrary washer IDs.
+CREATE OR REPLACE FUNCTION public.accept_booking_assignment_for_user(
+  p_assignment_id uuid,
+  p_user_id uuid
+) RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $function$
+DECLARE
+  v_washer public.washers%rowtype;
+  v_assignment public.booking_assignments%rowtype;
+  v_booking public.bookings%rowtype;
+BEGIN
+  IF p_user_id IS NULL OR NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = p_user_id AND role = 'washer' AND is_active = true) THEN
+    RAISE EXCEPTION 'Active washer account required.' USING errcode = '42501';
+  END IF;
+  SELECT * INTO v_washer FROM public.washers WHERE user_id = p_user_id AND is_active = true FOR UPDATE;
+  IF NOT FOUND OR v_washer.is_verified IS DISTINCT FROM true THEN
+    RAISE EXCEPTION 'Supervisor verification is required before accepting jobs.' USING errcode = '42501';
+  END IF;
+  IF v_washer.status IS DISTINCT FROM 'available' THEN
+    RAISE EXCEPTION 'Go online before accepting a booking.' USING errcode = '40001';
+  END IF;
+  SELECT * INTO v_assignment FROM public.booking_assignments WHERE id = p_assignment_id;
+  IF NOT FOUND OR v_assignment.washer_id <> v_washer.id THEN
+    RAISE EXCEPTION 'Assignment not found.' USING errcode = '42501';
+  END IF;
+  IF v_assignment.status <> 'pending' OR v_assignment.expires_at IS NULL OR v_assignment.expires_at <= now() THEN
+    RAISE EXCEPTION 'Assignment is no longer available.' USING errcode = '40001';
+  END IF;
+  SELECT * INTO v_booking FROM public.bookings WHERE id = v_assignment.booking_id FOR UPDATE;
+  IF NOT FOUND OR NOT public.booking_washer_is_eligible(v_booking.id, v_washer.id) THEN
+    RAISE EXCEPTION 'Booking is no longer eligible for this washer.' USING errcode = '40001';
+  END IF;
+  SELECT * INTO v_assignment FROM public.booking_assignments WHERE id = p_assignment_id FOR UPDATE;
+  IF NOT FOUND OR v_assignment.washer_id IS DISTINCT FROM v_washer.id
+     OR v_assignment.status IS DISTINCT FROM 'pending' OR v_assignment.expires_at IS NULL OR v_assignment.expires_at <= now() THEN
+    RAISE EXCEPTION 'Assignment is no longer available.' USING errcode = '40001';
+  END IF;
+  UPDATE public.bookings SET assigned_washer_id = v_washer.id, status = 'washer_assigned',
+    requires_supervisor = false, updated_at = now()
+   WHERE id = v_booking.id RETURNING * INTO v_booking;
+  UPDATE public.booking_assignments SET status = 'accepted', responded_at = now()
+   WHERE id = v_assignment.id RETURNING * INTO v_assignment;
+  UPDATE public.booking_assignments SET status = 'cancelled', responded_at = now(),
+    rejection_reason = 'Another washer accepted this booking.'
+   WHERE booking_id = v_booking.id AND id <> v_assignment.id AND status = 'pending';
+  UPDATE public.washers SET status = 'busy', updated_at = now() WHERE id = v_washer.id;
+  RETURN jsonb_build_object('booking', to_jsonb(v_booking), 'assignment', to_jsonb(v_assignment));
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.accept_booking_assignment_for_washer(
+  p_assignment_id uuid,
+  p_washer_id uuid
+) RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $function$
+DECLARE v_user_id uuid;
+BEGIN
+  SELECT user_id INTO v_user_id FROM public.washers
+   WHERE id = p_washer_id AND is_active = true AND is_verified = true;
+  IF NOT FOUND OR v_user_id IS NULL OR NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = v_user_id AND role = 'washer' AND is_active = true) THEN
+    RAISE EXCEPTION 'Active verified washer account required.' USING errcode = '42501';
+  END IF;
+  RETURN public.accept_booking_assignment_for_user(p_assignment_id, v_user_id);
+END;
+$function$;
+
 -- Supervisor selection creates an offer only. Acceptance confirms the washer.
 DROP FUNCTION IF EXISTS public.supervisor_assign_washer(uuid, uuid, uuid);
 CREATE FUNCTION public.supervisor_assign_washer(
@@ -254,6 +328,9 @@ GRANT EXECUTE ON FUNCTION public.supervisor_assign_washer(uuid, uuid, uuid) TO s
 REVOKE ALL ON FUNCTION public.booking_washer_is_eligible(uuid, uuid) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.accept_booking_assignment(uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.accept_booking_assignment(uuid) TO authenticated;
+REVOKE ALL ON FUNCTION public.accept_booking_assignment_for_washer(uuid, uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.accept_booking_assignment_for_washer(uuid, uuid) TO service_role;
+REVOKE ALL ON FUNCTION public.accept_booking_assignment_for_user(uuid, uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.booking_washer_is_eligible(uuid, uuid) TO service_role;
 
 COMMIT;

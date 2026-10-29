@@ -15,7 +15,7 @@ function ServicePhotos({ beforePhotos, afterPhotos, loading, error, onRefresh, o
       {loading && <p role="status" className="mt-6 text-slate-500">Loading service photos...</p>}
       {error && <p role="alert" className="mt-6 text-red-600">{error}</p>}
       {!loading && (
-        <button type="button" onClick={onRefresh} className="mt-4 text-sm font-semibold text-blue-600">
+        <button type="button" onClick={onRefresh} className="mt-4 text-sm font-semibold text-green-600">
           Refresh photos
         </button>
       )}
@@ -31,6 +31,8 @@ function ServicePhotos({ beforePhotos, afterPhotos, loading, error, onRefresh, o
                     key={photo.id}
                     src={photo.url}
                     alt={`Vehicle ${type} service`}
+                    loading="lazy"
+                    decoding="async"
                     className="h-40 w-full rounded-xl object-cover"
                     onError={() => onError("A photo could not be loaded. Refresh photos to try again.")}
                   />

@@ -44,7 +44,7 @@ export async function openRazorpayPayment(savedBooking, completeBooking, onError
       }
     },
     modal: { ondismiss: onDone },
-    theme: { color: "#2563eb" },
+    theme: { color: "#26704c" },
   });
   checkout.on("payment.failed", (response) => {
     onError(response.error?.description || "Payment failed. Please try again.");

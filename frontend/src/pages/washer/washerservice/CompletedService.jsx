@@ -24,7 +24,7 @@ function CompletedService({ jobStatus, validating, onValidate, onDashboard }) {
         </p>
       </div>
       {completed ? (
-        <button onClick={onDashboard} className="mt-7 w-full rounded-xl bg-blue-600 py-4 font-semibold text-white">
+        <button onClick={onDashboard} className="mt-7 w-full rounded-xl bg-green-600 py-4 font-semibold text-white">
           Back to Dashboard
         </button>
       ) : (
@@ -32,7 +32,7 @@ function CompletedService({ jobStatus, validating, onValidate, onDashboard }) {
           type="button"
           onClick={onValidate}
           disabled={validating}
-          className="mt-7 w-full rounded-xl bg-blue-600 py-4 font-semibold text-white disabled:opacity-50"
+          className="mt-7 w-full rounded-xl bg-green-600 py-4 font-semibold text-white disabled:opacity-50"
         >
           {validating ? "Validating..." : "Validate and complete job"}
         </button>

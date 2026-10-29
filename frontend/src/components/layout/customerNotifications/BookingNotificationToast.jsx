@@ -8,12 +8,12 @@ export default function BookingNotificationToast() {
 
   return (
     <div
-      className="fixed right-4 top-4 z-50 w-[min(24rem,calc(100vw-2rem))] rounded-2xl border border-blue-200 bg-white p-4 shadow-xl"
+      className="fixed right-4 top-4 z-50 w-[min(24rem,calc(100vw-2rem))] rounded-lg border border-green-200 bg-[#fbfcfb] p-4 shadow-md"
       role="status"
       aria-live="polite"
     >
       <div className="flex items-start gap-3">
-        <Bell size={20} className="mt-0.5 shrink-0 text-blue-600" aria-hidden="true" />
+        <Bell size={20} className="mt-0.5 shrink-0 text-green-600" aria-hidden="true" />
         <div className="min-w-0 flex-1">
           <p className="font-bold text-slate-900">{context.toast.title}</p>
           <p className="mt-1 text-sm text-slate-600">{context.toast.message}</p>
@@ -30,4 +30,3 @@ export default function BookingNotificationToast() {
     </div>
   );
 }
-

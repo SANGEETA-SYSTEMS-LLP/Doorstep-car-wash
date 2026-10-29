@@ -15,7 +15,7 @@ function StatusItem({
             completed
               ? "bg-green-600 text-white"
               : active
-              ? "bg-blue-600 text-white"
+              ? "bg-green-600 text-white"
               : "bg-slate-100 text-slate-400"
           }`}
         >
@@ -41,7 +41,7 @@ function StatusItem({
         <p
           className={`text-sm font-semibold ${
             active
-              ? "text-blue-700"
+              ? "text-green-700"
               : completed
               ? "text-slate-800"
               : "text-slate-400"

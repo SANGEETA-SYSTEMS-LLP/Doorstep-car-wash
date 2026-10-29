@@ -73,7 +73,7 @@ function PaymentSummary({ booking, servicePrice, platformFee, discount, offerDis
               <button
                 onClick={handlePayment}
                 disabled={processing || !compatible}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-4 font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {processing ? (
                   <>

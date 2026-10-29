@@ -23,7 +23,7 @@ function WasherDashboardActiveJob({ activeJob, navigate }) {
                     </p>
                   </div>
 
-                  <span className="w-fit rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700">
+                  <span className="w-fit rounded-full bg-green-50 px-4 py-2 text-sm font-bold text-green-700">
                     Accepted
                   </span>
                 </div>
@@ -47,7 +47,7 @@ function WasherDashboardActiveJob({ activeJob, navigate }) {
 
                 <div className="mt-6 rounded-2xl bg-slate-50 p-5">
                   <div className="flex gap-3">
-                    <MapPin className="shrink-0 text-blue-600" />
+                    <MapPin className="shrink-0 text-green-600" />
 
                     <div>
                       <p className="font-bold">
@@ -67,7 +67,7 @@ function WasherDashboardActiveJob({ activeJob, navigate }) {
                       `/washer/jobs/${activeJob.id}`
                     )
                   }
-                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 font-semibold text-white"
+                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-4 font-semibold text-white"
                 >
                   View Active Job
                   <Navigation size={18} />

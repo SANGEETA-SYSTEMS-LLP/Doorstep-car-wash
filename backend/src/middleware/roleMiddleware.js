@@ -1,3 +1,5 @@
+import { isPrimaryAdminEmail } from "../../../shared/adminAccess.mjs";
+
 export function allowRoles(...allowedRoles) {
   return (req, res, next) => {
     if (!req.profile) return res.status(401).json({ message: "Authentication required." });
@@ -7,4 +9,11 @@ export function allowRoles(...allowedRoles) {
     }
     next();
   };
+}
+
+export function restrictSuperAdminToPrimaryEmail(req, res, next) {
+  if (req.profile?.role === "super_admin" && !isPrimaryAdminEmail(req.user?.email)) {
+    return res.status(403).json({ message: "You do not have permission to access the admin console." });
+  }
+  next();
 }

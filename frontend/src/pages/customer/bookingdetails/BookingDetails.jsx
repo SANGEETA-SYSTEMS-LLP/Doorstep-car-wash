@@ -64,7 +64,7 @@ function BookingDetails() {
     );
   }
 
-  return <><div className="px-8 pt-5"><Link className="text-blue-700 underline" to={"/customer/invoices/"+booking.id}>Open booking invoice</Link></div><BookingDetailsContent navigate={navigate} booking={booking} /></>;
+  return <><div className="px-8 pt-5"><Link className="text-green-700 underline" to={"/customer/invoices/"+booking.id}>Open booking invoice</Link></div><BookingDetailsContent navigate={navigate} booking={booking} /></>;
 }
 
 export default BookingDetails;

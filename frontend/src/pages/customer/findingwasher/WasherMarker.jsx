@@ -4,7 +4,7 @@ function WasherMarker({ className, label }) {
   return (
     <div className={`absolute z-10 ${className}`}>
       <div className="relative">
-        <div className="flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-emerald-500 text-white shadow-lg">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-emerald-500 text-white shadow-md">
           <UserRound size={19} />
         </div>
 

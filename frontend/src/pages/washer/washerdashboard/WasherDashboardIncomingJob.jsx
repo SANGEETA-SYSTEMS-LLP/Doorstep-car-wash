@@ -3,10 +3,10 @@ import JobInfo from "./JobInfo";
 
 function WasherDashboardIncomingJob({ job, incomingJob, responding, handleAcceptJob, handleRejectJob }) {
   return (
-    <section className="overflow-hidden rounded-3xl border-2 border-blue-300 bg-white shadow-lg">
-                  <div className="flex items-center justify-between bg-blue-600 p-5 text-white">
+    <section className="overflow-hidden rounded-3xl border-2 border-green-300 bg-white shadow-sm">
+                  <div className="flex items-center justify-between bg-green-600 p-5 text-white">
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-blue-100">
+                      <p className="text-xs font-bold uppercase tracking-wider text-green-100">
                         New Job Request
                       </p>
 
@@ -64,7 +64,7 @@ function WasherDashboardIncomingJob({ job, incomingJob, responding, handleAccept
                     <div className="mt-5 flex gap-3 rounded-2xl bg-slate-50 p-4">
                       <MapPin
                         size={20}
-                        className="mt-0.5 shrink-0 text-blue-600"
+                        className="mt-0.5 shrink-0 text-green-600"
                       />
 
                       <div>

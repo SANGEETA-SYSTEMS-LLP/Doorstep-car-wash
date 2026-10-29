@@ -80,25 +80,37 @@ export async function razorpayWebhook(
       const refund = event.payload?.refund?.entity;
       if (refund?.id && refund?.payment_id && refund?.notes?.cancellation_id) {
         const { data: cancellation, error: cancellationError } = await supabaseAdmin
-          .from("booking_cancellations").select("id,payment_id,refund_amount_paise")
+        .from("booking_cancellations").select("id,payment_id,refund_amount_paise,provider_refund_id,status")
           .eq("id", refund.notes.cancellation_id).maybeSingle();
         if (cancellationError) throw cancellationError;
         if (cancellation) {
           const { data: payment, error: paymentError } = await supabaseAdmin.from("payments")
             .select("provider_payment_id").eq("id", cancellation.payment_id).maybeSingle();
           if (paymentError) throw paymentError;
-          if (!payment || payment.provider_payment_id !== refund.payment_id
+          if (!/^rfnd_[A-Za-z0-9]+$/.test(refund.id)
+            || !payment || payment.provider_payment_id !== refund.payment_id
             || Number(refund.amount) !== Number(cancellation.refund_amount_paise)
             || refund.currency !== "INR") {
             throw new Error("Refund webhook does not match the saved cancellation.");
           }
+          if (cancellation.provider_refund_id && cancellation.provider_refund_id !== refund.id) {
+            throw new Error("Refund webhook ID does not match the cancellation record.");
+          }
           const status = event.event === "refund.processed" ? "refund_processed" : "refund_failed";
-          const { error: updateError } = await supabaseAdmin.from("booking_cancellations").update({
+          let update = supabaseAdmin.from("booking_cancellations").update({
             provider_refund_id: refund.id,
             provider_status: refund.status || event.event.slice("refund.".length),
             status,
             updated_at: new Date().toISOString(),
-          }).eq("id", cancellation.id);
+          }).eq("id", cancellation.id)
+            .or(`provider_refund_id.is.null,provider_refund_id.eq.${refund.id}`);
+          // Provider events can arrive out of order. A processed refund is
+          // terminal; a delayed failure cannot move it backwards. A processed
+          // event may still advance an earlier failed event to the final state.
+          update = event.event === "refund.processed"
+            ? update.in("status", ["refund_pending", "refund_failed"])
+            : update.eq("status", "refund_pending");
+          const { error: updateError } = await update;
           if (updateError) throw updateError;
         }
       }
@@ -135,10 +147,11 @@ export async function razorpayWebhook(
 
         if (payment) {
           validateCapturedPayment(entity, payment);
+          if (payment.status === "paid" && payment.provider_payment_id !== entity.id) {
+            throw new Error("Captured provider payment conflicts with the saved order payment.");
+          }
           if (payment.status !== "paid") {
-            const {
-              error: paymentUpdateError,
-            } = await supabaseAdmin
+            const { data: updatedPayment, error: paymentUpdateError } = await supabaseAdmin
               .from("payments")
               .update({
                 status: "paid",
@@ -153,10 +166,22 @@ export async function razorpayWebhook(
 
                 updated_at: now,
               })
-              .eq("id", payment.id);
+              .eq("id", payment.id)
+              .in("status", ["created", "failed", "paid"])
+              .or(`provider_payment_id.is.null,provider_payment_id.eq.${entity.id}`)
+              .select("id")
+              .maybeSingle();
 
             if (paymentUpdateError) {
               throw paymentUpdateError;
+            }
+            if (!updatedPayment) {
+              const { data: latest, error: latestError } = await supabaseAdmin.from("payments")
+                .select("status,provider_payment_id").eq("id", payment.id).maybeSingle();
+              if (latestError) throw latestError;
+              if (latest?.status !== "paid" || latest.provider_payment_id !== entity.id) {
+                throw new Error("Captured provider payment conflicts with the saved order payment.");
+              }
             }
           }
 

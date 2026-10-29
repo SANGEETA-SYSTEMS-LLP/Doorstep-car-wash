@@ -58,7 +58,7 @@ export default function WasherReviews() {
 
   return <section className="mx-auto max-w-5xl">
     <div className="flex flex-wrap items-end justify-between gap-4">
-      <div><p className="text-sm font-semibold text-blue-700">Washer onboarding</p><h1 className="mt-1 text-3xl font-black text-slate-900">Washer verification</h1><p className="mt-2 text-slate-600">Review each washer’s account and service location. Verified washers remain offline until they choose to go online.</p></div>
+      <div><p className="text-sm font-semibold text-green-700">Washer onboarding</p><h1 className="mt-1 text-3xl font-black text-slate-900">Washer verification</h1><p className="mt-2 text-slate-600">Review each washer’s account and service location. Verified washers remain offline until they choose to go online.</p></div>
       <button type="button" onClick={() => setRefreshCount(value => value + 1)} disabled={loading} className="inline-flex items-center gap-2 rounded-xl border bg-white px-4 py-2.5 font-semibold text-slate-700 disabled:opacity-50"><RefreshCw size={16} className={loading ? "animate-spin" : ""} />Refresh</button>
     </div>
     {error && <p role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">{error}</p>}
@@ -77,7 +77,7 @@ export default function WasherReviews() {
           <div className="rounded-xl bg-slate-50 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Contact</p><p className="mt-2 flex items-center gap-2 text-sm"><Phone size={15} />{washer.profile?.phone || "Phone missing"}</p><p className="mt-2 text-sm">Status: {washer.status || "offline"}</p></div>
           <div className="rounded-xl bg-slate-50 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Service location</p><p className="mt-2 flex items-start gap-2 text-sm"><MapPin className="mt-0.5 shrink-0" size={15} /><span>{washer.current_address || "Address missing"}</span></p><p className="mt-2 text-xs text-slate-500">{point?.latitude != null && point?.longitude != null ? `Map pin: ${Number(point.latitude).toFixed(5)}, ${Number(point.longitude).toFixed(5)}` : "Map location missing"}</p></div>
         </div>
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4"><p className="text-sm text-slate-600">{complete ? "Required account and location details are complete." : "Washer must complete their name, phone, full service address, and map location before approval."}</p><button type="button" disabled={!complete || Boolean(busyId)} onClick={() => verify(washer)} className="rounded-xl bg-blue-700 px-5 py-2.5 font-semibold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-40">{busyId === washer.id ? "Verifying…" : "Verify washer"}</button></div>
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4"><p className="text-sm text-slate-600">{complete ? "Required account and location details are complete." : "Washer must complete their name, phone, full service address, and map location before approval."}</p><button type="button" disabled={!complete || Boolean(busyId)} onClick={() => verify(washer)} className="rounded-xl bg-green-700 px-5 py-2.5 font-semibold text-white hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-40">{busyId === washer.id ? "Verifying…" : "Verify washer"}</button></div>
       </article>;
     })}</div>
   </section>;

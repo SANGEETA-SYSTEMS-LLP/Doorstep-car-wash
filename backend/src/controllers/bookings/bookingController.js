@@ -55,7 +55,7 @@ export async function createBooking(req,res,next) {
   const bookingValues={id:requestId,customer_id:customer.id,address_id:addressId,vehicle_id:vehicleId,package_id:packageId,service_address:address.address_line,latitude:address.latitude,longitude:address.longitude,tower:address.tower,flat_number:address.flat_number,landmark:address.landmark,scheduled_date:date,scheduled_start_time:time,scheduled_time:time,base_amount:price,service_amount:price,platform_fee:checkoutAmounts.platformFee,discount_amount:checkoutAmounts.discountAmount,tax_amount:checkoutAmounts.taxAmount,total_amount:checkoutAmounts.totalAmount,payment_method:paymentMethod,status:"pending",requires_supervisor:true};
   if(normalizedPromoCode)bookingValues.promo_code=normalizedPromoCode;
   const {data,error}=await db.from("bookings").insert(bookingValues).select("*").single();
-  if(error?.code==="23505")return res.status(409).json({message:normalizedPromoCode==="FIRSTWASH"?"FIRSTWASH has already been redeemed on another booking.":"This request was already saved. Retry to retrieve it."});if(error)throw error;
+  if(error?.code==="23505")return res.status(409).json({message:normalizedPromoCode?"This offer was already redeemed on another booking.":"This request was already saved. Retry to retrieve it."});if(error)throw error;
   res.status(201).json({booking:data});
  }catch(error){
   if (["PGRST204", "42703"].includes(error.code)) {

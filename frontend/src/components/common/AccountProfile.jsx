@@ -21,7 +21,7 @@ export default function AccountProfile({ children, customerView = false, notice 
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <div className="mx-auto max-w-6xl">
         <header className="mb-7 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-700">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-green-700">
             Account settings
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
@@ -55,7 +55,7 @@ export default function AccountProfile({ children, customerView = false, notice 
             <button
               type="button"
               onClick={refresh}
-              className="mt-5 rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-600/20"
+              className="mt-5 rounded-xl bg-green-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-600/20"
             >
               Try again
             </button>
@@ -123,7 +123,7 @@ function ProfileForm({ profile, refresh, compact = false }) {
       <aside className="min-w-0 md:sticky md:top-6">
         <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex min-w-0 items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-xl font-bold text-blue-800 ring-1 ring-blue-100">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-xl font-bold text-green-800 ring-1 ring-green-100">
               {initials}
             </div>
             <div className="min-w-0">
@@ -170,7 +170,7 @@ function ProfileForm({ profile, refresh, compact = false }) {
           className="scroll-mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8"
         >
           <div className="flex min-w-0 items-start gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700">
               <UserRound size={21} aria-hidden="true" />
             </div>
             <div className="min-w-0">
@@ -206,7 +206,7 @@ function ProfileForm({ profile, refresh, compact = false }) {
               <span className="mb-2 block text-sm font-semibold text-slate-800">
                 Full name
               </span>
-              <span className="flex h-14 items-center gap-3 rounded-xl border border-slate-300 bg-white px-4 transition focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-600/10">
+              <span className="flex h-14 items-center gap-3 rounded-xl border border-slate-300 bg-white px-4 transition focus-within:border-green-600 focus-within:ring-4 focus-within:ring-green-600/10">
                 <UserRound
                   size={18}
                   className="shrink-0 text-slate-400"
@@ -259,7 +259,7 @@ function ProfileForm({ profile, refresh, compact = false }) {
               <span className="mb-2 block text-sm font-semibold text-slate-800">
                 Mobile number
               </span>
-              <span className="flex h-14 items-center gap-3 rounded-xl border border-slate-300 bg-white px-4 transition focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-600/10">
+              <span className="flex h-14 items-center gap-3 rounded-xl border border-slate-300 bg-white px-4 transition focus-within:border-green-600 focus-within:ring-4 focus-within:ring-green-600/10">
                 <Phone
                   size={18}
                   className="shrink-0 text-slate-400"
@@ -287,7 +287,7 @@ function ProfileForm({ profile, refresh, compact = false }) {
             <button
               type="submit"
               disabled={saving || !name.trim() || !phone.trim()}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-600/20 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-green-700 px-5 py-3 font-semibold text-white transition hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-600/20 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {saving ? (
                 <>
@@ -310,10 +310,10 @@ function ProfileForm({ profile, refresh, compact = false }) {
           </div>
         </form>
 
-        {!compact && <section className="flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50/70 p-5">
+        {!compact && <section className="flex items-start gap-3 rounded-2xl border border-green-100 bg-green-50/70 p-5">
           <ShieldCheck
             size={19}
-            className="mt-0.5 shrink-0 text-blue-700"
+            className="mt-0.5 shrink-0 text-green-700"
             aria-hidden="true"
           />
           <div>

@@ -1,4 +1,4 @@
-import { Car, Clock3, Droplets, Image, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { Car, Clock3, Droplets, Image, ShieldCheck, UserRound } from "lucide-react";
 
 import PhotoPlaceholder from "./PhotoPlaceholder";
 
@@ -8,7 +8,7 @@ function ServiceProgressContent({ booking, washer }) {
     <main className="mx-auto max-w-7xl p-6 lg:p-8">
         {/* PROGRESS HERO */}
 
-        <section className="overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 to-cyan-500 p-7 text-white lg:p-9">
+        <section className="overflow-hidden border-y border-slate-300 bg-green-900 p-7 text-white lg:p-9">
           <div className="flex flex-col justify-between gap-7 md:flex-row md:items-center">
             <div>
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15">
@@ -19,18 +19,18 @@ function ServiceProgressContent({ booking, washer }) {
                 Your car is getting cleaned
               </h2>
 
-              <p className="mt-3 max-w-xl text-blue-100">
+              <p className="mt-3 max-w-xl text-green-100">
                 {washer?.name || "Your washer"} is currently working on your{" "}
                 {booking.package?.name || "car wash"}.
               </p>
             </div>
 
-            <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
+            <div className="rounded-2xl border border-white/15 bg-white/5 p-5">
               <div className="flex items-center gap-3">
                 <Clock3 />
 
                 <div>
-                  <p className="text-xs text-blue-100">
+                  <p className="text-xs text-green-100">
                     Booking status
                   </p>
 
@@ -59,7 +59,7 @@ function ServiceProgressContent({ booking, washer }) {
                 </p>
               </div>
 
-              <Sparkles className="text-blue-600" />
+              <Droplets className="text-green-800" />
             </div>
 
             <p className="mt-8 text-slate-500">Your washer is completing the service checklist and uploading photos. This page will update when the service is completed.</p>
@@ -74,7 +74,7 @@ function ServiceProgressContent({ booking, washer }) {
               </p>
 
               <div className="mt-5 flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700">
                   <UserRound size={26} />
                 </div>
 
@@ -96,7 +96,7 @@ function ServiceProgressContent({ booking, washer }) {
 
             <div className="rounded-3xl border border-slate-200 bg-white p-6">
               <div className="flex items-center gap-3">
-                <Car className="text-blue-600" />
+                <Car className="text-green-600" />
 
                 <div>
                   <p className="font-bold">
@@ -114,7 +114,7 @@ function ServiceProgressContent({ booking, washer }) {
 
             <div className="rounded-3xl border border-slate-200 bg-white p-6">
               <div className="flex items-center gap-2">
-                <Image size={19} className="text-blue-600" />
+                <Image size={19} className="text-green-600" />
 
                 <h3 className="font-bold">
                   Before Service Photos

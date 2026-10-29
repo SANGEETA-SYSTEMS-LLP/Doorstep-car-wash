@@ -4,7 +4,7 @@ function WasherProfileSummary() {
   return (
     <aside>
       <div className="rounded-3xl border border-slate-200 bg-white p-7 text-center">
-        <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+        <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-green-100 text-green-700">
           <UserRound size={50} />
         </div>
         <h2 className="mt-5 text-2xl font-bold">Rahul Kumar</h2>

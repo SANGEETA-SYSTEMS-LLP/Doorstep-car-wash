@@ -72,7 +72,10 @@ CREATE OR REPLACE FUNCTION public.reserve_supervisor_payout(
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $function$
 DECLARE v_operation public.supervisor_payout_operations%rowtype; v_amount bigint;
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = p_actor AND role IN ('accountant','super_admin') AND is_active = true) THEN
+  -- This function is service-role-only, so p_actor is supplied by the API.
+  -- Validate that actor at the database boundary instead of trusting caller
+  -- role checks alone; a mismatched/inactive actor cannot reserve a payout.
+  IF p_actor IS NULL OR NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = p_actor AND role IN ('accountant','super_admin') AND is_active = true) THEN
     RAISE EXCEPTION 'Finance role required.';
   END IF;
   IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = p_supervisor_id AND role = 'supervisor' AND is_active = true) THEN
@@ -80,7 +83,7 @@ BEGIN
   END IF;
   SELECT * INTO v_operation FROM public.supervisor_payout_operations WHERE id = p_id;
   IF FOUND THEN
-    IF v_operation.supervisor_id <> p_supervisor_id THEN RAISE EXCEPTION 'Payout request ID is already used.'; END IF;
+    IF v_operation.supervisor_id <> p_supervisor_id OR v_operation.created_by <> p_actor THEN RAISE EXCEPTION 'Payout request ID is already used.'; END IF;
     RETURN v_operation;
   END IF;
   PERFORM id FROM public.supervisor_earnings WHERE supervisor_id = p_supervisor_id AND status = 'pending' AND payout_operation_id IS NULL FOR UPDATE;
@@ -104,12 +107,20 @@ DECLARE v_operation public.supervisor_payout_operations%rowtype; v_status text;
 BEGIN
   SELECT * INTO v_operation FROM public.supervisor_payout_operations WHERE id = p_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'Supervisor payout not found.'; END IF;
+  IF p_provider_id IS NULL OR p_provider_id = '' THEN RAISE EXCEPTION 'Provider payout ID is required.'; END IF;
+  IF v_operation.provider_id IS NOT NULL AND v_operation.provider_id <> p_provider_id THEN
+    RAISE EXCEPTION 'Provider payout ID does not match the reserved operation.';
+  END IF;
   v_status := CASE lower(p_status)
     WHEN 'pending' THEN 'pending' WHEN 'queued' THEN 'pending' WHEN 'processing' THEN 'pending' WHEN 'initiated' THEN 'pending'
     WHEN 'processed' THEN 'processed' WHEN 'failed' THEN 'failed' WHEN 'reversed' THEN 'reversed'
     WHEN 'cancelled' THEN 'failed' WHEN 'rejected' THEN 'failed' ELSE NULL END;
   IF v_status IS NULL THEN RAISE EXCEPTION 'Unsupported payout status.'; END IF;
+  -- Terminal results are monotonic: stale provider reads/events must never
+  -- reopen a completed or failed transfer. Only failed may advance to a later
+  -- processed result after a fresh provider reconciliation.
   IF v_operation.status IN ('processed','reversed','cancelled') THEN RETURN v_operation; END IF;
+  IF v_operation.status = 'failed' AND v_status <> 'processed' THEN RETURN v_operation; END IF;
   UPDATE public.supervisor_payout_operations SET provider_id = coalesce(provider_id, p_provider_id),
     provider_status = p_status, status = v_status, updated_at = now(),
     processed_at = CASE WHEN v_status = 'processed' THEN coalesce(processed_at, now()) ELSE processed_at END

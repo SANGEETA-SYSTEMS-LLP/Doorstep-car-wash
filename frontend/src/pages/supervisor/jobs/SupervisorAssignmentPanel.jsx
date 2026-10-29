@@ -36,7 +36,7 @@ function SupervisorAssignmentPanel({ washers, canAssign, loading, assigningId, o
                   <p className="mt-1 text-sm text-gray-600">{washer.address || "Washer address not saved"}</p>
                   <p className="mt-1 text-sm capitalize text-gray-600">{washer.status?.replaceAll("_", " ")}</p>
                   <p className="mt-1 text-sm text-gray-500">{washer.serviceAddressMatched ? "Same service address as customer" : washer.distanceKm == null ? "Distance unavailable" : `${washer.distanceKm} km away`}</p>
-                  {washer.extendedRadius && <p className="mt-2 rounded bg-blue-50 p-2 text-sm text-blue-800">Outside the normal {washer.serviceRadiusKm || 5} km radius. The customer must approve any travel charge requested by the washer.</p>}
+                  {washer.extendedRadius && <p className="mt-2 rounded bg-green-50 p-2 text-sm text-green-800">Outside the normal {washer.serviceRadiusKm || 5} km radius. The customer must approve any travel charge requested by the washer.</p>}
                   <p className="mt-1 text-sm text-gray-500">
                     Rating: {washer.rating ?? 0} · Jobs completed: {washer.jobs_completed ?? 0}
                   </p>
@@ -44,7 +44,7 @@ function SupervisorAssignmentPanel({ washers, canAssign, loading, assigningId, o
                 <button
                   onClick={() => onAssign(washer.id)}
                   disabled={Boolean(assigningId) || !washer.eligible}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {assigningId === washer.id ? "Assigning..." : "Assign washer"}
                 </button>

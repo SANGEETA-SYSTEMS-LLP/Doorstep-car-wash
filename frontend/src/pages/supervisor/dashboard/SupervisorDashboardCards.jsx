@@ -17,7 +17,7 @@ function SupervisorDashboardCards({ stats }) {
               <p className="text-sm font-medium text-slate-500">{title}</p>
               <p className="mt-3 text-3xl font-black text-slate-900">{value}</p>
             </div>
-            <div className="rounded-2xl bg-blue-50 p-3 text-blue-600">
+            <div className="rounded-2xl bg-green-50 p-3 text-green-600">
               <Icon size={24} />
             </div>
           </div>

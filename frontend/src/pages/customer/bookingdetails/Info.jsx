@@ -2,7 +2,7 @@
 function Info({ icon, label, value }) {
   return (
     <div className="flex gap-3">
-      <div className="text-blue-600">{icon}</div>
+      <div className="text-green-600">{icon}</div>
 
       <div>
         <p className="text-xs text-slate-400">

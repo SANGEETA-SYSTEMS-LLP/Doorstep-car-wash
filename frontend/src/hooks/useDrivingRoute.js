@@ -34,8 +34,8 @@ export default function useDrivingRoute(origin, destination) {
   }, [enabled, end?.lat, end?.lng]);
   return {
     path: enabled ? route?.path : undefined,
-    distance: enabled && route?.distanceMeters != null ? (route.distanceMeters / 1000).toFixed(1) : "—",
-    eta: enabled && route?.durationMillis != null ? Math.ceil(route.durationMillis / 60000) : "—",
+    distance: enabled && route?.distanceMeters != null ? (route.distanceMeters / 1000).toFixed(1) : "-",
+    eta: enabled && route?.durationMillis != null ? Math.ceil(route.durationMillis / 60000) : "-",
     error,
   };
 }

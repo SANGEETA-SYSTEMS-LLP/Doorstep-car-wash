@@ -33,7 +33,7 @@ function EscalationAssignment({ booking, washers, canAssign, loading, assigningI
           {washers.map((washer) => (
             <div key={washer.id} className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-gray-200 p-4">
               <div className="flex items-start gap-3">
-                <div className="rounded-full bg-blue-50 p-2 text-blue-700"><UserRound size={20} /></div>
+                <div className="rounded-full bg-green-50 p-2 text-green-700"><UserRound size={20} /></div>
                 <div>
                   <p className="font-semibold text-gray-900">Washer {washer.id.slice(0, 8)}</p>
                   <p className="mt-1 text-sm text-gray-500">{washer.distanceKm} km away</p>
@@ -45,7 +45,7 @@ function EscalationAssignment({ booking, washers, canAssign, loading, assigningI
               <button
                 onClick={() => onAssign(washer.id)}
                 disabled={Boolean(assigningId)}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {assigningId === washer.id ? "Assigning..." : "Assign washer"}
               </button>

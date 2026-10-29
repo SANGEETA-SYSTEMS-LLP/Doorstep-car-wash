@@ -32,7 +32,7 @@ function EscalationCard({ booking }) {
       </div>
       <Link
         to={`/supervisor/escalations/${booking.id}`}
-        className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-blue-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-950"
+        className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-green-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-950"
       >
         Review assignment
       </Link>

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Car } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { WashNowBrand } from "../../../components/layout/WashNowBrand";
 import LoginCredentialsForm from "./LoginCredentialsForm";
 
 function LoginForm({ showPassword, setShowPassword, email, setEmail, password, setPassword, handleSubmit, loading, error }) {
@@ -15,22 +16,11 @@ function LoginForm({ showPassword, setShowPassword, email, setEmail, password, s
           </Link>
 
           <div className="mb-8 lg:hidden">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white">
-                <Car size={24} />
-              </div>
-
-              <div>
-                <p className="text-xl font-bold">WashNow</p>
-                <p className="text-xs text-slate-500">
-                  Doorstep Car Care
-                </p>
-              </div>
-            </div>
+            <WashNowBrand />
           </div>
 
           <div>
-            <p className="font-semibold text-blue-600">
+            <p className="font-semibold text-green-600">
               WELCOME BACK
             </p>
 
@@ -61,7 +51,7 @@ function LoginForm({ showPassword, setShowPassword, email, setEmail, password, s
               Don't have an account?{" "}
               <Link
                 to="/register"
-                className="font-semibold text-blue-600 hover:text-blue-700"
+                className="font-semibold text-green-600 hover:text-green-700"
               >
                 Create account
               </Link>

@@ -1,38 +1,14 @@
 @import "tailwindcss";
 
-/* Shared visual system: deep ocean blue, restrained teal, and cool neutral surfaces. */
+/* Shared visual system: WashNow green with cool neutral surfaces. */
 @theme {
-  --font-sans: Inter, "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
-  --color-brand: #205d82;
-  --color-brand-strong: #194c6b;
-  --color-brand-soft: #eff6fb;
-  --color-surface: #ffffff;
+  --font-sans: "Aptos", "Segoe UI", Arial, sans-serif;
+  --color-brand: #26704c;
+  --color-brand-strong: #215a3f;
+  --color-brand-soft: #eff9f3;
+  --color-surface: #fbfcfb;
   --color-page: #f6f8fa;
   --color-border: #dce3eb;
-
-  --color-blue-50: #eff6fb;
-  --color-blue-100: #dcebf5;
-  --color-blue-200: #bad5e9;
-  --color-blue-300: #8fb9d5;
-  --color-blue-400: #5d96bc;
-  --color-blue-500: #34769e;
-  --color-blue-600: #205d82;
-  --color-blue-700: #194c6b;
-  --color-blue-800: #173f58;
-  --color-blue-900: #153449;
-  --color-blue-950: #0c2233;
-
-  --color-cyan-50: #effaf9;
-  --color-cyan-100: #d6f0ec;
-  --color-cyan-200: #afe0d9;
-  --color-cyan-300: #7ac7be;
-  --color-cyan-400: #48a99f;
-  --color-cyan-500: #267e77;
-  --color-cyan-600: #206e68;
-  --color-cyan-700: #1e5854;
-  --color-cyan-800: #1c4744;
-  --color-cyan-900: #193c3a;
-  --color-cyan-950: #0b2423;
 
   --color-slate-50: #f7f9fb;
   --color-slate-100: #eef2f6;
@@ -98,7 +74,7 @@ button {
 #root { width: 100%; min-width: 0; min-height: 100dvh; overflow-x: clip; }
 :where(main, aside, article, section, form) { min-width: 0; }
 :where(.flex, .grid) > * { min-width: 0; }
-:where(button, a, input, select, textarea):focus-visible { outline: 3px solid var(--color-blue-400); outline-offset: 3px; }
+:where(button, a, input, select, textarea):focus-visible { outline: 3px solid var(--color-green-400); outline-offset: 3px; }
 button:disabled { cursor: not-allowed; }
 :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
   max-width: 100%;
@@ -121,7 +97,7 @@ button:disabled { cursor: not-allowed; }
 :where(td,th) { vertical-align: top; }
 a { text-underline-offset: 0.2em; }
 .mobile-navigation summary::-webkit-details-marker { display:none; }
-.mobile-navigation[open] > summary { background: var(--color-blue-50); }
+.mobile-navigation[open] > summary { background: var(--color-green-50); }
 .mobile-navigation-content aside { position: static; display: flex; width: 100%; min-height: 0; height: auto; border-right: 0; }
 .mobile-navigation-content aside > div:first-child { display: none; }
 .mobile-navigation-content nav { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.25rem; padding:.75rem; }
@@ -151,3 +127,10 @@ a { text-underline-offset: 0.2em; }
 .overflow-x-auto { max-width: 100%; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; }
 .overflow-x-auto > table { min-width: 640px; }
 @media (max-width: 639px) { .mobile-navigation + main { width: 100%; } }
+
+
+/* WashNow surfaces use warm white and firmer corners across customer and staff workspaces. */
+.bg-white { background-color: #fbfcfb; }
+.rounded-3xl { border-radius: 1rem; }
+.rounded-2xl { border-radius: 0.8rem; }
+.rounded-xl { border-radius: 0.65rem; }

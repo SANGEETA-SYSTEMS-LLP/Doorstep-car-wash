@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getWasherWorkspace } from "../services/washer/washerWorkspaceService";
-import { supabase } from "../services/auth/supabase";
 
 export default function useWasherWorkspace() {
   const { user } = useAuth();
@@ -26,14 +25,5 @@ export default function useWasherWorkspace() {
     const timer = setInterval(load, 10000);
     return () => { active = false; clearInterval(timer); };
   }, [user, version]);
-  useEffect(() => {
-    if (!data?.washer?.id) return;
-    const id = data.washer.id;
-    const channel = supabase.channel("washer-workspace-" + id)
-      .on("postgres_changes", { event: "*", schema: "public", table: "booking_assignments", filter: "washer_id=eq." + id }, refresh)
-      .on("postgres_changes", { event: "*", schema: "public", table: "bookings", filter: "assigned_washer_id=eq." + id }, refresh)
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [data?.washer?.id, refresh]);
   return { data: data?.sessionUserId === user?.id ? data : null, error, errorStatus, loading, refresh, accountUnavailable };
 }

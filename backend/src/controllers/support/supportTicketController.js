@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "../../config/supabase.js";
 import { validateTicketInput, validateTicketUpdate, uuidPattern } from "../../services/support/supportTicketService.js";
+import { getSupervisorAreaBookingIds, getSupervisorServiceArea, isWithinSupervisorArea } from "../../services/supervisor/supervisorServiceArea.js";
 
 const ticketFields = "id, ticket_number, created_by, booking_id, issue_type, subject, description, status, priority, assigned_to, resolution_note, created_at, updated_at, resolved_at";
 
@@ -22,13 +23,17 @@ async function canAccessBooking(bookingId, userId, role) {
   const isUuid = uuidPattern.test(bookingId);
   const { data: booking, error } = await supabaseAdmin
     .from("bookings")
-    .select("id, customer_id, assigned_washer_id")
+    .select("id, customer_id, assigned_washer_id, latitude, longitude")
     .eq(isUuid ? "id" : "booking_number", bookingId)
     .maybeSingle();
   if (error) throw error;
   if (!booking) return false;
 
-  if (["support", "supervisor", "sub_admin", "super_admin"].includes(role)) return true;
+  if (["support", "sub_admin", "super_admin"].includes(role)) return true;
+  if (role === "supervisor") {
+    const area = await getSupervisorServiceArea(userId);
+    return isWithinSupervisorArea(booking, area);
+  }
   if (role === "customer") {
     const { data: customer, error: customerError } = await supabaseAdmin
       .from("customers")
@@ -111,6 +116,16 @@ export async function listSupportTickets(req, res, next) {
       }
       query = query.eq("status", status);
     }
+    if (req.profile.role === "supervisor") {
+      const area = await getSupervisorServiceArea(req.user.id);
+      if (!area) return res.status(428).json({
+        code: "SUPERVISOR_AREA_REQUIRED",
+        message: "Save your supervisor service address and map location before opening operations.",
+      });
+      const bookingIds = await getSupervisorAreaBookingIds(area);
+      if (!bookingIds.length) return res.json({ success: true, tickets: [] });
+      query = query.in("booking_id", bookingIds);
+    }
     const { data, error } = await query;
     if (error) throw error;
     return res.json({ success: true, tickets: data || [] });
@@ -126,12 +141,22 @@ export async function updateSupportTicket(req, res, next) {
       return res.status(400).json({ success: false, message: "Invalid ticket ID." });
     }
     const payload = validateTicketUpdate(req.body);
-    const { data, error } = await supabaseAdmin
+    let supervisorBookingId;
+    if (req.profile.role === "supervisor") {
+      const { data: ticket, error: ticketError } = await supabaseAdmin
+        .from("support_tickets").select("id,booking_id").eq("id", ticketId).maybeSingle();
+      if (ticketError) throw ticketError;
+      if (!ticket?.booking_id || !await canAccessBooking(ticket.booking_id, req.user.id, req.profile.role)) {
+        return res.status(404).json({ success: false, message: "Support ticket not found in your service area." });
+      }
+      supervisorBookingId = ticket.booking_id;
+    }
+    let updateQuery = supabaseAdmin
       .from("support_tickets")
       .update(payload)
-      .eq("id", ticketId)
-      .select(ticketFields)
-      .maybeSingle();
+      .eq("id", ticketId);
+    if (req.profile.role === "supervisor") updateQuery = updateQuery.eq("booking_id", supervisorBookingId);
+    const { data, error } = await updateQuery.select(ticketFields).maybeSingle();
     if (error) throw error;
     if (!data) {
       return res.status(404).json({ success: false, message: "Support ticket not found." });

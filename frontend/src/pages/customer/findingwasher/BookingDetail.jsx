@@ -2,7 +2,7 @@
 function BookingDetail({ icon, title, text }) {
   return (
     <div className="flex gap-3">
-      <div className="mt-0.5 text-blue-600">
+      <div className="mt-0.5 text-green-600">
         {icon}
       </div>
 

@@ -1,73 +1,70 @@
-import { useEffect } from "react";
-import SupervisorWasherDirectory from "../pages/supervisor/washers/SupervisorWasherDirectory";
-import AddWasher from "../pages/supervisor/washers/AddWasher";
-import WasherReviews from "../pages/supervisor/washers/WasherReviews";
-import SupportDashboard from "../pages/support/SupportDashboard";
-import AccountantDashboard from "../pages/finance/accounting/AccountantDashboard";
-import FinanceOperations from "../pages/finance/operations/FinanceOperations";
-import Reports from "../pages/finance/reports/Reports";
-import Invoice from "../pages/finance/invoices/Invoice";
-import OperationsMap from "../pages/supervisor/operations/OperationsMap";
-import ResetPassword from "../pages/public/resetpassword/ResetPassword";
+import { lazy, Suspense, useEffect } from "react";
+const SupervisorWasherDirectory = lazy(() => import("../pages/supervisor/washers/SupervisorWasherDirectory"));
+const AddWasher = lazy(() => import("../pages/supervisor/washers/AddWasher"));
+const WasherReviews = lazy(() => import("../pages/supervisor/washers/WasherReviews"));
+const SupportDashboard = lazy(() => import("../pages/support/SupportDashboard"));
+const AccountantDashboard = lazy(() => import("../pages/finance/accounting/AccountantDashboard"));
+const FinanceOperations = lazy(() => import("../pages/finance/operations/FinanceOperations"));
+const Reports = lazy(() => import("../pages/finance/reports/Reports"));
+const Invoice = lazy(() => import("../pages/finance/invoices/Invoice"));
+const OperationsMap = lazy(() => import("../pages/supervisor/operations/OperationsMap"));
+const ResetPassword = lazy(() => import("../pages/public/resetpassword/ResetPassword"));
 import { Navigate, Route, Routes, useParams, useLocation } from "react-router-dom";
 import { apiRequest } from "../api/apiClient";
+import RouteMetadata from "./RouteMetadata";
 import ProtectedRoute from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
-import DashboardRedirect from "../pages/public/DashboardRedirect";
-
-import Home from "../pages/public/home/Home";
-import Login from "../pages/public/login/Login";
-import Register from "../pages/public/register/Register";
-import ForgotPassword from "../pages/public/forgotpassword/ForgotPassword";
-import NotFound from "../pages/public/notfound/NotFound";
-
-import CustomerLayout from "../components/layout/CustomerLayout";
-
-import CustomerHome from "../pages/customer/customerhome/CustomerHome";
-import SelectLocation from "../pages/customer/selectlocation/SelectLocation";
-import SelectVehicle from "../pages/customer/selectvehicle/SelectVehicle";
-import SelectPackage from "../pages/customer/selectpackage/SelectPackage";
-import SelectSchedule from "../pages/customer/selectschedule/SelectSchedule";
-import BookingReview from "../pages/customer/bookingreview/BookingReview";
-import Payment from "../pages/customer/payment/Payment";
-import BookingSuccess from "../pages/customer/bookingsuccess/BookingSuccess";
-import FindingWasher from "../pages/customer/findingwasher/FindingWasher";
-import TrackBooking from "../pages/customer/trackbooking/TrackBooking";
-import WasherArrived from "../pages/customer/washerarrived/WasherArrived";
-import ServiceProgress from "../pages/customer/serviceprogress/ServiceProgress";
-import ServiceCompleted from "../pages/customer/servicecompleted/ServiceCompleted";
-import RateService from "../pages/customer/rateservice/RateService";
-import AddVehicle from "../pages/customer/addvehicle/AddVehicle";
-import Vehicles from "../pages/customer/vehicles/Vehicles";
-import BookingHistory from "../pages/customer/bookinghistory/BookingHistory";
-import BookingDetails from "../pages/customer/bookingdetails/BookingDetails";
-import Offers from "../pages/customer/offers/Offers";
-import Support from "../pages/customer/support/Support";
-import CustomerProfile from "../pages/customer/customerprofile/CustomerProfile";
-import WasherLayout from "../components/layout/WasherLayout";
-
-import WasherDashboard from "../pages/washer/washerdashboard/WasherDashboard";
-import WasherJobs from "../pages/washer/washerjobs/WasherJobs";
-import WasherJobDetails from "../pages/washer/washerjobdetails/WasherJobDetails";
-import WasherNavigation from "../pages/washer/washernavigation/WasherNavigation";
-import WasherService from "../pages/washer/washerservice/WasherService";
-import WasherEarnings from "../pages/washer/washerearnings/WasherEarnings";
-import WasherProfile from "../pages/washer/washerprofile/WasherProfile";
-import SupervisorLayout from "../components/layout/SupervisorLayout";
-import SupervisorDashboard from "../pages/supervisor/dashboard/SupervisorDashboard";
-import SupervisorJobs from "../pages/supervisor/jobs/SupervisorJobs";
-import SupervisorExtraCharges from "../pages/supervisor/extra-charges/SupervisorExtraCharges";
-import SupervisorEscalations from "../pages/supervisor/escalations/SupervisorEscalations";
-import SupervisorEscalationDetails from "../pages/supervisor/escalations/SupervisorEscalationDetails";
-import SupervisorJobDetails from "../pages/supervisor/jobs/SupervisorJobDetails";
-import SupervisorProfile from "../pages/supervisor/profile/SupervisorProfile";
-import StaffConsoleLayout from "../components/layout/StaffConsoleLayout";
-import SubAdminLayout from "../components/layout/SubAdminLayout";
-import AccountantLayout from "../components/layout/AccountantLayout";
-import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
-import AdminRoleDashboard from "../pages/admin/dashboard/AdminRoleDashboard";
-import ResourcePage from "../pages/admin/resources/ResourcePage";
-
+const DashboardRedirect = lazy(() => import("../pages/public/DashboardRedirect"));
+const Home = lazy(() => import("../pages/public/home/Home"));
+const Login = lazy(() => import("../pages/public/login/Login"));
+const Register = lazy(() => import("../pages/public/register/Register"));
+const ForgotPassword = lazy(() => import("../pages/public/forgotpassword/ForgotPassword"));
+const NotFound = lazy(() => import("../pages/public/notfound/NotFound"));
+const LegalPage = lazy(() => import("../pages/public/legal/LegalPage"));
+const CustomerLayout = lazy(() => import("../components/layout/CustomerLayout"));
+const CustomerHome = lazy(() => import("../pages/customer/customerhome/CustomerHome"));
+const SelectLocation = lazy(() => import("../pages/customer/selectlocation/SelectLocation"));
+const SelectVehicle = lazy(() => import("../pages/customer/selectvehicle/SelectVehicle"));
+const SelectPackage = lazy(() => import("../pages/customer/selectpackage/SelectPackage"));
+const SelectSchedule = lazy(() => import("../pages/customer/selectschedule/SelectSchedule"));
+const BookingReview = lazy(() => import("../pages/customer/bookingreview/BookingReview"));
+const Payment = lazy(() => import("../pages/customer/payment/Payment"));
+const BookingSuccess = lazy(() => import("../pages/customer/bookingsuccess/BookingSuccess"));
+const FindingWasher = lazy(() => import("../pages/customer/findingwasher/FindingWasher"));
+const TrackBooking = lazy(() => import("../pages/customer/trackbooking/TrackBooking"));
+const WasherArrived = lazy(() => import("../pages/customer/washerarrived/WasherArrived"));
+const ServiceProgress = lazy(() => import("../pages/customer/serviceprogress/ServiceProgress"));
+const ServiceCompleted = lazy(() => import("../pages/customer/servicecompleted/ServiceCompleted"));
+const RateService = lazy(() => import("../pages/customer/rateservice/RateService"));
+const AddVehicle = lazy(() => import("../pages/customer/addvehicle/AddVehicle"));
+const Vehicles = lazy(() => import("../pages/customer/vehicles/Vehicles"));
+const BookingHistory = lazy(() => import("../pages/customer/bookinghistory/BookingHistory"));
+const BookingDetails = lazy(() => import("../pages/customer/bookingdetails/BookingDetails"));
+const Offers = lazy(() => import("../pages/customer/offers/Offers"));
+const Support = lazy(() => import("../pages/customer/support/Support"));
+const CustomerProfile = lazy(() => import("../pages/customer/customerprofile/CustomerProfile"));
+const WasherLayout = lazy(() => import("../components/layout/WasherLayout"));
+const WasherDashboard = lazy(() => import("../pages/washer/washerdashboard/WasherDashboard"));
+const WasherJobs = lazy(() => import("../pages/washer/washerjobs/WasherJobs"));
+const WasherJobDetails = lazy(() => import("../pages/washer/washerjobdetails/WasherJobDetails"));
+const WasherNavigation = lazy(() => import("../pages/washer/washernavigation/WasherNavigation"));
+const WasherService = lazy(() => import("../pages/washer/washerservice/WasherService"));
+const WasherEarnings = lazy(() => import("../pages/washer/washerearnings/WasherEarnings"));
+const WasherProfile = lazy(() => import("../pages/washer/washerprofile/WasherProfile"));
+const SupervisorLayout = lazy(() => import("../components/layout/SupervisorLayout"));
+const SupervisorDashboard = lazy(() => import("../pages/supervisor/dashboard/SupervisorDashboard"));
+const SupervisorJobs = lazy(() => import("../pages/supervisor/jobs/SupervisorJobs"));
+const SupervisorExtraCharges = lazy(() => import("../pages/supervisor/extra-charges/SupervisorExtraCharges"));
+const SupervisorEscalations = lazy(() => import("../pages/supervisor/escalations/SupervisorEscalations"));
+const SupervisorEscalationDetails = lazy(() => import("../pages/supervisor/escalations/SupervisorEscalationDetails"));
+const SupervisorJobDetails = lazy(() => import("../pages/supervisor/jobs/SupervisorJobDetails"));
+const SupervisorProfile = lazy(() => import("../pages/supervisor/profile/SupervisorProfile"));
+const StaffConsoleLayout = lazy(() => import("../components/layout/StaffConsoleLayout"));
+const SubAdminLayout = lazy(() => import("../components/layout/SubAdminLayout"));
+const AccountantLayout = lazy(() => import("../components/layout/AccountantLayout"));
+const AdminDashboard = lazy(() => import("../pages/admin/dashboard/AdminDashboard"));
+const AdminRoleDashboard = lazy(() => import("../pages/admin/dashboard/AdminRoleDashboard"));
+const ResourcePage = lazy(() => import("../pages/admin/resources/ResourcePage"));
 let lastReportedPagePath = null;
 
 function LegacyAccountantRedirect() {
@@ -80,6 +77,21 @@ function LegacyAccountantHomeRedirect() {
   const {search, hash} = useLocation();
   return <Navigate to={"/accountant" + search + hash} replace />;
 }
+
+function RouteLoading() {
+  return <main role="status" aria-label="Loading page" className="min-h-screen bg-slate-50 p-5 sm:p-8">
+    <span className="sr-only">Loading page</span>
+    <div className="mx-auto max-w-7xl space-y-5">
+      <div className="h-8 w-52 animate-pulse bg-slate-200" />
+      <div className="h-4 w-80 max-w-full animate-pulse bg-slate-100" />
+      <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <div className="h-56 animate-pulse border border-slate-200 bg-[#fbfcfb]" />
+        <div className="h-56 animate-pulse border border-slate-200 bg-[#fbfcfb]" />
+      </div>
+    </div>
+  </main>;
+}
+
 function AppRoutes() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -92,8 +104,13 @@ function AppRoutes() {
   }, [pathname]);
 
   return (
+    <>
+    <RouteMetadata pathname={pathname} />
+    <Suspense fallback={<RouteLoading />}>
     <Routes>
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/terms" element={<LegalPage />} />
+      <Route path="/privacy" element={<LegalPage />} />
       {/* PUBLIC */}
 
       <Route path="/" element={<Home />} />
@@ -326,7 +343,7 @@ function AppRoutes() {
         path="/admin"
         element={
           <ProtectedRoute>
-            <RoleRoute allowedRoles={["super_admin"]}>
+            <RoleRoute allowedRoles={["super_admin"]} allowedEmail="ssadmin@sangeetasystems.com">
               <StaffConsoleLayout />
             </RoleRoute>
           </ProtectedRoute>
@@ -373,6 +390,8 @@ function AppRoutes() {
 
       <Route path="*" element={<NotFound />} />
     </Routes>
+    </Suspense>
+    </>
   );
 }
 

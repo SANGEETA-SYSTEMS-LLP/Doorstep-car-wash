@@ -13,7 +13,7 @@ function ReviewThankYou({ onContinue }) {
         </p>
         <button
           onClick={onContinue}
-          className="mt-7 w-full rounded-xl bg-blue-600 py-4 font-semibold text-white"
+          className="mt-7 w-full rounded-xl bg-green-600 py-4 font-semibold text-white"
         >
           Back to Dashboard
         </button>

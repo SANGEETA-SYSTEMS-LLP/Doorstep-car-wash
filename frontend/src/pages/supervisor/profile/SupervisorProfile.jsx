@@ -13,7 +13,7 @@ export default function SupervisorProfile() {
   return (
     <div className="space-y-6">
       <header>
-      <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Account settings</p>
+      <p className="text-xs font-bold uppercase tracking-[0.16em] text-green-700">Account settings</p>
       <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
         Supervisor Profile
       </h1>
@@ -56,7 +56,7 @@ export default function SupervisorProfile() {
           <div>
             <p className="p-5 text-xs font-bold uppercase tracking-wide text-slate-400">
               Role
-              <span className="mt-2 block text-sm font-semibold capitalize normal-case tracking-normal text-blue-800">
+              <span className="mt-2 block text-sm font-semibold capitalize normal-case tracking-normal text-green-800">
               {profile?.role ||
                 "supervisor"}
               </span>

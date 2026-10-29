@@ -80,7 +80,7 @@ function DashboardSidebar({ online }) {
               <div className="flex items-center gap-2">
                 <Navigation
                   size={19}
-                  className="text-blue-600"
+                  className="text-green-600"
                 />
 
                 <h2 className="font-bold">

@@ -20,7 +20,7 @@ function TrackingHeader({ booking, washer, currentStatus, navigate }) {
             <ArrowLeft size={19} />
           </button>
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
+            <p className="text-xs font-bold uppercase tracking-wider text-green-600">
               {booking.bookingId || "Booking"}
             </p>
             <h1 className="text-xl font-bold">Track Your Washer</h1>
@@ -31,7 +31,7 @@ function TrackingHeader({ booking, washer, currentStatus, navigate }) {
             )}
           </div>
         </div>
-        <div className="hidden items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 sm:flex">
+        <div className="hidden items-center gap-2 rounded-full bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 sm:flex">
           <Navigation size={16} />
           {statusLabel}
         </div>

@@ -3,7 +3,7 @@ function ExtraChargeRequestCard({ request, processing, onReview }) {
     <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm shadow-slate-900/[0.025] sm:p-6">
       <div className="flex flex-wrap justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wide text-blue-700">
+          <p className="text-xs font-bold uppercase tracking-wide text-green-700">
             {request.booking?.booking_number}
           </p>
           <h3 className="mt-1 text-lg font-bold text-slate-950">{request.reason}</h3>
@@ -27,7 +27,7 @@ function ExtraChargeRequestCard({ request, processing, onReview }) {
         <button
           disabled={processing}
           onClick={() => onReview(request.id, "approve")}
-          className="min-h-11 flex-1 rounded-xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-950 disabled:opacity-50"
+          className="min-h-11 flex-1 rounded-xl bg-green-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-green-950 disabled:opacity-50"
         >
           Approve
         </button>

@@ -12,7 +12,7 @@ function UpcomingBooking({ booking, loading }) {
     <section className="mt-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-blue-700">
+          <p className="text-xs font-bold uppercase tracking-wider text-green-700">
             Your schedule
           </p>
           <h2 className="mt-1 text-xl font-bold text-slate-950">
@@ -21,7 +21,7 @@ function UpcomingBooking({ booking, loading }) {
         </div>
         <Link
           to="/customer/history"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-blue-700 hover:text-blue-900"
+          className="inline-flex items-center gap-1 text-sm font-semibold text-green-700 hover:text-green-900"
         >
           View booking history <ArrowRight size={16} />
         </Link>
@@ -33,7 +33,7 @@ function UpcomingBooking({ booking, loading }) {
         <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
             <div className="flex min-w-0 gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700">
                 <Car size={23} />
               </div>
               <div className="min-w-0">
@@ -107,7 +107,7 @@ function UpcomingBooking({ booking, loading }) {
             </div>
             <Link
               to={`/customer/bookings/${booking.id}`}
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-blue-200 px-4 py-2.5 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-green-200 px-4 py-2.5 text-sm font-semibold text-green-700 transition hover:bg-green-50"
             >
               View details <ArrowRight size={16} />
             </Link>
@@ -123,7 +123,7 @@ function UpcomingBooking({ booking, loading }) {
           </div>
           <Link
             to="/customer/select-location"
-            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800"
+            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-green-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-800"
           >
             Book a wash
           </Link>

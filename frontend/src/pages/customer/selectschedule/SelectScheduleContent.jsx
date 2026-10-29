@@ -19,7 +19,7 @@ function SelectScheduleContent({ navigate, selectedDate, setSelectedDate, select
         </button>
 
         <div className="mt-7">
-          <p className="font-semibold text-blue-600">
+          <p className="font-semibold text-green-600">
             SCHEDULE
           </p>
 
@@ -46,7 +46,7 @@ function SelectScheduleContent({ navigate, selectedDate, setSelectedDate, select
           <button
             onClick={handleContinue}
             disabled={!valid}
-            className="flex items-center gap-2 rounded-xl bg-blue-600 px-7 py-3.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-green-600 px-7 py-3.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             Review Booking
             <ArrowRight size={18} />

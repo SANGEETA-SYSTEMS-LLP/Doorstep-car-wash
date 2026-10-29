@@ -12,7 +12,7 @@ function ArrivalConfirmationPanel({ onContinue }) {
           </p>
         </div>
       </div>
-      <button onClick={onContinue} className="mt-6 w-full rounded-xl bg-blue-600 py-4 font-semibold text-white hover:bg-blue-700">
+      <button onClick={onContinue} className="mt-6 w-full rounded-xl bg-green-600 py-4 font-semibold text-white hover:bg-green-700">
         Continue
       </button>
     </div>

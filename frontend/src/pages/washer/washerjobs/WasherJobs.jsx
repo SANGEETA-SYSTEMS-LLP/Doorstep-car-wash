@@ -59,7 +59,7 @@ export default function WasherJobs() {
   return <main className="mx-auto max-w-7xl space-y-7 p-5 lg:p-8">
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-700">Washer partner workspace</p>
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-green-700">Washer partner workspace</p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">My jobs</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Your assigned services, schedules, customer details, and the next step for every wash.</p>
       </div>
@@ -74,7 +74,7 @@ export default function WasherJobs() {
         type="button"
         aria-pressed={filter === key}
         onClick={() => setFilter(key)}
-        className={"inline-flex min-h-10 items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition " + (filter === key ? "bg-blue-800 text-white shadow-sm" : "text-slate-600 hover:bg-slate-50 hover:text-slate-950")}
+        className={"inline-flex min-h-10 items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition " + (filter === key ? "bg-green-800 text-white shadow-sm" : "text-slate-600 hover:bg-slate-50 hover:text-slate-950")}
       >
         <Icon size={16} />{label}<span className={"rounded-full px-2 py-0.5 text-xs tabular-nums " + (filter === key ? "bg-white/15 text-white" : "bg-slate-100 text-slate-500")}>{counts[key]}</span>
       </button>)}
@@ -96,7 +96,7 @@ export default function WasherJobs() {
     </div>}
 
     {!loading && !error && !jobs.length && <section className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-700"><BriefcaseBusiness size={24} /></span>
+      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-700"><BriefcaseBusiness size={24} /></span>
       <h2 className="mt-4 text-lg font-bold text-slate-900">{allJobs.length || assignments.length ? `No ${filter === "Requests" ? "new requests" : filter.toLowerCase()} jobs` : "No assigned jobs yet"}</h2>
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">{allJobs.length || assignments.length ? "Try another filter to see more of your work." : "New requests and accepted bookings will appear here when they’re available."}</p>
     </section>}

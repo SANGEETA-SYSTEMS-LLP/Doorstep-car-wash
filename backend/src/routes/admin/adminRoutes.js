@@ -1,10 +1,10 @@
 import express from "express";
 import { requireAuth } from "../../middleware/authMiddleware.js";
-import { allowRoles } from "../../middleware/roleMiddleware.js";
+import { allowRoles, restrictSuperAdminToPrimaryEmail } from "../../middleware/roleMiddleware.js";
 import { deletePackage, getAdminDashboard, listResource, saveResource } from "../../controllers/admin/adminController.js";
 import { adminMutationRateLimit } from "../../middleware/rateLimitMiddleware.js";
 const router = express.Router();
-router.use(requireAuth, allowRoles("sub_admin", "super_admin"));
+router.use(requireAuth, allowRoles("sub_admin", "super_admin"), restrictSuperAdminToPrimaryEmail);
 router.get("/dashboard", getAdminDashboard);
 router.get("/:resource", listResource);
 router.post("/:resource", adminMutationRateLimit, saveResource);

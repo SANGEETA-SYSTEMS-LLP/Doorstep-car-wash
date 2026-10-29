@@ -1,4 +1,5 @@
 import ResponsiveNavigation from "./ResponsiveNavigation";
+import { WashNowBrand } from "./WashNowBrand";
 import {
   Banknote,
   BriefcaseBusiness,
@@ -58,10 +59,7 @@ export default function StaffConsoleLayout() {
     <div className="flex min-h-screen flex-col bg-slate-50 lg:flex-row">
       <ResponsiveNavigation title={title}><aside className="sticky top-0 flex h-dvh w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
         <div className="border-b border-slate-200 px-5 py-6">
-          <h1 className="text-lg font-black text-slate-900">Doorstep Car Wash</h1>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-blue-600">
-            {title}
-          </p>
+          <WashNowBrand to={isSupport ? "/support" : "/admin"} subtitle={title} />
         </div>
         <nav aria-label={`${title} navigation`} className="flex-1 space-y-1 overflow-y-auto p-3">
           {[...links].sort((a,b) => a.path === "/admin" ? -1 : b.path === "/admin" ? 1 : 0).map(({ label, path, icon: Icon, end }) => (
@@ -72,7 +70,7 @@ export default function StaffConsoleLayout() {
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold ${
                   isActive
-                    ? "bg-blue-50 text-blue-700"
+                    ? "bg-green-50 text-green-700"
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 }`
               }

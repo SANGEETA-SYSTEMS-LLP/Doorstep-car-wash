@@ -8,7 +8,7 @@ function FindingWasherStatus({ booking, databaseBooking, navigate, washerFound }
             <div className="rounded-3xl border border-slate-200 bg-white p-6">
               {!washerFound ? (
                 <>
-                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-50 text-green-600">
                     <Search
                       size={34}
                       className="animate-pulse"
@@ -40,7 +40,7 @@ function FindingWasherStatus({ booking, databaseBooking, navigate, washerFound }
             </div>
 
             {databaseBooking && (
-              <p className="mt-3 text-sm font-semibold text-blue-600">
+              <p className="mt-3 text-sm font-semibold text-green-600">
                 {databaseBooking.booking_number}
               </p>
             )}

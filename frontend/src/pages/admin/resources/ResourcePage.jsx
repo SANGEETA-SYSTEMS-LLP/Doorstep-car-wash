@@ -24,7 +24,7 @@ function ResourceTable({ base, resource }) {
       const records = Array.isArray(row.earning_records) ? row.earning_records : [];
       if (!records.length) return "No earnings yet";
       return <details className="min-w-56">
-        <summary className="cursor-pointer font-semibold text-blue-700">View {records.length} earning record(s)</summary>
+        <summary className="cursor-pointer font-semibold text-green-700">View {records.length} earning record(s)</summary>
         <div className="mt-2 max-h-56 space-y-2 overflow-y-auto rounded-lg bg-slate-50 p-3">
           {records.map((earning, index) => <div key={`${earning.booking_number}-${index}`} className="border-b border-slate-200 pb-2 text-xs last:border-0">
             <p className="font-semibold text-slate-800">{earning.booking_number}</p>
@@ -37,7 +37,7 @@ function ResourceTable({ base, resource }) {
     if (["washers", "supervisors"].includes(resource) && ["total_earnings", "pending_earnings"].includes(column)) {
       return `₹${Number(row[column] || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
     }
-    return typeof row[column] === "boolean" ? row[column] ? "Yes" : "No" : String(row[column] ?? "—");
+    return typeof row[column] === "boolean" ? row[column] ? "Yes" : "No" : String(row[column] ?? "-");
   }
 
   async function deletePackage(row) {
@@ -59,14 +59,14 @@ function ResourceTable({ base, resource }) {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">{data?.title || "Records"}</h1>
         <div className="flex gap-4">
-          <button onClick={refresh} className="text-blue-700 underline">Refresh</button>
-          {data?.fields && base === "admin" && <button onClick={() => setEditor({ row: null })} className="rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white">Add record</button>}
+          <button onClick={refresh} className="text-green-700 underline">Refresh</button>
+          {data?.fields && base === "admin" && <button onClick={() => setEditor({ row: null })} className="rounded-xl bg-green-600 px-4 py-3 font-semibold text-white">Add record</button>}
         </div>
       </div>
       {error && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-red-700">{error}</p>}
       {actionError && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-red-700">{actionError}</p>}
       {loading && <p role="status" className="mt-5">Loading records...</p>}
-      {resource === "packages" && base === "admin" && <p className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-900">Create one package per vehicle category and plan. Use names such as “Basic Monthly Plan - Hatchback” for monthly plans. Customer pricing reads directly from these records.</p>}
+      {resource === "packages" && base === "admin" && <p className="mt-4 rounded-xl border border-green-100 bg-green-50 p-4 text-sm text-green-900">Create one package per vehicle category and plan. Use names such as “Basic Monthly Plan - Hatchback” for monthly plans. Customer pricing reads directly from these records.</p>}
       {editor && <ResourceEditor resource={resource} fields={data.fields} row={editor.row} onClose={() => setEditor(null)} onSaved={() => { setEditor(null); refresh(); }} />}
       <input aria-label="Filter current page" value={search} onChange={event => setSearch(event.target.value)} placeholder="Filter this page..." className="my-5 w-full max-w-md rounded-xl border border-slate-300 bg-white p-3" />
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
@@ -75,7 +75,7 @@ function ResourceTable({ base, resource }) {
           <tbody>{rows.map(row => <tr key={row.id} className="border-t border-slate-100">
             {data.columns.map(column => <td key={column} className="max-w-xs break-words p-3">{renderCell(row, column)}</td>)}
             {data.fields && base === "admin" && <td className="whitespace-nowrap p-3">
-              <button onClick={() => setEditor({ row })} className="text-blue-700 underline">Edit</button>
+              <button onClick={() => setEditor({ row })} className="text-green-700 underline">Edit</button>
               {resource === "packages" && row.is_active !== false && <button disabled={deletingId === row.id} onClick={() => deletePackage(row)} className="ml-4 text-red-700 underline disabled:opacity-50">{deletingId === row.id ? "Removing…" : "Delete"}</button>}
               {resource === "packages" && row.is_active === false && <span className="ml-4 text-slate-400">Inactive</span>}
             </td>}

@@ -37,7 +37,7 @@ function PriceSummary({
         type="button"
         disabled={processing}
         onClick={onContinue}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         {processing ? "Opening Razorpay…" : "Continue to Payment"}
         {!processing && <ArrowRight size={18} />}

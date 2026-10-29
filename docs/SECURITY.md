@@ -15,6 +15,8 @@ The repository now applies API security headers, strict frontend-origin checks, 
 9. In Supabase Auth, require verified email where appropriate, configure strong password rules and MFA for staff, and enable CAPTCHA or abuse protection for public sign-up and recovery flows. The browser client also throttles direct Auth requests to 20 attempts per 15 minutes per browser profile; this is an additional UX guard and can be reset by clearing browser storage, so Supabase Auth controls remain required.
 10. Keep service-photo storage private. The backend should issue short-lived signed URLs only after checking booking ownership or assignment.
 11. Configure the payment provider webhook with the matching server-side webhook secret. Review payout permissions and run a controlled provider test before enabling live transfers.
+12. Apply `backend/database/add_atomic_payment_order_reservation.sql` before deploying the payment-order controller. It requires resolving duplicate active payment rows first. Confirm the live `payments` schema supports a nullable `provider_order_id` and the `failed` status before applying it.
+13. Apply `backend/database/repair_customer_offers.sql` to enforce one redemption of each offer code per customer. Resolve any duplicate code redemptions before running the migration.
 
 ## Local development
 

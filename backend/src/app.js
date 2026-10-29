@@ -82,7 +82,7 @@ app.use(helmet({
       objectSrc: ["'none'"],
       frameAncestors: ["'none'"],
       formAction: ["'self'", "https://api.razorpay.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://checkout.razorpay.com", "https://maps.googleapis.com", "https://maps.gstatic.com"],
+      scriptSrc: ["'self'", "https://checkout.razorpay.com", "https://maps.googleapis.com", "https://maps.gstatic.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.googleapis.com", "https://*.gstatic.com", "https://tile.openstreetmap.org", "https://*.tile.openstreetmap.org", "https://*.razorpay.com"],

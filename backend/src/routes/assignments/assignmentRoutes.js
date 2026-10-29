@@ -12,6 +12,7 @@ import {
   startAssignment,
   rejectAssignment,
   calculateAcceptedAssignmentEarning,
+  acceptAssignment,
 } from "../../controllers/assignments/assignmentController.js";
 
 const router =
@@ -29,6 +30,13 @@ router.post(
   requireAuth,
   allowRoles("washer"),
   rejectAssignment
+);
+
+router.post(
+  "/assignments/:assignmentId/accept",
+  requireAuth,
+  allowRoles("washer"),
+  acceptAssignment
 );
 
 router.post(

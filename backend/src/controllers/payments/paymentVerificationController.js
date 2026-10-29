@@ -110,9 +110,7 @@ export async function verifyPayment(
     const now =
       new Date().toISOString();
 
-    const {
-      error: updatePaymentError,
-    } = await supabaseAdmin
+    const { data: updatedPayment, error: updatePaymentError } = await supabaseAdmin
       .from("payments")
       .update({
         status:
@@ -130,10 +128,25 @@ export async function verifyPayment(
         updated_at:
           now,
       })
-      .eq("id", payment.id);
+      .eq("id", payment.id)
+      .in("status", ["created", "failed", "paid"])
+      .or(`provider_payment_id.is.null,provider_payment_id.eq.${razorpay_payment_id}`)
+      .select("id,status,provider_payment_id")
+      .maybeSingle();
 
     if (updatePaymentError) {
       throw updatePaymentError;
+    }
+
+    // A previously paid row is idempotent only for the same provider payment.
+    // Never replace the provider payment ID attached to a successful order.
+    const { data: latestPayment, error: latestPaymentError } = await supabaseAdmin.from("payments")
+      .select("id,status,provider_payment_id")
+      .eq("id", payment.id)
+      .maybeSingle();
+    if (latestPaymentError) throw latestPaymentError;
+    if (!updatedPayment && (latestPayment?.status !== "paid" || latestPayment.provider_payment_id !== razorpay_payment_id)) {
+      return res.status(409).json({ success: false, message: "This order has already been completed with a different payment. Contact support." });
     }
 
     const { data: currentBooking, error: currentBookingError } = await supabaseAdmin.from("bookings")

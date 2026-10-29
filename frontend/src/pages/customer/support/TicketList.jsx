@@ -6,9 +6,9 @@ import {
 } from "lucide-react";
 
 const statusStyles = {
-  open: "bg-blue-50 text-blue-700",
+  open: "bg-green-50 text-green-700",
   in_progress: "bg-amber-50 text-amber-800",
-  waiting_on_customer: "bg-violet-50 text-violet-700",
+  waiting_on_customer: "bg-green-50 text-green-700",
   resolved: "bg-emerald-50 text-emerald-700",
   closed: "bg-slate-100 text-slate-600",
 };
@@ -20,7 +20,7 @@ function TicketList({ data, loading, error, refresh }) {
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-blue-700">
+          <p className="text-xs font-bold uppercase tracking-wider text-green-700">
             Request history
           </p>
           <h2 className="mt-1 text-xl font-bold text-slate-950">
@@ -113,7 +113,7 @@ function TicketCard({ ticket }) {
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-xs font-bold text-blue-700">
+            <span className="font-mono text-xs font-bold text-green-700">
               {ticket.ticket_number || "Support request"}
             </span>
             <span className="text-slate-300" aria-hidden="true">·</span>
@@ -137,11 +137,11 @@ function TicketCard({ ticket }) {
       </div>
 
       {ticket.resolution_note && (
-        <div className="mt-4 rounded-lg border-l-2 border-blue-500 bg-blue-50 p-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-blue-800">
+        <div className="mt-4 rounded-lg border border-green-200 bg-[#f4f8fa] p-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-green-800">
             Response from support
           </p>
-          <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-blue-950">
+          <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-green-950">
             {ticket.resolution_note}
           </p>
         </div>

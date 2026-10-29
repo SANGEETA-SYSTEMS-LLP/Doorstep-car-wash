@@ -1,4 +1,4 @@
-import { ArrowLeft, Car, Clock3, Sparkles } from "lucide-react";
+import { ArrowLeft, Car, Clock3, Droplets } from "lucide-react";
 import Summary from "./Summary";
 import StageBadge from "./StageBadge";
 
@@ -12,7 +12,7 @@ function WasherServiceHeader({ jobId, stage, activeJob, onBack }) {
               <ArrowLeft size={18} />
             </button>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-600">{jobId}</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-green-600">{jobId}</p>
               <h1 className="font-bold">Service Job</h1>
             </div>
           </div>
@@ -21,7 +21,7 @@ function WasherServiceHeader({ jobId, stage, activeJob, onBack }) {
       </header>
       <div className="grid gap-4 sm:grid-cols-3">
         <Summary icon={<Car />} label="Vehicle" value={activeJob.vehicle?.name || "Vehicle"} />
-        <Summary icon={<Sparkles />} label="Service" value={activeJob.service || "Car Wash"} />
+        <Summary icon={<Droplets />} label="Service" value={activeJob.service || "Car Wash"} />
         <Summary icon={<Clock3 />} label="Duration" value="60 Minutes" />
       </div>
     </>

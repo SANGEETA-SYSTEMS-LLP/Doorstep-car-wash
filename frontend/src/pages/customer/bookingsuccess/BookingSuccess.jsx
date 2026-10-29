@@ -68,24 +68,24 @@ function BookingSuccess() {
           />
         </div>
 
-        <div className="mt-7 rounded-2xl border border-blue-100 bg-blue-50 p-5 text-left">
+        <div className="mt-7 rounded-2xl border border-green-100 bg-green-50 p-5 text-left">
           <div className="flex gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-600 text-white">
               <Search size={19} />
             </div>
 
             <div>
-              <p className="font-bold text-blue-900">
+              <p className="font-bold text-green-900">
                 Finding a washer
               </p>
 
-              <p className="mt-1 text-sm leading-6 text-blue-700">
+              <p className="mt-1 text-sm leading-6 text-green-700">
                 We're checking nearby available professionals for
                 your booking.
               </p>
 
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-blue-100">
-                <div className="h-full w-2/3 animate-pulse rounded-full bg-blue-600" />
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-green-100">
+                <div className="h-full w-2/3 animate-pulse rounded-full bg-green-600" />
               </div>
             </div>
           </div>
@@ -95,7 +95,7 @@ function BookingSuccess() {
           onClick={() =>
             navigate("/customer/finding-washer")
           }
-          className="mt-7 w-full rounded-xl bg-blue-600 py-4 font-semibold text-white transition hover:bg-blue-700"
+          className="mt-7 w-full rounded-xl bg-green-600 py-4 font-semibold text-white transition hover:bg-green-700"
         >
           Track Booking
         </button>
@@ -114,7 +114,7 @@ function BookingSuccess() {
 function Info({ icon, label, value }) {
   return (
     <div className="rounded-xl border border-slate-200 p-4">
-      <div className="text-blue-600">
+      <div className="text-green-600">
         {icon}
       </div>
 

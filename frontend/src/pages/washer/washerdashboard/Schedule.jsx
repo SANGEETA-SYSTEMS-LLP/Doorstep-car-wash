@@ -7,7 +7,7 @@ function Schedule({
 }) {
   return (
     <div className="flex gap-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600">
         <Clock3 size={16} />
       </div>
 
@@ -22,7 +22,7 @@ function Schedule({
               status === "Completed"
                 ? "text-green-600"
                 : status === "Current"
-                ? "text-blue-600"
+                ? "text-green-600"
                 : "text-slate-400"
             }`}
           >

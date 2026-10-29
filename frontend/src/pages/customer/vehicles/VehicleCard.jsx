@@ -5,7 +5,7 @@ function VehicleCard({ vehicle, onDelete, onBook }) {
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
       <div className="flex justify-between gap-4">
         <div className="flex gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50 text-green-600">
             <Car />
           </div>
           <div>
@@ -24,7 +24,7 @@ function VehicleCard({ vehicle, onDelete, onBook }) {
           <Trash2 size={18} />
         </button>
       </div>
-      <button onClick={onBook} className="mt-5 w-full rounded-xl bg-blue-600 py-3 font-semibold text-white">
+      <button onClick={onBook} className="mt-5 w-full rounded-xl bg-green-600 py-3 font-semibold text-white">
         Book Wash
       </button>
     </div>

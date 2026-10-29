@@ -73,7 +73,7 @@ function CustomerSupportAssistant({ onCreateTicket }) {
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700">
           <Bot size={21} />
         </div>
         <div>
@@ -91,7 +91,7 @@ function CustomerSupportAssistant({ onCreateTicket }) {
             key={item.id}
             type="button"
             onClick={() => askAssistant(item.question)}
-            className="rounded-full border border-slate-200 px-3 py-1.5 text-left text-xs font-medium text-slate-700 transition hover:border-violet-300 hover:bg-violet-50 hover:text-violet-800"
+            className="rounded-full border border-slate-200 px-3 py-1.5 text-left text-xs font-medium text-slate-700 transition hover:border-green-300 hover:bg-green-50 hover:text-green-800"
           >
             {item.question}
           </button>
@@ -117,12 +117,12 @@ function CustomerSupportAssistant({ onCreateTicket }) {
           }}
           placeholder="Ask about bookings, payments..."
           maxLength={240}
-          className="min-w-0 flex-1 rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
+          className="min-w-0 flex-1 rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10"
         />
         <button
           type="submit"
           aria-label="Get support answer"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-700 text-white hover:bg-violet-800"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-700 text-white hover:bg-green-800"
         >
           <Send size={16} />
         </button>
@@ -135,16 +135,16 @@ function CustomerSupportAssistant({ onCreateTicket }) {
       )}
 
       {answer && (
-        <div className="mt-4 rounded-xl bg-violet-50 p-4">
-          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-violet-800">
+        <div className="mt-4 rounded-xl bg-green-50 p-4">
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-green-800">
             <MessageCircle size={14} />
             Support guidance
           </p>
-          <p className="mt-2 text-sm leading-6 text-violet-950">{answer}</p>
+          <p className="mt-2 text-sm leading-6 text-green-950">{answer}</p>
           <button
             type="button"
             onClick={onCreateTicket}
-            className="mt-3 text-sm font-semibold text-violet-800 underline underline-offset-2"
+            className="mt-3 text-sm font-semibold text-green-800 underline underline-offset-2"
           >
             Contact the support team
           </button>

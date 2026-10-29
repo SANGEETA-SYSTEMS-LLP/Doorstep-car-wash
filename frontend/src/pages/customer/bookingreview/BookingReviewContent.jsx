@@ -1,4 +1,4 @@
-import { CalendarDays, Car, Clock3, MapPin, Sparkles } from "lucide-react";
+import { CalendarDays, Car, Clock3, MapPin, Droplets, Tag } from "lucide-react";
 import ReviewCard from "./ReviewCard";
 import PriceSummary from "./PriceSummary";
 
@@ -66,7 +66,7 @@ function BookingReviewContent({
             </ReviewCard>
 
             <ReviewCard
-              icon={<Sparkles />}
+              icon={<Droplets />}
               title="Wash Package"
             >
               <div className="flex justify-between">
@@ -111,7 +111,7 @@ function BookingReviewContent({
               </div>
             </ReviewCard>
 
-            <ReviewCard icon={<Sparkles />} title="Offer code">
+            <ReviewCard icon={<Tag />} title="Offer code">
               {appliedOffer ? (
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-sm text-emerald-700"><span className="font-semibold">{appliedOffer.code}</span> applied · save ₹{offerDiscount}</p>

@@ -75,10 +75,13 @@ export async function recordCodPayment(
       payment,
     });
   } catch (error) {
+    console.error("COD payment recording failed", {
+      name: typeof error?.name === "string" ? error.name : "Error",
+      code: typeof error?.code === "string" ? error.code : undefined,
+    });
     return res.status(400).json({
       success: false,
-      message:
-        error.message,
+      message: "Unable to record this cash payment. Verify the booking status and retry.",
     });
   }
 }

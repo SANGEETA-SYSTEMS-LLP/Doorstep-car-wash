@@ -11,21 +11,41 @@ import {
 
 import {
   getCustomerBookingDetails,
+  getCustomerBookingByNumber,
+  getTrackingWasherLocation,
   getPendingExtraCharges,
   respondExtraCharge,
   getServicePhotos,
   confirmService,
 } from "../../controllers/customers/bookings/customerBookingController.js";
 import { cancelCustomerBooking } from "../../controllers/customers/bookingCancellationController.js";
+import { listCustomerNotifications, markCustomerNotificationRead } from "../../controllers/customers/customerNotificationController.js";
 
 const router =
   express.Router();
+
+router.get("/notifications", requireAuth, allowRoles("customer"), listCustomerNotifications);
+router.patch("/notifications/:notificationId/read", requireAuth, allowRoles("customer"), markCustomerNotificationRead);
+
+router.get(
+  "/bookings/by-number/:bookingNumber",
+  requireAuth,
+  allowRoles("customer"),
+  getCustomerBookingByNumber
+);
 
 router.get(
   "/bookings/:bookingId/details",
   requireAuth,
   allowRoles("customer"),
   getCustomerBookingDetails
+);
+
+router.get(
+  "/bookings/:bookingId/washer-location",
+  requireAuth,
+  allowRoles("customer"),
+  getTrackingWasherLocation
 );
 
 router.post(

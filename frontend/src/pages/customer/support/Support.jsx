@@ -73,17 +73,17 @@ export default function Support() {
   return (
     <main className="min-h-full bg-slate-50 px-4 py-7 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-7">
-        <header className="overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-blue-950 to-blue-800 px-6 py-7 text-white shadow-sm sm:px-9 sm:py-9">
+        <header className="overflow-hidden border-y border-slate-300 bg-green-900 px-6 py-7 text-white sm:px-9 sm:py-9">
           <div className="flex flex-col justify-between gap-7 sm:flex-row sm:items-center">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-blue-100">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-green-100">
                 <LifeBuoy size={15} />
                 WashNow customer care
               </div>
               <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
                 How can we help?
               </h1>
-              <p className="mt-2 max-w-xl leading-6 text-blue-100">
+              <p className="mt-2 max-w-xl leading-6 text-green-100">
                 Tell us what happened and our support team will follow up on your
                 request. You can track updates to your tickets below.
               </p>
@@ -91,12 +91,12 @@ export default function Support() {
             <div className="grid grid-cols-2 gap-3 sm:min-w-60">
               <SupportStat
                 label="Your tickets"
-                value={tickets.loading ? "—" : ticketCount}
+                value={tickets.loading ? "-" : ticketCount}
                 icon={<MessageSquareText size={16} />}
               />
               <SupportStat
                 label="Open requests"
-                value={tickets.loading ? "—" : openTicketCount}
+                value={tickets.loading ? "-" : openTicketCount}
                 icon={<Clock3 size={16} />}
               />
             </div>
@@ -122,7 +122,7 @@ export default function Support() {
               onCreated={tickets.refresh}
             />
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-700">
                 <ShieldCheck size={20} />
               </div>
               <h2 className="mt-4 font-bold text-slate-900">
@@ -145,7 +145,7 @@ export default function Support() {
 function SupportStat({ label, value, icon }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/10 p-3">
-      <div className="flex items-center gap-1.5 text-xs text-blue-100">
+      <div className="flex items-center gap-1.5 text-xs text-green-100">
         {icon}
         {label}
       </div>

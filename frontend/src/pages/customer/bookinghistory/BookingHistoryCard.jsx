@@ -32,7 +32,7 @@ function BookingHistoryCard({ booking, onDetails, onDelete, deleting, onCancel, 
   const cancellable = ["pending", "confirmed", "finding_washer", "support_escalated", "washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified"].includes(status);
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-blue-200 hover:shadow-md">
+    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-colors duration-150 hover:border-green-200">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -48,9 +48,9 @@ function BookingHistoryCard({ booking, onDetails, onDelete, deleting, onCancel, 
         </span>
       </div>
 
-      <div className="flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-5 p-5 sm:p-6 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex min-w-0 gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700">
             <CarFront size={23} />
           </div>
 
@@ -72,7 +72,7 @@ function BookingHistoryCard({ booking, onDetails, onDelete, deleting, onCancel, 
             )}
             {(booking.payment?.provider_method || booking.payment?.payment_method) && <p className="mt-2 text-xs font-medium capitalize text-slate-500">Payment method: {formatPaymentMethod(booking.payment.provider_method || booking.payment.payment_method)}</p>}
             {awaitingPayment && <p className="mt-2 text-xs font-medium text-amber-800">Complete payment within 30 minutes to confirm this booking. Unpaid bookings expire automatically.</p>}
-            {status === "expired" && <p className="mt-2 text-xs font-medium text-slate-500">Payment was not completed within 30 minutes. This history record will be removed automatically after 7 days.</p>}
+            {status === "expired" && <p className="mt-2 text-xs font-medium text-slate-500">Payment was not completed within 30 minutes, so the booking expired without being confirmed.</p>}
             {booking.cancellation && <p className="mt-2 text-xs font-medium text-slate-600">
               {Number(booking.cancellation.refund_amount_paise || 0) > 0
                 ? `Refund ₹${(Number(booking.cancellation.refund_amount_paise) / 100).toLocaleString("en-IN", { minimumFractionDigits: 2 })} · ${formatRefundStatus(booking.cancellation.status)}`
@@ -98,29 +98,29 @@ function BookingHistoryCard({ booking, onDetails, onDelete, deleting, onCancel, 
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-5 border-t border-slate-100 pt-4 lg:border-0 lg:pt-0">
-          <div>
+        <div className="flex w-full flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-4 xl:w-auto xl:shrink-0 xl:flex-nowrap xl:border-0 xl:pt-0">
+          <div className="shrink-0 whitespace-nowrap">
             <p className="text-xs text-slate-400">Booking total</p>
-            <p className="mt-0.5 text-xl font-bold text-slate-900">
+            <p className="mt-0.5 whitespace-nowrap text-xl font-bold tabular-nums text-slate-900">
               {Number.isFinite(amount)
-                ? `₹${amount.toLocaleString("en-IN")}`
-                : "—"}
+                ? `₹${amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                : "-"}
             </p>
           </div>
-          <div className="flex items-center gap-1">
-            {cancellable && <button type="button" onClick={onCancel} disabled={cancelling} className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50 disabled:opacity-50">
+          <div className="flex flex-wrap items-center justify-end gap-1">
+            {cancellable && <button type="button" onClick={onCancel} disabled={cancelling} className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50 disabled:opacity-50">
               <XCircle size={15} />{cancelling ? "Cancelling…" : "Cancel booking"}
             </button>}
-            {booking.cancellation?.status === "refund_pending" && <button type="button" onClick={onCheckRefund} disabled={cancelling} className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 disabled:opacity-50">
+            {booking.cancellation?.status === "refund_pending" && <button type="button" onClick={onCheckRefund} disabled={cancelling} className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 disabled:opacity-50">
               <RefreshCw size={15} className={cancelling ? "animate-spin" : ""} />Check refund
             </button>}
-            {removable && <button type="button" onClick={onDelete} disabled={deleting} className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50">
+            {removable && <button type="button" onClick={onDelete} disabled={deleting} className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50">
               <Trash2 size={15} />{deleting ? "Removing…" : "Remove"}
             </button>}
             <button
               type="button"
               onClick={onDetails}
-              className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
+              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50"
             >
               Details <ChevronRight size={17} />
             </button>
@@ -188,9 +188,9 @@ function getStatusStyle(status) {
     return "bg-rose-50 text-rose-700";
   }
   if (status === "washer_arrived" || status === "service_started") {
-    return "bg-violet-50 text-violet-700";
+    return "bg-green-50 text-green-700";
   }
-  return "bg-blue-50 text-blue-700";
+  return "bg-green-50 text-green-700";
 }
 
 export default BookingHistoryCard;

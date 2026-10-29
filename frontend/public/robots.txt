@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /customer/
+Disallow: /washer/
+Disallow: /supervisor/
+Disallow: /admin/
+Disallow: /sub-admin/
+Disallow: /accountant/
+Disallow: /support
+Disallow: /dashboard
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://doorstep-car-wash-gold.vercel.app/sitemap.xml

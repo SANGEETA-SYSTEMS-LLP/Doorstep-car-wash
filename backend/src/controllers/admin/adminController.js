@@ -256,6 +256,19 @@ export async function getAdminDashboard(req, res, next) {
   try {
     const keys = ["customers", "washers", "bookings", "societies", "zones", "services"];
     const stats = await Promise.all(keys.map(async key => {
+      if (key === "customers") {
+        // Match the customer directory: old customer rows can remain after an
+        // account changes role, and should not inflate the customer total.
+        const { data: customerProfiles, error: profilesError } = await db.from("profiles")
+          .select("id").eq("role", "customer");
+        if (profilesError) throw profilesError;
+        const customerUserIds = (customerProfiles || []).map(profile => profile.id);
+        if (!customerUserIds.length) return { key, label: resources[key].title, count: 0 };
+        const { count, error } = await db.from(resources[key].table)
+          .select("id", { count: "exact", head: true }).in("user_id", customerUserIds);
+        if (error) throw error;
+        return { key, label: resources[key].title, count: count || 0 };
+      }
       const { count, error } = await db.from(resources[key].table).select("id", { count: "exact", head: true });
       if (error) throw error;
       return { key, label: resources[key].title, count: count || 0 };

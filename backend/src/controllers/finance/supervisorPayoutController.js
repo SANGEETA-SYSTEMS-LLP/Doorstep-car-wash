@@ -84,6 +84,12 @@ export async function paySupervisor(req, res, next) {
     const { id, supervisorId, paymentMethod } = req.body || {};
     const mode = String(paymentMethod || "").toUpperCase();
     if (!uuid.test(id || "") || !uuid.test(supervisorId || "") || !["IMPS", "NEFT", "RTGS", "UPI"].includes(mode)) throw invalid("Provide a valid supervisor, request ID, and transfer method.");
+    // The finance role is checked by the route. Recheck the actor against the
+    // live profile here before making any external provider calls.
+    const { data: actor, error: actorError } = await db.from("profiles")
+      .select("id,role,is_active").eq("id", req.user.id).maybeSingle();
+    if (actorError) throw actorError;
+    if (!actor?.is_active || !["accountant", "super_admin"].includes(actor.role)) throw Object.assign(new Error("Finance role required."), { status: 403 });
     const fundAccountId = await ensureSupervisorFundAccount(supervisorId, mode);
     const { data: operation, error: reserveError } = await db.rpc("reserve_supervisor_payout", {
       p_id: id, p_supervisor_id: supervisorId, p_actor: req.user.id,
@@ -91,6 +97,9 @@ export async function paySupervisor(req, res, next) {
       p_account_number: process.env.RAZORPAYX_ACCOUNT_NUMBER || null,
     });
     if (reserveError) throw Object.assign(new Error(reserveError.message), { status: 409 });
+    if (!operation || operation.created_by !== req.user.id || operation.supervisor_id !== supervisorId) {
+      throw Object.assign(new Error("The payout reservation does not match this request."), { status: 409 });
+    }
     const request = { ...operation.provider_request, fund_account_id: fundAccountId, mode,
       amount: Number(operation.amount_paise), currency: "INR", purpose: "payout", reference_id: operation.id };
     const { error: updateError } = await db.from("supervisor_payout_operations").update({ provider_request: request, updated_at: new Date().toISOString() }).eq("id", operation.id);

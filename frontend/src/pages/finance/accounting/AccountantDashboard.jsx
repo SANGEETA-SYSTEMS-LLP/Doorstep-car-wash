@@ -14,11 +14,11 @@ export default function AccountantDashboard({ base = "/admin" }) {
   const {profile} = useAuth();
   const visible = profile?.role === "supervisor" ? sections.filter(s => ["payments", "earnings", "settlements"].includes(s.path)) : profile?.role === "sub_admin" ? sections.filter(s => s.path !== "finance") : sections;
   return <section>
-    <p className="text-sm font-semibold text-blue-600">ACCOUNTS</p>
+    <p className="text-sm font-semibold text-green-600">ACCOUNTS</p>
     <h1 className="mt-2 text-3xl font-bold text-slate-900">Accounts</h1>
     <p className="mt-3 text-slate-500">View financial records here. Authorized accountants and administrators can manage refunds and payouts.</p>
-    <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{visible.map(({ title, description, path, icon: Icon }) => <Link key={path} to={base + "/" + path} className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-blue-400 hover:shadow-sm">
-      <Icon className="text-blue-600" size={26} /><h2 className="mt-4 text-lg font-bold">{title}</h2><p className="mt-2 text-sm text-slate-500">{description}</p><span className="mt-5 flex items-center gap-2 text-sm font-semibold text-blue-700">Open <ArrowRight size={16} /></span>
+    <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{visible.map(({ title, description, path, icon: Icon }) => <Link key={path} to={base + "/" + path} className="rounded-2xl border border-slate-200 bg-white p-6 transition-colors duration-150 hover:border-green-400">
+      <Icon className="text-green-600" size={26} /><h2 className="mt-4 text-lg font-bold">{title}</h2><p className="mt-2 text-sm text-slate-500">{description}</p><span className="mt-5 flex items-center gap-2 text-sm font-semibold text-green-700">Open <ArrowRight size={16} /></span>
     </Link>)}</div>
     <div className="mt-8"><ServiceCompletionFeed /></div>
   </section>;

@@ -10,6 +10,9 @@ export async function startAssignment(
     const {
       bookingId,
     } = req.params;
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(bookingId || "")) {
+      return res.status(400).json({ message: "Invalid booking ID." });
+    }
 
     /*
      * Verify booking belongs to
@@ -64,17 +67,14 @@ export async function startAssignment(
       ...result,
     });
   } catch (error) {
-    console.error(
-      "Start assignment:",
-      error
-    );
+    console.error("Start assignment failed", {
+      name: typeof error?.name === "string" ? error.name : "Error",
+      code: typeof error?.code === "string" ? error.code : undefined,
+    });
 
-    return res.status(400).json({
+    return res.status(error.status || 500).json({
       success: false,
-
-      message:
-        error.message ||
-        "Unable to find washer.",
+      message: error.status && error.status < 500 ? error.message : "Unable to find washer.",
     });
   }
 }

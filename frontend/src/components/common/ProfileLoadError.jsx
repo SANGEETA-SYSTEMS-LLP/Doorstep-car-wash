@@ -10,7 +10,7 @@ export default function ProfileLoadError() {
           {profileError || "Your account profile is unavailable. Please retry or sign in again."}
         </p>
         <div className="mt-5 flex justify-center gap-4">
-          <button className="rounded bg-blue-600 px-4 py-2 text-white" onClick={() => refreshProfile()}>Retry</button>
+          <button className="rounded bg-green-600 px-4 py-2 text-white" onClick={() => refreshProfile()}>Retry</button>
           <button className="rounded border px-4 py-2" onClick={() => logout().catch(() => {})}>Sign out</button>
         </div>
       </div>

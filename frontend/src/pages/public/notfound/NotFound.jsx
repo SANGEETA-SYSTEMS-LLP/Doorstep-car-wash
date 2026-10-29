@@ -11,7 +11,7 @@ function NotFound() {
 
       <Link
         to="/"
-        className="mt-6 rounded-xl bg-blue-600 px-6 py-3 text-white"
+        className="mt-6 rounded-xl bg-green-600 px-6 py-3 text-white"
       >
         Back Home
       </Link>

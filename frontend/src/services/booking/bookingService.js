@@ -1,5 +1,4 @@
 import { apiRequest } from "../core/api";
-import { supabase } from "../auth/supabase";
 
 export async function createBooking({ userId, booking, requestId }) {
  if(!userId) throw new Error("Sign in to create a booking.");
@@ -38,18 +37,8 @@ export async function getBookingByNumber(bookingNumber) {
   if (!bookingNumber) {
     throw new Error("Booking number is required.");
   }
-
-  const { data, error } = await supabase
-    .from("bookings")
-    .select("*")
-    .eq("booking_number", bookingNumber)
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
+  const result = await apiRequest(`/customer/bookings/by-number/${encodeURIComponent(bookingNumber)}`);
+  return result.booking;
 }
 
 function convertBookingDate(

@@ -69,3 +69,35 @@ No application MFA assurance check was found. Configure MFA for privileged roles
 ## Operational follow-up
 
 Apply the security migrations after resolving duplicate-row prerequisites, and apply `backend/database/add_supervisor_service_areas.sql` before using supervisor operations. Then verify the live Supabase RLS/grants, storage bucket policies, Auth settings (MFA, email verification, password strength, CAPTCHA), trusted proxy count, shared rate limits, Vercel CSP in a real browser, and Razorpay webhook/payout configuration. Backend logs currently go to process stdout; configure centralized retention, access controls, and alerting in the hosting platform for durable security monitoring.
+
+## Follow-up remediation review — 2026-10-28
+
+The following source-level remediations were added during the follow-up review:
+
+- **Payment order/cancellation coordination:** checkout now reserves the payment through `reserve_razorpay_payment_order`, which locks the booking and inserts a single active payment row before calling Razorpay. It uses the booking-first lock order shared by cancellation. Apply `backend/database/add_atomic_payment_order_reservation.sql` before deploying this handler. The migration intentionally stops if duplicate active payments exist. Late captures are handled through the cancellation refund path.
+- **Supervisor support-ticket boundary:** ticket listing, creation, and updates now restrict supervisors to bookings inside their saved service area. The update query is also constrained to the booking ID rechecked for that area.
+- **One-use promo concurrency:** `repair_customer_offers.sql` now adds a unique per-customer/per-code constraint, after checking for duplicates.
+- **Refund event ordering:** webhook transitions are conditional so delayed `refund.failed` events cannot downgrade a processed refund. Refund ID, payment ID, amount, and currency are matched against the cancellation record.
+- **CSP script policy:** removed `'unsafe-inline'` from frontend and API `script-src`. Keep the current third-party allowlist only after confirming those origins in the deployed app.
+
+### Verification and remaining limits
+
+The two production dependency audits reported zero known vulnerabilities. JavaScript syntax checks passed for the changed payment and support controllers, and `git diff --check` found no whitespace errors. The focused payment workflow tests and the full backend suite do not currently pass: the focused suite has stale mocks/fixtures (including short invalid Razorpay IDs), and the full suite reports multiple failures across unrelated customer, finance, migration, supervisor, and washer tests. Treat these as unresolved verification debt; do not interpret this audit as a passing test suite.
+
+The checkout migration requires confirmation against the live payments schema before application: `payments.status` must accept `failed`, `provider_order_id` must be nullable for the short-lived reservation row, and `payments` must contain the referenced columns. The complete production schema is not present here, so this cannot be asserted from source alone. Apply the existing booking-expiry migration needed for `expired` status separately if not already deployed.
+
+## Source remediation follow-up — 2026-10-29
+
+- Payment verification and capture webhooks now conditionally update only eligible payment states and require the same provider payment ID for an idempotent retry. A different captured payment for an already-paid order is rejected instead of replacing the saved payment identity.
+- COD recording failures now return a generic client message and log only sanitized error metadata.
+- The customer booking lookup by booking number now uses an authenticated API endpoint scoped to the signed-in customer's database record.
+- Customer tracking now fetches washer GPS through a booking-owner-scoped API endpoint. Browser Realtime subscriptions for booking status, washer location, washer jobs, customer notifications, and supervisor booking lists were removed in favor of the existing authenticated polling paths (notifications now poll every 30 seconds).
+- Customer notifications now load and mark-read through customer-role API endpoints that scope rows to the signed-in customer's record.
+- Washer assignment acceptance now uses an authenticated API endpoint that resolves the washer record from the signed-in user. The paired SQL wrapper is service-role-only; the existing browser RPC remains bound to `auth.uid()`.
+- Supervisor payout operations now recheck the finance actor profile before provider calls, ensure a retried reservation belongs to the same actor and beneficiary, reject mismatched provider payout IDs, and prevent stale status reads from reopening terminal payouts.
+
+These changes require applying the updated `repair_washer_assignment_acceptance.sql` and `add_supervisor_commissions_and_payouts.sql` migrations before deploying the corresponding application code. The service-role RPC still trusts the API to pass the authenticated actor ID because service-role PostgREST calls do not carry the user's JWT into PostgreSQL; the RPC remains inaccessible to `anon` and `authenticated`.
+
+The live RLS/grant review, existing missing RPC definitions, Supabase Auth settings, hosting edge limits, proxy trust, and provider configuration remain operational items. No comprehensive RLS migration was added because the complete production schema and intended browser-access rules are unavailable. The package registry could not be reached during this follow-up, so dependency advisories were not independently rechecked.
+
+The high-severity live RLS/grants and missing-RPC findings above remain open. Specifically, the definitions of `reserve_finance_operation`, `begin_finance_operation`, `reconcile_finance_operation`, `record_cod_payment_once`, `confirm_customer_service`, and `respond_extra_charge` are still not in this repository and cannot be audited. Supabase Auth, Vercel edge limits, trusted proxy configuration, webhook secrets, and production policies also require live dashboard verification. This remains a source audit, not a penetration test or deployment certification.

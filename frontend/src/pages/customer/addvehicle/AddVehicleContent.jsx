@@ -14,7 +14,7 @@ function AddVehicleContent({ navigate, loading, error, form, handleChange, handl
           </button>
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
+            <p className="text-xs font-bold uppercase tracking-wider text-green-600">
               My Vehicles
             </p>
 
@@ -28,7 +28,7 @@ function AddVehicleContent({ navigate, loading, error, form, handleChange, handl
       <main className="mx-auto max-w-3xl p-6 lg:p-8">
         <div className="rounded-3xl border border-slate-200 bg-white p-7 lg:p-9">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-600">
               <Car size={27} />
             </div>
 

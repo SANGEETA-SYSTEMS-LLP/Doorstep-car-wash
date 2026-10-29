@@ -8,7 +8,7 @@ function Feature({ icon, title, text }) {
 
       <div>
         <p className="font-semibold">{title}</p>
-        <p className="mt-1 text-sm leading-6 text-blue-100">
+        <p className="mt-1 text-sm leading-6 text-green-100">
           {text}
         </p>
       </div>

@@ -25,13 +25,13 @@ function LocationForm({initial}) {
   return <form onSubmit={save} className="mt-5 space-y-4">
     <fieldset disabled={busy} className="space-y-4">
       <AddressSearch disabled={busy} onStart={()=>++sequence.current} onSelect={(point,address,id)=>{if(id===sequence.current)select(point,address);}} onError={(message,id)=>{if(id===sequence.current)setError(message);}} />
-      <button type="button" onClick={locate} className="rounded-xl border px-4 py-3 text-blue-700">Use my current location</button>
+      <button type="button" onClick={locate} className="rounded-xl border px-4 py-3 text-green-700">Use my current location</button>
       <ServiceMap location={location} onSelect={busy?undefined:point=>{++sequence.current;select(point);}} className="h-72 rounded-xl" />
       {location.latitude!=null&&<p className="text-sm text-slate-500">{location.name&&<><span className="font-semibold text-slate-700">Selected place: {location.name}</span><br/></>}Map pin: {Number(location.latitude).toFixed(5)}, {Number(location.longitude).toFixed(5)}</p>}
       <label className="block text-sm font-semibold">Complete address<textarea required minLength={10} maxLength={500} rows={3} value={location.address||""} onChange={event=>{setLocation({...location,address:event.target.value});setSaved(false);}} className="mt-2 w-full rounded-xl border p-3" /></label>
     </fieldset>
     {error&&<p role="alert" className="text-red-700">{error}</p>}
     {saved&&<p role="status" className="text-green-700">Address and location saved. Nearby visibility requires an active, verified washer account.</p>}
-    <button disabled={busy||location.latitude==null||location.longitude==null} className="rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white disabled:opacity-50">{busy?"Please wait…":"Save location & address"}</button>
+    <button disabled={busy||location.latitude==null||location.longitude==null} className="rounded-xl bg-green-700 px-5 py-3 font-semibold text-white disabled:opacity-50">{busy?"Please wait…":"Save location & address"}</button>
   </form>;
 }

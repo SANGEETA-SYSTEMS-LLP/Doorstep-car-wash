@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CalendarDays, Car, Clock3, MapPin, Sparkles } from "lucide-react";
+import { ArrowRight, CalendarDays, Car, Clock3, MapPin } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { getMyBookings } from "../../../services/booking/bookingService";
 import { getSavedAddresses } from "../../../services/locations/locationService";
@@ -104,34 +104,15 @@ function CustomerHome() {
       <CustomerHomeHeader />
 
       <div className="mx-auto max-w-[1440px] p-5 sm:p-6 lg:p-8">
-        <section className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-blue-950 to-cyan-900 p-7 text-white shadow-lg shadow-blue-950/10 sm:p-9 lg:p-11">
-          <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-28 -z-10 h-80 w-80 rounded-full border-[44px] border-white/[0.06]" />
-          <div aria-hidden="true" className="pointer-events-none absolute bottom-[-8rem] right-1/3 -z-10 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
-          <div className="relative z-10 max-w-xl">
-            <div className="flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold tracking-wide text-cyan-100">
-              <Sparkles size={16} />
-              Doorstep car care
-            </div>
-
-            <h2 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.75rem]">
-              Your car deserves a fresh start.
-            </h2>
-
-            <p className="mt-4 max-w-lg text-sm leading-7 text-blue-100 sm:text-base">
-              Choose your location, select your vehicle and
-              schedule a professional car wash in minutes.
-            </p>
-
-            <Link
-              to="/customer/select-location"
-              className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-blue-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-cyan-50"
-            >
-              Book a Wash
-              <ArrowRight size={18} />
-            </Link>
+        <section className="relative overflow-hidden border border-[#315c49] bg-[#183a2e] px-6 py-8 text-white shadow-sm sm:px-9 sm:py-10">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#a8d7bf]">Doorstep car care</p>
+            <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">Your car deserves a fresh start.</h2>
+            <p className="mt-4 max-w-lg text-sm leading-7 text-[#e0eee6] sm:text-base">Choose your location, select your vehicle and schedule a professional car wash.</p>
+            <Link to="/customer/select-location" className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-lg bg-[#328c64] px-5 py-3 font-semibold text-white transition hover:bg-[#3a9a70] focus:outline-none focus:ring-4 focus:ring-[#a8d7bf]/40">Book a wash <ArrowRight size={18}/></Link>
           </div>
-
-          <Car className="absolute -bottom-10 right-8 hidden h-64 w-64 text-white/10 xl:block" />
+          <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-20 hidden h-72 w-72 rounded-full border border-white/10 sm:block" />
+          <div aria-hidden="true" className="pointer-events-none absolute -right-1 -top-9 hidden h-52 w-52 rounded-full border border-white/10 sm:block" />
         </section>
 
         {error && (
@@ -154,7 +135,7 @@ function CustomerHome() {
           <QuickCard
             icon={<Car />}
             title="My Vehicles"
-            value={loading ? "—" : dashboardData.vehicles.length}
+            value={loading ? "-" : dashboardData.vehicles.length}
             text="Registered vehicles"
             to="/customer/vehicles"
           />
@@ -162,7 +143,7 @@ function CustomerHome() {
           <QuickCard
             icon={<CalendarDays />}
             title="Bookings"
-            value={loading ? "—" : dashboardData.bookings.length}
+            value={loading ? "-" : dashboardData.bookings.length}
             text="All your bookings"
             to="/customer/history"
           />
@@ -170,7 +151,7 @@ function CustomerHome() {
           <QuickCard
             icon={<Clock3 />}
             title="Upcoming"
-            value={loading ? "—" : upcomingBookings.length}
+            value={loading ? "-" : upcomingBookings.length}
             text="Active and scheduled"
             to="/customer/history"
           />
@@ -178,7 +159,7 @@ function CustomerHome() {
           <QuickCard
             icon={<MapPin />}
             title="Saved Places"
-            value={loading ? "—" : dashboardData.addresses.length}
+            value={loading ? "-" : dashboardData.addresses.length}
             text="Saved addresses"
             to="/customer/select-location"
           />

@@ -13,9 +13,9 @@ function PaymentMethodDetails({ paymentMethod, upiId, setUpiId }) {
             value={upiId}
             onChange={(event) => setUpiId(event.target.value)}
             placeholder="example@upi"
-            className="flex-1 rounded-xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            className="flex-1 rounded-xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-100"
           />
-          <button type="button" className="rounded-xl border border-blue-600 px-6 py-3 font-semibold text-blue-600">Verify</button>
+          <button type="button" className="rounded-xl border border-green-600 px-6 py-3 font-semibold text-green-600">Verify</button>
         </div>
       </div>
     );
@@ -24,7 +24,7 @@ function PaymentMethodDetails({ paymentMethod, upiId, setUpiId }) {
     return (
       <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
         <h3 className="font-bold">Select Bank</h3>
-        <select className="mt-5 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 outline-none focus:border-blue-500">
+        <select className="mt-5 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 outline-none focus:border-green-500">
           <option>Select your bank</option>
           <option>State Bank of India</option>
           <option>HDFC Bank</option>
@@ -49,9 +49,9 @@ function PaymentMethodDetails({ paymentMethod, upiId, setUpiId }) {
   }
   if (paymentMethod === "cod") {
     return (
-      <div className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-6">
-        <h3 className="font-bold text-blue-900">Pay After Service</h3>
-        <p className="mt-2 text-sm leading-6 text-blue-700">
+      <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 p-6">
+        <h3 className="font-bold text-green-900">Pay After Service</h3>
+        <p className="mt-2 text-sm leading-6 text-green-700">
           Your booking will be confirmed now. Payment can be collected after the car wash is completed.
         </p>
       </div>

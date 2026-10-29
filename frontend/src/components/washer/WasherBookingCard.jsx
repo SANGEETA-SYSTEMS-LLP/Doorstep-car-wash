@@ -61,15 +61,15 @@ export default function WasherBookingCard({ booking, assignment, busy, onAccept,
           ? "View completion"
           : "View job";
 
-  return <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:border-blue-200 hover:shadow-md">
-    <header className={"flex flex-wrap items-center justify-between gap-3 p-5 " + (assignment ? "bg-gradient-to-r from-blue-950 to-blue-800 text-white" : "border-b border-slate-100 bg-white")}>
+  return <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-colors duration-150 hover:border-green-200">
+    <header className={"flex flex-wrap items-center justify-between gap-3 p-5 " + (assignment ? "bg-green-900 text-white" : "border-b border-slate-100 bg-white")}>
       <div>
-        <p className={"text-[11px] font-bold uppercase tracking-[0.16em] " + (assignment ? "text-blue-200" : "text-slate-500")}>{assignment ? "New wash request" : `Booking ${booking.booking_number}`}</p>
+        <p className={"text-[11px] font-bold uppercase tracking-[0.16em] " + (assignment ? "text-green-200" : "text-slate-500")}>{assignment ? "New wash request" : `Booking ${booking.booking_number}`}</p>
         <h2 className="mt-1 text-xl font-bold">{booking.package?.name || "Car wash"}</h2>
-        {assignment && <p className="mt-1 text-sm text-blue-100">Booking {booking.booking_number}</p>}
+        {assignment && <p className="mt-1 text-sm text-green-100">Booking {booking.booking_number}</p>}
       </div>
       {assignment && <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold">Offer ends {new Date(assignment.expires_at).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}</span>}
-      {!assignment && <span className={"rounded-full px-3 py-1.5 text-xs font-bold capitalize " + (completed ? "bg-green-50 text-green-800" : "bg-blue-50 text-blue-800")}>{statusLabel}</span>}
+      {!assignment && <span className={"rounded-full px-3 py-1.5 text-xs font-bold capitalize " + (completed ? "bg-green-50 text-green-800" : "bg-green-50 text-green-800")}>{statusLabel}</span>}
     </header>
 
     <div className="space-y-5 p-5">
@@ -78,8 +78,8 @@ export default function WasherBookingCard({ booking, assignment, busy, onAccept,
           const reached = index <= progressIndex(booking.status);
           const stage = booking.status === "service_completed" && index === 4 ? "Proof sent" : defaultStage;
           return <li key={stage} className="min-w-0 text-center">
-            <span className={"mx-auto flex h-7 w-7 items-center justify-center rounded-full " + (reached ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-400")}>{reached ? <Check size={14} /> : <span className="text-xs">{index + 1}</span>}</span>
-            <span className={"mt-1 block truncate text-[10px] sm:text-xs " + (reached ? "font-semibold text-blue-800" : "text-slate-400")}>{stage}</span>
+            <span className={"mx-auto flex h-7 w-7 items-center justify-center rounded-full " + (reached ? "bg-green-700 text-white" : "bg-slate-100 text-slate-400")}>{reached ? <Check size={14} /> : <span className="text-xs">{index + 1}</span>}</span>
+            <span className={"mt-1 block truncate text-[10px] sm:text-xs " + (reached ? "font-semibold text-green-800" : "text-slate-400")}>{stage}</span>
           </li>;
         })}
       </ol>}
@@ -91,13 +91,13 @@ export default function WasherBookingCard({ booking, assignment, busy, onAccept,
       </div>
 
       <div className="grid gap-4 text-sm sm:grid-cols-2">
-        <div className="flex gap-3 rounded-xl border border-slate-100 p-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700"><Car size={18} /></span><div><p className="font-semibold text-slate-800">{[booking.vehicle?.brand, booking.vehicle?.model].filter(Boolean).join(" ") || "Vehicle details unavailable"}</p><p className="mt-1 text-xs text-slate-500">{[booking.vehicle?.vehicle_number, booking.vehicle?.colour, booking.vehicle?.vehicle_type].filter(Boolean).join(" · ") || "Vehicle information unavailable"}</p></div></div>
-        <div className="flex gap-3 rounded-xl border border-slate-100 p-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-cyan-700"><Clock3 size={18} /></span><div><p className="font-semibold text-slate-800">{formatSchedule(booking.scheduled_date, booking.scheduled_start_time)}</p><p className="mt-1 text-xs text-slate-500">{booking.package?.duration_minutes ? booking.package.duration_minutes + " minute service" : "Duration unavailable"}</p></div></div>
+        <div className="flex gap-3 rounded-xl border border-slate-100 p-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-50 text-green-700"><Car size={18} /></span><div><p className="font-semibold text-slate-800">{[booking.vehicle?.brand, booking.vehicle?.model].filter(Boolean).join(" ") || "Vehicle details unavailable"}</p><p className="mt-1 text-xs text-slate-500">{[booking.vehicle?.vehicle_number, booking.vehicle?.colour, booking.vehicle?.vehicle_type].filter(Boolean).join(" · ") || "Vehicle information unavailable"}</p></div></div>
+        <div className="flex gap-3 rounded-xl border border-slate-100 p-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-50 text-green-700"><Clock3 size={18} /></span><div><p className="font-semibold text-slate-800">{formatSchedule(booking.scheduled_date, booking.scheduled_start_time)}</p><p className="mt-1 text-xs text-slate-500">{booking.package?.duration_minutes ? booking.package.duration_minutes + " minute service" : "Duration unavailable"}</p></div></div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-100 bg-blue-50/70 p-4 text-sm">
-        <div className="flex min-w-0 gap-3"><span className="mt-0.5 shrink-0 text-blue-700"><MapPin size={18} /></span><div><p className="mb-0.5 text-[11px] font-bold uppercase tracking-wide text-slate-500">Service address</p><p className="break-words text-slate-800">{booking.location?.address || "Address unavailable"}</p></div></div>
-        {mapsUrl && <a href={mapsUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-white px-3 font-semibold text-blue-800 shadow-sm transition hover:bg-blue-100"><Route size={16} />Navigate</a>}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-green-100 bg-green-50/70 p-4 text-sm">
+        <div className="flex min-w-0 gap-3"><span className="mt-0.5 shrink-0 text-green-700"><MapPin size={18} /></span><div><p className="mb-0.5 text-[11px] font-bold uppercase tracking-wide text-slate-500">Service address</p><p className="break-words text-slate-800">{booking.location?.address || "Address unavailable"}</p></div></div>
+        {mapsUrl && <a href={mapsUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-white px-3 font-semibold text-green-800 shadow-sm transition hover:bg-green-100"><Route size={16} />Navigate</a>}
       </div>
 
       {booking.customer_notes && <p className="rounded-xl bg-amber-50 p-3 text-sm"><strong>Customer instructions:</strong> {booking.customer_notes}</p>}
@@ -111,7 +111,7 @@ export default function WasherBookingCard({ booking, assignment, busy, onAccept,
       {assignment ? <div className="grid grid-cols-2 gap-3">
         <button disabled={busy} onClick={onReject} className="rounded-xl border border-red-200 p-3 font-semibold text-red-700 disabled:opacity-50">Decline</button>
         <button disabled={busy} onClick={onAccept} className="rounded-xl bg-green-600 p-3 font-semibold text-white disabled:opacity-50">{busy ? "Confirming..." : "Accept & confirm booking"}</button>
-      </div> : !hideLink && <Link to={"/washer/jobs/" + booking.id} className={"block rounded-xl p-3 text-center font-semibold " + (completed ? "border border-slate-200 text-slate-700" : "bg-blue-700 text-white hover:bg-blue-800")}>{jobAction}</Link>}
+      </div> : !hideLink && <Link to={"/washer/jobs/" + booking.id} className={"block rounded-xl p-3 text-center font-semibold " + (completed ? "border border-slate-200 text-slate-700" : "bg-green-700 text-white hover:bg-green-800")}>{jobAction}</Link>}
     </div>
   </article>;
 }

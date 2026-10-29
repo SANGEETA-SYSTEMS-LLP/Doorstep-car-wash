@@ -46,7 +46,7 @@ function ForgotPassword() {
 
         {!sent ? (
           <>
-            <div className="mt-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+            <div className="mt-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-600">
               <KeyRound size={27} />
             </div>
 
@@ -77,11 +77,11 @@ function ForgotPassword() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full rounded-xl border border-slate-300 py-3.5 pl-12 pr-4 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  className="w-full rounded-xl border border-slate-300 py-3.5 pl-12 pr-4 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"
                 />
               </div>
 
-              <button disabled={loading} className="mt-5 w-full rounded-xl bg-blue-600 py-3.5 font-semibold text-white disabled:opacity-50">
+              <button disabled={loading} className="mt-5 w-full rounded-xl bg-green-600 py-3.5 font-semibold text-white disabled:opacity-50">
                 {loading ? "Sending..." : "Send Reset Link"}
               </button>
             </form>
@@ -104,7 +104,7 @@ function ForgotPassword() {
 
             <Link
               to="/login"
-              className="mt-7 inline-block rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white"
+              className="mt-7 inline-block rounded-xl bg-green-600 px-6 py-3 font-semibold text-white"
             >
               Back to Login
             </Link>

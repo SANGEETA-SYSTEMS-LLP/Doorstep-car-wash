@@ -21,7 +21,7 @@ function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived, cu
             </button>
 
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
+              <p className="text-xs font-bold uppercase tracking-wider text-green-600">
                 {jobId}
               </p>
 
@@ -31,7 +31,7 @@ function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived, cu
             </div>
           </div>
 
-          <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700">
+          <span className="rounded-full bg-green-50 px-4 py-2 text-sm font-bold text-green-700">
             On The Way
           </span>
         </div>
@@ -46,7 +46,7 @@ function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived, cu
             <div className="space-y-3 p-5">
               <p>Driving distance: {route.distance} km · ETA: {route.eta} min</p>
               {route.error && <p role="status" className="text-sm text-amber-800">Driving route unavailable.</p>}
-              {destination ? <a className="inline-block rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white" target="_blank" rel="noreferrer" href={"https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=" + encodeURIComponent(destination.lat + "," + destination.lng)}>Open Google Maps navigation</a> : <p role="alert">This booking is missing destination coordinates.</p>}
+              {destination ? <a className="inline-block rounded-xl bg-green-600 px-5 py-3 font-semibold text-white" target="_blank" rel="noreferrer" href={"https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=" + encodeURIComponent(destination.lat + "," + destination.lng)}>Open Google Maps navigation</a> : <p role="alert">This booking is missing destination coordinates.</p>}
             </div>
           </section>
 
@@ -59,7 +59,7 @@ function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived, cu
               </p>
 
               <div className="mt-5 flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700">
                   <UserRound />
                 </div>
 
@@ -79,7 +79,7 @@ function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived, cu
 
             <section className="rounded-3xl border border-slate-200 bg-white p-6">
               <div className="flex gap-3">
-                <MapPin className="shrink-0 text-blue-600" />
+                <MapPin className="shrink-0 text-green-600" />
 
                 <div>
                   <p className="font-bold">
@@ -93,16 +93,16 @@ function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived, cu
               </div>
             </section>
 
-            <section className="rounded-3xl border border-blue-200 bg-blue-50 p-5">
+            <section className="rounded-3xl border border-green-200 bg-green-50 p-5">
               <div className="flex gap-3">
-                <Clock3 className="shrink-0 text-blue-600" />
+                <Clock3 className="shrink-0 text-green-600" />
 
                 <div>
-                  <p className="font-bold text-blue-900">
+                  <p className="font-bold text-green-900">
                     Arrived at location?
                   </p>
 
-                  <p className="mt-1 text-sm leading-6 text-blue-700">
+                  <p className="mt-1 text-sm leading-6 text-green-700">
                     Mark arrived only after you reach the
                     customer's service location.
                   </p>
@@ -111,7 +111,7 @@ function WasherNavigationContent({ activeJob, navigate, jobId, handleArrived, cu
 
               <button
                 onClick={handleArrived}
-                className="mt-5 w-full rounded-xl bg-blue-600 py-3.5 font-semibold text-white"
+                className="mt-5 w-full rounded-xl bg-green-600 py-3.5 font-semibold text-white"
               >
                 I've Arrived
               </button>

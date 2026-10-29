@@ -18,7 +18,7 @@ function SelectVehicleContent({ navigate, selected, setSelected, vehicles, loadi
         </button>
 
         <div className="mt-7">
-          <p className="font-semibold text-blue-600">
+          <p className="font-semibold text-green-600">
             SELECT VEHICLE
           </p>
 
@@ -56,12 +56,12 @@ function SelectVehicleContent({ navigate, selected, setSelected, vehicles, loadi
                 onClick={() => setSelected(vehicle.id)}
                 className={`relative rounded-2xl border-2 bg-white p-6 text-left transition ${
                   active
-                    ? "border-blue-600 shadow-md shadow-blue-100"
+                    ? "border-green-600 shadow-md shadow-green-100"
                     : "border-slate-200 hover:border-slate-300"
                 }`}
               >
                 {active && (
-                  <div className="absolute right-5 top-5 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white">
+                  <div className="absolute right-5 top-5 flex h-7 w-7 items-center justify-center rounded-full bg-green-600 text-white">
                     <Check size={16} />
                   </div>
                 )}
@@ -69,7 +69,7 @@ function SelectVehicleContent({ navigate, selected, setSelected, vehicles, loadi
                 <div
                   className={`flex h-14 w-14 items-center justify-center rounded-2xl ${
                     active
-                      ? "bg-blue-50 text-blue-600"
+                      ? "bg-green-50 text-green-600"
                       : "bg-slate-100 text-slate-500"
                   }`}
                 >
@@ -95,7 +95,7 @@ function SelectVehicleContent({ navigate, selected, setSelected, vehicles, loadi
 
           <button
             onClick={() => navigate("/customer/vehicles/add")}
-            className="flex min-h-56 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-white p-6 text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
+            className="flex min-h-56 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-white p-6 text-slate-500 transition hover:border-green-400 hover:text-green-600"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
               <Plus />
@@ -115,7 +115,7 @@ function SelectVehicleContent({ navigate, selected, setSelected, vehicles, loadi
           <button
             disabled={loading || Boolean(error) || !vehicles.some((vehicle) => vehicle.id === selected)}
             onClick={handleContinue}
-            className="flex items-center gap-2 rounded-xl bg-blue-600 px-7 py-3.5 font-semibold text-white disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-green-600 px-7 py-3.5 font-semibold text-white disabled:opacity-50"
           >
             Continue
             <ArrowRight size={18} />
