@@ -27,6 +27,7 @@ import {
 } from "./controllers/payments/paymentController.js";
 const app =
   express();
+app.set("etag", false);
 
 const trustProxyHops = Number(process.env.TRUST_PROXY_HOPS || 0);
 if (!Number.isSafeInteger(trustProxyHops) || trustProxyHops < 0 || trustProxyHops > 10) {
@@ -115,6 +116,12 @@ app.use(
 );
 
 app.use("/api", apiRateLimit);
+// API responses contain live account and booking state. Avoid ETag based 304
+// responses because the JSON API client expects a response body on every read.
+app.use("/api", (_req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
 
 app.use("/api/telemetry", express.json({ limit: "2kb" }), telemetryRoutes);
 

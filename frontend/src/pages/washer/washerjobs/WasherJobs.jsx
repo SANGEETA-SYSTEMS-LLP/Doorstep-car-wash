@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { BriefcaseBusiness, CheckCircle2, Clock3, RefreshCw, Send } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import useWasherWorkspace from "../../../hooks/useWasherWorkspace";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import WasherBookingCard from "../../../components/washer/WasherBookingCard";
 import { ACTIVE_STATUSES, getWasherJob, toActiveJob } from "../../../services/washer/washerWorkspaceService";
 import { acceptAssignment, rejectAssignment } from "../../../services/booking/assignmentService";
@@ -18,12 +17,12 @@ const filters = [
 export default function WasherJobs() {
   const navigate = useNavigate();
   const { acceptJob, updateJobStatus } = useWasher();
-  const { data, loading, error, errorStatus, refresh } = useWasherWorkspace();
+  const { data, loading, error, errorStatus, refresh } = useOutletContext();
   const [filter, setFilter] = useState("All");
   const [busy, setBusy] = useState("");
   const [actionError, setActionError] = useState("");
-  const allJobs = data?.jobs || [];
-  const assignments = data?.assignments || [];
+  const allJobs = (data?.jobs || []).filter(Boolean);
+  const assignments = (data?.assignments || []).filter(offer => offer?.booking);
   const jobs = filter === "Requests" ? assignments.map(offer => ({ ...offer.booking, assignment: offer })) : allJobs.filter(job => filter === "All"
     || (filter === "Active" ? ACTIVE_STATUSES.includes(job.status) : completedStatuses.includes(job.status)));
   const counts = {
@@ -92,7 +91,10 @@ export default function WasherJobs() {
     </div>}
 
     {!loading && !error && jobs.length > 0 && <div className="grid items-start gap-5 xl:grid-cols-2">
-      {jobs.map(booking => <WasherBookingCard key={booking.id} booking={booking} assignment={booking.assignment} busy={busy === booking.assignment?.id} onAccept={() => respond(booking.assignment, true)} onReject={() => respond(booking.assignment, false)} />)}
+      {jobs.map(booking => {
+        const assignment = filter === "Requests" ? booking.assignment : undefined;
+        return <WasherBookingCard key={booking.id} booking={booking} assignment={assignment} busy={busy === assignment?.id} onAccept={assignment ? () => respond(assignment, true) : undefined} onReject={assignment ? () => respond(assignment, false) : undefined} />;
+      })}
     </div>}
 
     {!loading && !error && !jobs.length && <section className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">

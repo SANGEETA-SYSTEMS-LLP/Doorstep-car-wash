@@ -2,8 +2,11 @@ import { supabaseAdmin as db } from "../../config/supabase.js";
 import { getCoverage } from "../../services/coverage/coverageService.js";
 import { calculateOfferDiscount } from "../../services/customer/customerOfferService.js";
 import { calculateCheckoutAmounts } from "../../services/checkout/checkoutPricing.js";
+import { createHash } from "node:crypto";
+import { monthlyTiers, monthlyPrices, normalizeVehicleType as normalizePackageType, fields as packageFields } from "../packages/packageCatalog.js";
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const bad=message=>Object.assign(new Error(message),{status:400});
+const virtualMonthlyId=/^monthly-[a-f0-9]{32}$/;
 const normalizeVehicleType=value=>String(value||"").trim().toLowerCase().replace(/[_-]+/g," ").replace(/\s+/g," ");
 function sameVehicleCategory(left,right){
  const category=value=>{const type=normalizeVehicleType(value);if(type.includes("luxury")||type.includes("large"))return "luxury";if(type.includes("hatch")||type==="compact")return "hatchback";if(type.includes("sedan"))return "sedan";if(["suv","muv","mpv","crossover"].some(token=>type.includes(token)))return "suv";return type;};
@@ -18,19 +21,31 @@ export function validateSchedule(date,time,now=Date.now()) {
 export async function createBooking(req,res,next) {
  try {
   const {requestId,addressId,vehicleId,packageId,date,time,paymentMethod,promoCode}=req.body||{};
-  if(![requestId,addressId,vehicleId,packageId].every(id=>uuid.test(id||"")))throw bad("Choose a saved address, vehicle and service package before checkout.");
+  if(!uuid.test(requestId||""))throw bad("This checkout request is invalid. Please refresh and try again.");
+  if(!uuid.test(addressId||""))throw bad("Choose a service address before checkout.");
+  if(!uuid.test(vehicleId||""))throw bad("Choose a vehicle before checkout.");
+  if(!uuid.test(packageId||"")&&!virtualMonthlyId.test(packageId||""))throw bad("Choose a service package before checkout.");
   if(!["cod","upi","card","netbanking","wallet","online"].includes(paymentMethod))throw bad("Choose a supported payment method.");
   const {data:customer,error:ce}=await db.from("customers").select("id").eq("user_id",req.user.id).single();if(ce)throw ce;
-  const {data:existing,error:ee}=await db.from("bookings").select("*").eq("id",requestId).eq("customer_id",customer.id).maybeSingle();if(ee)throw ee;
-  if(existing){if(existing.address_id!==addressId||existing.vehicle_id!==vehicleId||existing.package_id!==packageId||existing.payment_method!==paymentMethod||existing.scheduled_date!==date||existing.scheduled_start_time.slice(0,5)!==time.slice(0,5)||(existing.promo_code||"")!==(typeof promoCode === "string" ? promoCode.trim().toUpperCase() : ""))throw bad("This booking request already exists with different details.");return res.json({booking:existing});}
   validateSchedule(date,time);
   const results=await Promise.all([
    db.from("customer_addresses").select("*").eq("id",addressId).eq("customer_id",customer.id).single(),
    db.from("vehicles").select("id,vehicle_type").eq("id",vehicleId).eq("customer_id",customer.id).eq("is_active",true).single(),
-   db.from("service_packages").select("id,name,price,vehicle_type,is_active").eq("id",packageId).eq("is_active",true).single(),
   ]);
-  if(results.some(r=>r.error||!r.data))throw bad("The address, vehicle or package is unavailable.");
-  const [address,vehicle,pack]=results.map(r=>r.data);
+  if(results.some(r=>r.error||!r.data))throw bad("The address or vehicle is unavailable.");
+  const [address,vehicle]=results.map(r=>r.data);
+  let pack, bookingPackageId=packageId;
+  if(uuid.test(packageId)) {
+   const result=await db.from("service_packages").select("id,name,price,vehicle_type,is_active").eq("id",packageId).eq("is_active",true).single();
+   if(result.error||!result.data)throw bad("The selected service package is unavailable. Please choose it again.");
+   pack=result.data;
+  } else {
+   pack=await resolveMonthlyPlan(packageId,vehicle.vehicle_type);
+   if(!pack)throw bad("This monthly package is no longer available. Please select it again.");
+   bookingPackageId=pack.catalogId;
+  }
+  const {data:existing,error:ee}=await db.from("bookings").select("*").eq("id",requestId).eq("customer_id",customer.id).maybeSingle();if(ee)throw ee;
+  if(existing){if(existing.address_id!==addressId||existing.vehicle_id!==vehicleId||existing.package_id!==bookingPackageId||existing.payment_method!==paymentMethod||existing.scheduled_date!==date||existing.scheduled_start_time.slice(0,5)!==time.slice(0,5)||(existing.promo_code||"")!==(typeof promoCode === "string" ? promoCode.trim().toUpperCase() : ""))throw bad("This booking request already exists with different details.");return res.json({booking:existing});}
   if(!sameVehicleCategory(pack.vehicle_type,vehicle.vehicle_type))throw bad("Choose a package for this vehicle type.");
   if(!(await getCoverage(address.latitude,address.longitude)).available)throw bad("The selected address needs valid map coordinates.");
   const price=Number(pack.price);if(!Number.isFinite(price)||price<=0)throw bad("Invalid package price.");
@@ -52,7 +67,7 @@ export async function createBooking(req,res,next) {
    promoDiscount = calculateOfferDiscount({ code: normalizedPromoCode, servicePrice: price, packageName: pack.name, scheduledDate: date, firstBooking }).discountAmount;
   }
   const checkoutAmounts = calculateCheckoutAmounts(price, promoDiscount);
-  const bookingValues={id:requestId,customer_id:customer.id,address_id:addressId,vehicle_id:vehicleId,package_id:packageId,service_address:address.address_line,latitude:address.latitude,longitude:address.longitude,tower:address.tower,flat_number:address.flat_number,landmark:address.landmark,scheduled_date:date,scheduled_start_time:time,scheduled_time:time,base_amount:price,service_amount:price,platform_fee:checkoutAmounts.platformFee,discount_amount:checkoutAmounts.discountAmount,tax_amount:checkoutAmounts.taxAmount,total_amount:checkoutAmounts.totalAmount,payment_method:paymentMethod,status:"pending",requires_supervisor:true};
+  const bookingValues={id:requestId,customer_id:customer.id,address_id:addressId,vehicle_id:vehicleId,package_id:bookingPackageId,service_address:address.address_line,latitude:address.latitude,longitude:address.longitude,tower:address.tower,flat_number:address.flat_number,landmark:address.landmark,scheduled_date:date,scheduled_start_time:time,scheduled_time:time,base_amount:price,service_amount:price,platform_fee:checkoutAmounts.platformFee,discount_amount:checkoutAmounts.discountAmount,tax_amount:checkoutAmounts.taxAmount,total_amount:checkoutAmounts.totalAmount,payment_method:paymentMethod,status:"pending",requires_supervisor:true};
   if(normalizedPromoCode)bookingValues.promo_code=normalizedPromoCode;
   const {data,error}=await db.from("bookings").insert(bookingValues).select("*").single();
   if(error?.code==="23505")return res.status(409).json({message:normalizedPromoCode?"This offer was already redeemed on another booking.":"This request was already saved. Retry to retrieve it."});if(error)throw error;
@@ -68,4 +83,24 @@ export async function createBooking(req,res,next) {
   }
   next(error);
  }
+}
+
+async function resolveMonthlyPlan(packageId, vehicleType) {
+ const normalized=normalizePackageType(String(vehicleType||""));
+ const category=normalized.includes("luxury")||normalized.includes("large")?"luxury":normalized.includes("hatch")||normalized==="compact"?"hatchback":normalized.includes("sedan")?"sedan":["suv","muv","mpv","crossover"].some(token=>normalized.includes(token))?"suv":normalized;
+ const prices=monthlyPrices[category];if(!prices)return null;
+ const tiers=monthlyTiers.map(tier=>tier.washes);
+ // Monthly IDs include the service ID in their digest; find the active wash service first.
+ const {data:services,error:serviceError}=await db.from("services").select("id,name").eq("is_active",true).ilike("name","%wash%").order("name");
+ if(serviceError)throw serviceError;
+ const serviceId=(services||[]).find(service=>normalizePackageType(service.name)==="exterior wash")?.id||services?.[0]?.id;
+ if(!serviceId)return null;
+ const tierIndex=tiers.findIndex(washes=>packageId===`monthly-${createHash("sha256").update(`${serviceId}:${category}:${washes}`).digest("hex").slice(0,32)}`);
+ if(tierIndex<0)return null;
+ const {data:catalog,error}=await db.from("service_packages").select(packageFields).eq("service_id",serviceId).eq("is_active",true).order("price",{ascending:true});
+ if(error)throw error;
+ const template=(catalog||[]).find(item=>monthlyTiers.some(tier=>normalizePackageType(item.name||"").startsWith(normalizePackageType(tier.name))))||(catalog||[])[0];
+ if(!template)return null;
+ const tier=monthlyTiers[tierIndex];
+ return {id:packageId,catalogId:template.id,name:`${tier.name} - ${category}`,price:prices[tierIndex],vehicle_type:vehicleType,plan_washes:tier.washes};
 }

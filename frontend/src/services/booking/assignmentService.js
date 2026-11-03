@@ -14,13 +14,13 @@ export async function acceptAssignment(
   assignmentId
 ) {
   if (!assignmentId) throw new Error("Assignment ID is required.");
-  const { data } = await apiRequest(`/assignments/${encodeURIComponent(assignmentId)}/accept`, {
+  const result = await apiRequest(`/assignments/${encodeURIComponent(assignmentId)}/accept`, {
     method: "POST",
   });
 
   // Earnings are finalized after service/payment, not during acceptance.
 
-  return data.assignment;
+  return result.assignment;
 }
 
 export async function rejectAssignment(assignmentId, reason = null) {

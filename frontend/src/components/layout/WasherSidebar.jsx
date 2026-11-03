@@ -2,6 +2,7 @@ import ResponsiveNavigation from "./ResponsiveNavigation";
 import { WashNowMark } from "./WashNowBrand";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useState } from "react";
 import {
   Banknote,
   BriefcaseBusiness,
@@ -38,15 +39,17 @@ const menuItems = [
 function WasherSidebar() {
   const navigate = useNavigate();
   const { logout, profile } = useAuth();
+  const [logoutError, setLogoutError] = useState("");
   const displayName = profile?.full_name || "Washer Partner";
   const initials = displayName.trim().split(/\s+/).slice(0, 2).map((name) => name[0]).join("").toUpperCase();
 
   const handleLogout = async () => {
+    setLogoutError("");
     try {
       await logout();
       navigate("/login", { replace: true });
     } catch (error) {
-      console.error("Logout error:", error);
+      setLogoutError(error.message || "Unable to log out. Please try again.");
     }
   };
 
@@ -93,6 +96,7 @@ function WasherSidebar() {
       </nav>
 
       <div className="border-t border-slate-100 p-4">
+        {logoutError && <p role="alert" className="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{logoutError}</p>}
         <div className="mb-3 flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 font-bold text-green-800 ring-2 ring-white">
             {initials}

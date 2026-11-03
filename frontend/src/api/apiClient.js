@@ -40,6 +40,7 @@ export async function apiRequest(
       `${API_URL}${endpoint}`,
       {
         ...options,
+        cache: options.cache || "no-store",
 
         headers: {
           ...(!isFormData
@@ -62,6 +63,7 @@ export async function apiRequest(
     const renewed = await refreshAccessToken();
     if (renewed) response = await fetch(API_URL + endpoint, {
       ...options,
+      cache: options.cache || "no-store",
       headers: { ...(!isFormData ? {"Content-Type":"application/json"} : {}), ...options.headers, Authorization: "Bearer " + renewed },
     });
   }

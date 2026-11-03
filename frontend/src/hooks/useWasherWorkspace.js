@@ -22,7 +22,7 @@ export default function useWasherWorkspace() {
       finally { pending = false; if (active) setLoading(false); }
     }
     load();
-    const timer = setInterval(load, 10000);
+    const timer = setInterval(load, 5000);
     return () => { active = false; clearInterval(timer); };
   }, [user, version]);
   return { data: data?.sessionUserId === user?.id ? data : null, error, errorStatus, loading, refresh, accountUnavailable };

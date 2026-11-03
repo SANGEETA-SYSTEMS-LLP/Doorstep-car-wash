@@ -1,12 +1,11 @@
 import { currentPosition } from "../../../services/locations/maps";
 import { sendWasherLocation } from "../../../services/washer/washerJobService";
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { ArrowRight, Banknote, BriefcaseBusiness, CalendarDays, CheckCircle2, Clock3, Power, RefreshCw } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { useWasher } from "../../../context/WasherContext";
 import useApi from "../../../hooks/useApi";
-import useWasherWorkspace from "../../../hooks/useWasherWorkspace";
 import { ACTIVE_STATUSES, getWasherJob, setWasherAvailability, toActiveJob } from "../../../services/washer/washerWorkspaceService";
 import { acceptAssignment, rejectAssignment } from "../../../services/booking/assignmentService";
 import WasherBookingCard from "../../../components/washer/WasherBookingCard";
@@ -48,7 +47,7 @@ function formatCurrency(amount) {
 export default function WasherDashboard() {
   const { profile, user, logout } = useAuth();
   const { acceptJob, updateJobStatus, setOnline } = useWasher();
-  const { data, loading, error, refresh, accountUnavailable, errorStatus } = useWasherWorkspace();
+  const { data, loading, error, refresh, accountUnavailable, errorStatus } = useOutletContext();
   const [dashboardNow, setDashboardNow] = useState(() => new Date());
   useEffect(() => {
     const timer = setInterval(() => setDashboardNow(() => new Date()), 60000);
@@ -59,6 +58,7 @@ export default function WasherDashboard() {
   const earnings = useApi(earningsUrl);
   const [busy, setBusy] = useState("");
   const [actionError, setActionError] = useState("");
+  const autoOnlineUser = useRef(null);
   const navigate = useNavigate();
   const online = data?.washer?.status === "available";
   const jobs = data?.jobs || [];
@@ -76,6 +76,40 @@ export default function WasherDashboard() {
       return firstSchedule.localeCompare(secondSchedule);
     })
     .slice(0, 3);
+
+  useEffect(() => {
+    if (!user?.id || !data || data.sessionUserId !== user.id) return;
+    if (autoOnlineUser.current === user.id) return;
+    if (data.washer.status !== "offline" || !data.washer.is_verified || !data.payoutAccountConfigured || active.length) {
+      autoOnlineUser.current = user.id;
+      return;
+    }
+
+    let current = true;
+    setBusy("availability");
+    setActionError("");
+    (async () => {
+      try {
+        const point = await currentPosition();
+        if (!current) return;
+        await sendWasherLocation({ latitude: point.lat, longitude: point.lng });
+        if (!current) return;
+        await setWasherAvailability(true);
+        if (current) {
+          setOnline(true);
+          refresh();
+        }
+      } catch (err) {
+        if (current) setActionError(`Could not automatically go online: ${err.message} Use Go online to retry.`);
+      } finally {
+        if (current) {
+          autoOnlineUser.current = user.id;
+          setBusy("");
+        }
+      }
+    })();
+    return () => { current = false; };
+  }, [user?.id, data, active.length, refresh, setOnline]);
 
   useEffect(() => {
     if (!locationTracking || !navigator.geolocation) return;

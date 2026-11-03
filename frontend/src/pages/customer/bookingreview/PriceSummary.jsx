@@ -45,6 +45,24 @@ function PriceSummary({
       {paymentError && (
         <div role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           {paymentError}
+          {paymentError.toLowerCase().includes("address") && (
+            <button
+              type="button"
+              onClick={() => navigate("/customer/select-location")}
+              className="mt-2 block font-semibold underline"
+            >
+              Choose a service address
+            </button>
+          )}
+          {paymentError.toLowerCase().includes("vehicle") && (
+            <button
+              type="button"
+              onClick={() => navigate("/customer/select-vehicle")}
+              className="mt-2 block font-semibold underline"
+            >
+              Choose a vehicle
+            </button>
+          )}
           {paymentError.toLowerCase().includes("package") && (
             <button
               type="button"

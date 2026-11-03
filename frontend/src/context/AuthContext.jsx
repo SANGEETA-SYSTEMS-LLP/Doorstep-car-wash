@@ -156,6 +156,19 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
+    if (profile?.role === "washer") {
+      try {
+        await apiRequest("/washer/availability", {
+          method: "PATCH",
+          body: JSON.stringify({ online: false }),
+        });
+      } catch (error) {
+        // Busy washers stay marked busy until their active job is completed.
+        // Any other failure should keep the session open so they are not left
+        // available for new assignments after an unsuccessful logout.
+        if (error.status !== 409) throw error;
+      }
+    }
     const { error } =
       await supabase.auth.signOut();
 

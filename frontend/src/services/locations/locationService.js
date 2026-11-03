@@ -10,13 +10,18 @@ function requireUser(userId) {
 export async function saveServiceAddress(userId, location, address = {}, societyId) {
   requireUser(userId);
   if (!validServiceAddress(location)) throw new Error("Select a map pin and enter a complete street address.");
-  return apiRequest("/account/addresses", { method: "POST", body: JSON.stringify({
+  const result = await apiRequest("/account/addresses", { method: "POST", body: JSON.stringify({
     address_id: location.addressId || null,
     label: location.name?.trim() || "Service location", address_line: location.address.trim(),
     society_id: societyId || null, tower: address.tower || null, flat_number: address.flatNumber || null,
     landmark: address.landmark || null, city: location.city || null, state: location.state || null,
     postal_code: location.postalCode || null, latitude: Number(location.latitude), longitude: Number(location.longitude),
   }) });
+  // The endpoint may return either the address row or a small { id } result.
+  // Normalize here so the checkout always receives the saved address ID.
+  const addressId = result?.id || result?.address?.id || result?.row?.id;
+  if (!addressId) throw new Error("Your address was saved without an ID. Please try selecting it again.");
+  return { ...result, id: addressId };
 }
 export async function getSavedAddresses(userId) {
   if (!userId) return [];
