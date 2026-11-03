@@ -93,7 +93,8 @@ function convertBookingDate(
       "0"
     );
 
-  return `2026-${month}-${day}`;
+  const year = dateObject.year || new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric" }).format(new Date());
+  return `${year}-${month}-${day}`;
 }
 
 function convertTimeTo24Hour(time) {

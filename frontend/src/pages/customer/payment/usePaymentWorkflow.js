@@ -5,6 +5,7 @@ import { useBooking } from "../../../context/BookingContext";
 import { useAuth } from "../../../context/AuthContext";
 import { createBooking } from "../../../services/booking/bookingService";
 import { openRazorpayPayment } from "./paymentHelpers";
+import { canSelectSlot } from "../selectschedule/data";
 
 function usePaymentWorkflow() {
   const { booking, updateBooking } = useBooking();
@@ -34,6 +35,10 @@ function usePaymentWorkflow() {
     }
     if (!user) {
       setPaymentError("Please login before creating a booking.");
+      return;
+    }
+    if (!canSelectSlot(booking.schedule?.date?.iso, booking.schedule?.time)) {
+      setPaymentError("Your selected service date or time has passed. Choose a new schedule to continue.");
       return;
     }
     processingRef.current = true;

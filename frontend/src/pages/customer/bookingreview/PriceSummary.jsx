@@ -63,6 +63,15 @@ function PriceSummary({
               Choose a vehicle
             </button>
           )}
+          {(paymentError.toLowerCase().includes("schedule") || paymentError.toLowerCase().includes("date or time") || paymentError.toLowerCase().includes("service time")) && (
+            <button
+              type="button"
+              onClick={() => navigate("/customer/select-schedule")}
+              className="mt-2 block font-semibold underline"
+            >
+              Choose a new date and time
+            </button>
+          )}
           {paymentError.toLowerCase().includes("package") && (
             <button
               type="button"

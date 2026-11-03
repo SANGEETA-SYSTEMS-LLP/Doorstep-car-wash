@@ -12,11 +12,11 @@ function loadRazorpayScript() {
 }
 
 export async function openRazorpayPayment(savedBooking, completeBooking, onError, onDone) {
+  const order = await createPaymentOrder(savedBooking.id);
   const scriptLoaded = await loadRazorpayScript();
   if (!scriptLoaded) {
     throw new Error("Unable to load Razorpay checkout. Check your connection and try again.");
   }
-  const order = await createPaymentOrder(savedBooking.id);
   if (!order.keyId) throw new Error("Razorpay did not return a checkout key.");
   if (import.meta.env.DEV && !order.keyId.startsWith("rzp_test_")) {
     throw new Error("Razorpay test mode is required during development. Configure a test key in the backend environment.");
