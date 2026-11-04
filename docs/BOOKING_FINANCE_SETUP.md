@@ -28,6 +28,8 @@ Deploy the updated backend with them. The second migration removes browser write
 
 Customer cancellation is available before service starts. It retains the recorded platform fee and returns the remaining captured online amount through Razorpay. Apply `backend/database/add_customer_booking_cancellation_refunds.sql` before enabling the cancel action. In Razorpay webhook settings, enable `refund.processed` and `refund.failed` in addition to `payment.captured` so the cancellation ledger and customer history receive final refund status.
 
+If online checkout is retried after a booking has advanced to washer assignment or service, apply `backend/database/repair_razorpay_checkout_booking_statuses.sql` in the hosted database. It updates the payment reservation function to accept active unpaid online bookings while keeping cancelled/expired bookings and COD checkout protected. Deploy the app after applying the SQL.
+
 `backend/database/repair_customer_cancellation_pending_payments.sql` updates the cancellation RPC so customers can cancel while an online payment is still pending. It records the open payment against the cancellation and automatically initiates a refund if that payment is captured after cancellation. Apply this repair after the cancellation/refund migration and deploy the matching backend code together.
 
 Set these privately in backend/.env (examples are in backend/.env.example):

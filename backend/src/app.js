@@ -87,7 +87,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "blob:", "https://*.supabase.co", "https://*.googleapis.com", "https://*.gstatic.com", "https://tile.openstreetmap.org", "https://*.tile.openstreetmap.org", "https://*.razorpay.com"],
-      connectSrc: ["'self'", "https://*.supabase.co", "wss://*.supabase.co", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://maps.googleapis.com", "https://maps.gstatic.com", "https://nominatim.openstreetmap.org", "https://*.tile.openstreetmap.org", "https://*.openstreetmap.org"],
+      connectSrc: ["'self'", "https://*.supabase.co", "wss://*.supabase.co", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://lumberjack.razorpay.com", "https://maps.googleapis.com", "https://maps.gstatic.com", "https://nominatim.openstreetmap.org", "https://*.tile.openstreetmap.org", "https://*.openstreetmap.org"],
       frameSrc: ["https://api.razorpay.com", "https://checkout.razorpay.com"],
       upgradeInsecureRequests: process.env.NODE_ENV === "production" ? [] : null,
     },

@@ -49,7 +49,11 @@ BEGIN
     RAISE EXCEPTION 'The booking payment window has expired.' USING errcode = '55000';
   END IF;
   IF (NOT v_online AND v_booking.status::text NOT IN ('customer_confirmed', 'closed'))
-     OR (v_online AND v_booking.status::text NOT IN ('pending', 'customer_confirmed')) THEN
+     OR (v_online AND v_booking.status::text NOT IN (
+       'pending', 'confirmed', 'finding_washer', 'support_escalated',
+       'washer_assigned', 'washer_on_the_way', 'washer_arrived', 'otp_verified',
+       'service_started', 'service_completed', 'customer_confirmed', 'payment_completed', 'closed'
+     )) THEN
     RAISE EXCEPTION 'This booking is not eligible for online payment.' USING errcode = '55000';
   END IF;
   IF v_booking.total_amount IS NULL OR v_booking.total_amount <= 0 THEN
