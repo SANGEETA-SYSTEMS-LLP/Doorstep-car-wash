@@ -5,7 +5,6 @@ import { GST_RATE_PERCENT, formatRupees } from "../../../services/payments/check
 function PriceSummary({
   booking,
   servicePrice,
-  platformFee,
   discount,
   offerDiscount = 0,
   appliedOffer,
@@ -21,7 +20,6 @@ function PriceSummary({
       <h2 className="text-xl font-bold">Price Summary</h2>
       <div className="mt-6 space-y-4 text-sm">
         <Price label={booking.package?.name || "Service"} amount={formatRupees(servicePrice)} />
-        <Price label="Platform fee" amount={formatRupees(platformFee)} />
         {discount > 0 && <Price label={appliedOffer ? `${appliedOffer.code} offer` : "Discount"} amount={`-${formatRupees(discount)}`} green />}
         <Price label={`GST (${GST_RATE_PERCENT}%)`} amount={formatRupees(taxAmount)} />
       </div>

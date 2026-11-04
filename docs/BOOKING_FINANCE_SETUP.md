@@ -2,7 +2,7 @@
 
 ## Implemented
 
-- Customer booking creation now uses POST /api/customer/bookings. The server checks customer ownership of the saved vehicle/address, active package and matching vehicle type, service coverage, and a future India-time schedule within 90 days. It reads the package price from the database; supplied browser prices are ignored. The existing INR 20 fee / INR 20 discount pricing behavior is preserved.
+- Customer booking creation now uses POST /api/customer/bookings. The server checks customer ownership of the saved vehicle/address, active package and matching vehicle type, service coverage, and a future India-time schedule within 90 days. It reads the package price from the database; supplied browser prices are ignored. New bookings include GST, with the platform fee and automatic 10% discount temporarily disabled. Customer-entered offer codes remain supported.
 - A request UUID lets checkout retry a booking creation without creating a second booking. Online washer assignment requires a paid payment for the booking amount.
 - Online verification checks the checkout signature AND fetches Razorpay's captured payment, matching order, amount and INR currency. Captured webhooks use the same validation. Existing unpaid orders are reused; already-paid bookings reject new orders.
 - Cash collection uses an atomic database function and a unique active-payment index. Earnings have a unique booking index, and repeated callbacks do not recalculate existing earnings.

@@ -4,7 +4,7 @@ import { LockKeyhole, ShieldCheck } from "lucide-react";
 import SummaryRow from "./SummaryRow";
 import { GST_RATE_PERCENT, formatRupees } from "../../../services/payments/checkoutPricing";
 
-function PaymentSummary({ booking, servicePrice, platformFee, discount, offerDiscount = 0, appliedOffer, total, taxAmount, processing, paymentError, handlePayment }) {
+function PaymentSummary({ booking, servicePrice, discount, offerDiscount = 0, appliedOffer, total, taxAmount, processing, paymentError, handlePayment }) {
   const compatible = isPackageForVehicle(booking.package, booking.vehicle);
   return (
     <aside>
@@ -33,11 +33,6 @@ function PaymentSummary({ booking, servicePrice, platformFee, discount, offerDis
                 <SummaryRow
                   label="Service amount"
                   value={formatRupees(servicePrice)}
-                />
-
-                <SummaryRow
-                  label="Platform fee"
-                  value={formatRupees(platformFee)}
                 />
 
                 {discount > 0 && <SummaryRow label={appliedOffer ? `${appliedOffer.code} offer` : "Discount"} value={`-${formatRupees(discount)}`} green />}

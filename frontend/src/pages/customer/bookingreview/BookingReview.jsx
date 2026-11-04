@@ -16,7 +16,7 @@ function BookingReview() {
   const [offerBusy, setOfferBusy] = useState(false);
   const servicePrice = booking.package?.price || 0;
   const offerDiscount = Number(booking.appliedOffer?.discountAmount || 0);
-  const { platformFee, discountAmount: discount, automaticDiscountAmount, offerDiscountAmount, taxAmount, totalAmount: total } = getCheckoutPriceBreakdown(servicePrice, offerDiscount);
+  const { discountAmount: discount, automaticDiscountAmount, offerDiscountAmount, taxAmount, totalAmount: total } = getCheckoutPriceBreakdown(servicePrice, offerDiscount);
 
   const navigate = useNavigate();
 
@@ -87,7 +87,6 @@ function BookingReview() {
         <BookingReviewContent
           booking={booking}
           servicePrice={servicePrice}
-          platformFee={platformFee}
           discount={discount}
           automaticDiscountAmount={automaticDiscountAmount}
           offerDiscountAmount={offerDiscountAmount}

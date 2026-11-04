@@ -1,5 +1,7 @@
-export const PLATFORM_FEE_INR = 20;
-export const AUTOMATIC_DISCOUNT_PERCENT = 10;
+// Temporarily disabled; new customer bookings do not include a platform fee.
+export const PLATFORM_FEE_INR = 0;
+// Temporarily disabled; new bookings receive no automatic discount.
+export const AUTOMATIC_DISCOUNT_PERCENT = 0;
 
 const configuredTaxRate = Number(process.env.GST_RATE_PERCENT ?? 18);
 if (!Number.isFinite(configuredTaxRate) || configuredTaxRate < 0 || configuredTaxRate > 100) {

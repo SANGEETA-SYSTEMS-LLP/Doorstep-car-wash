@@ -1,5 +1,8 @@
-export const PLATFORM_FEE_INR = 20;
-export const AUTOMATIC_DISCOUNT_PERCENT = 10;
+// Temporarily disabled. Keep the shared field at zero so the browser quote
+// matches the amount persisted by the backend for every new booking.
+export const PLATFORM_FEE_INR = 0;
+// Temporarily disabled; customer totals no longer include an automatic discount.
+export const AUTOMATIC_DISCOUNT_PERCENT = 0;
 
 const configuredGstRate = Number(import.meta.env.VITE_GST_RATE_PERCENT ?? 18);
 export const GST_RATE_PERCENT = Number.isFinite(configuredGstRate)

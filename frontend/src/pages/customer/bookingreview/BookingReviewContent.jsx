@@ -5,7 +5,6 @@ import PriceSummary from "./PriceSummary";
 function BookingReviewContent({
   booking,
   servicePrice,
-  platformFee,
   discount,
   offerDiscount,
   appliedOffer,
@@ -132,7 +131,6 @@ function BookingReviewContent({
           <PriceSummary
             booking={booking}
             servicePrice={servicePrice}
-            platformFee={platformFee}
             discount={discount}
             offerDiscount={offerDiscount}
             appliedOffer={appliedOffer}
