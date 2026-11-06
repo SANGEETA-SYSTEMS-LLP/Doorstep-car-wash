@@ -25,6 +25,18 @@ function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  if (accountType !== "customer") {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-5 py-10">
+        <section className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-8 text-center">
+          <h1 className="text-2xl font-bold text-slate-950">Staff accounts require an administrator</h1>
+          <p className="mt-3 text-sm leading-6 text-slate-600">Public registration is only available for customer accounts. Contact an administrator to request staff access.</p>
+          <a href="/login" className="mt-6 inline-flex rounded-lg bg-green-800 px-5 py-3 text-sm font-semibold text-white hover:bg-green-900">Go to sign in</a>
+        </section>
+      </main>
+    );
+  }
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((previous) => ({ ...previous, [name]: value }));

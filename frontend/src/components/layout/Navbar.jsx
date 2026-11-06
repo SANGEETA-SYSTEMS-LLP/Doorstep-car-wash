@@ -34,7 +34,6 @@ function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link to="/register?role=washer" className="hidden items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-green-800 sm:inline-flex">Partner with us <ArrowUpRight size={15} /></Link>
           <Link to="/login" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-green-800">Log in</Link>
           <SignupDropdown />
         </div>

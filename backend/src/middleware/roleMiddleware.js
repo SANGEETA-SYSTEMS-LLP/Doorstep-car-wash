@@ -12,7 +12,7 @@ export function allowRoles(...allowedRoles) {
 }
 
 export function restrictSuperAdminToPrimaryEmail(req, res, next) {
-  if (req.profile?.role === "super_admin" && !isPrimaryAdminEmail(req.user?.email)) {
+  if (req.profile?.role !== "super_admin" || !isPrimaryAdminEmail(req.user?.email)) {
     return res.status(403).json({ message: "You do not have permission to access the admin console." });
   }
   next();

@@ -15,7 +15,6 @@ BEGIN
       ('ssadmin@sangeetasystems.com', 'super_admin'),
       ('gayatri.panda@sangeetasystems.com', 'supervisor'),
       ('gayatripanda949@gmail.com', 'washer'),
-      ('supportsstech@gmail.com', 'accountant'),
       ('atalari04@gmail.com', 'sub_admin')
     ) AS expected(email, role)
   LOOP
@@ -48,7 +47,6 @@ SELECT u.email, p.full_name, p.role, p.is_active
    lower('ssadmin@sangeetasystems.com'),
    lower('gayatri.panda@sangeetasystems.com'),
    lower('gayatripanda949@gmail.com'),
-   lower('supportsstech@gmail.com'),
    lower('atalari04@gmail.com')
  )
  ORDER BY lower(u.email);

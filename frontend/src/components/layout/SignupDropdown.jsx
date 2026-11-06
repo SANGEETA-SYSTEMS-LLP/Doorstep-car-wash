@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, Car, Droplets, ShieldCheck } from "lucide-react";
+import { ChevronDown, Car } from "lucide-react";
 
 export default function SignupDropdown() {
   const [open, setOpen] = useState(false);
@@ -21,8 +21,6 @@ export default function SignupDropdown() {
     {open && <div id={id} className="absolute right-0 top-full z-50 mt-3 w-64 rounded-lg border border-slate-200 bg-[#fbfcfb] p-2 shadow-md">
       <div className="px-3 pb-2 pt-1"><p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Choose your account</p></div>
       <Link to="/register?role=customer" onClick={finish} className={linkClass}><Car size={18} className="text-green-700" /><span><span className="block">Customer</span><span className="mt-0.5 block text-xs font-normal text-slate-500">Book doorstep car care</span></span></Link>
-      <Link to="/register?role=washer" onClick={finish} className={linkClass}><Droplets size={18} className="text-green-700" /><span><span className="block">Washer partner</span><span className="mt-0.5 block text-xs font-normal text-slate-500">Manage jobs and earnings</span></span></Link>
-      <Link to="/register?role=supervisor" onClick={finish} className={linkClass}><ShieldCheck size={18} className="text-slate-500" /><span><span className="block">Supervisor</span><span className="mt-0.5 block text-xs font-normal text-slate-500">Apply to manage local operations</span></span></Link>
     </div>}
   </div>;
 }
