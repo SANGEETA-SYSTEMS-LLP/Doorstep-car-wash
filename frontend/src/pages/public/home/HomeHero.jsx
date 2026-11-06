@@ -25,19 +25,19 @@ function HomeHero() {
           <p className="mt-6 max-w-xl text-base leading-8 text-slate-700 sm:text-lg">Choose a service location, vehicle and time. Follow the booking as a local supervisor assigns an available washer.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link to={bookingPath} className="inline-flex min-h-12 items-center justify-center rounded-lg bg-green-800 px-6 py-3 text-sm font-semibold text-white hover:bg-green-900">Book a wash</Link>
-            <Link to="/register?role=washer" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-slate-400 bg-transparent px-6 py-3 text-sm font-semibold text-slate-800 hover:bg-white">Apply as a washer</Link>
+            <a href="mailto:supportsstech@gmail.com?subject=Washer%20partner%20application" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-slate-400 bg-transparent px-6 py-3 text-sm font-semibold text-slate-800 hover:bg-white">Ask about washer opportunities</a>
           </div>
-          <p className="mt-4 text-xs text-slate-600">Already registered? <Link to="/login" className="font-semibold text-green-900 underline">Sign in</Link>. Washer accounts need supervisor approval.</p>
+          <p className="mt-4 text-sm leading-6 text-slate-600">Already registered? <Link to="/login" className="font-semibold text-green-900 underline">Sign in</Link>. Washer accounts need supervisor approval.</p>
         </div>
         <section aria-label="Interactive booking walkthrough preview" className="border border-slate-300 bg-[#f8faf9] p-5 sm:p-7">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-300 pb-4">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-600">Booking walkthrough</p>
-            <span className="text-xs text-slate-500">Step {step + 1} of {preview.length}</span>
+            <span className="text-sm text-slate-600">Step {step + 1} of {preview.length}</span>
           </div>
           <div className="flex flex-wrap gap-2 border-b border-slate-200 py-3" role="group" aria-label="Choose a walkthrough step">
-            {preview.map((item, index) => <button key={item.label} type="button" aria-pressed={step === index} onClick={() => setStep(index)} className={`min-h-10 px-3 text-xs font-semibold ${step === index ? "border-b-2 border-green-700 text-green-800" : "text-slate-600 hover:text-slate-950"}`}>{item.label}</button>)}
+            {preview.map((item, index) => <button key={item.label} type="button" aria-pressed={step === index} onClick={() => setStep(index)} className={`min-h-11 px-3 text-sm font-semibold ${step === index ? "border-b-2 border-green-700 text-green-800" : "text-slate-600 hover:text-slate-950"}`}>{item.label}</button>)}
           </div>
-          <div id="booking-walkthrough-preview" className="min-h-64 py-6" aria-live="polite">
+          <div id="booking-walkthrough-preview" className="min-h-56 py-5 sm:min-h-64 sm:py-6" aria-live="polite">
             <div className="flex items-start gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-green-100 bg-green-50 text-green-800"><PreviewIcon size={19} aria-hidden="true" /></span>
               <div><h2 className="text-xl font-bold tracking-tight text-slate-950">{active.title}</h2><p className="mt-1 text-sm leading-6 text-slate-600">{active.detail}</p></div>

@@ -16,7 +16,7 @@ function About() {
           </article>
           <article className="grid gap-3 py-6 sm:grid-cols-[10rem_1fr] sm:gap-6">
             <p className="text-xs font-bold uppercase tracking-wide text-green-800">For washer partners</p>
-            <div><h3 className="text-lg font-bold text-slate-950">Manage assigned work</h3><p className="mt-2 text-sm leading-6 text-slate-600">After verification and approval, review assigned job details, update service progress, and see completed work and earnings in the washer workspace.</p><Link to="/register?role=washer" className="mt-3 inline-block text-sm font-semibold text-green-900 underline">Apply as a washer partner</Link></div>
+            <div><h3 className="text-lg font-bold text-slate-950">Manage assigned work</h3><p className="mt-2 text-sm leading-6 text-slate-600">After verification and approval, review assigned job details, update service progress, and see completed work and earnings in the washer workspace.</p><a href="mailto:supportsstech@gmail.com?subject=Washer%20partner%20application" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-green-900 underline">Ask about washer partner opportunities</a></div>
           </article>
           <article className="grid gap-3 py-6 sm:grid-cols-[10rem_1fr] sm:gap-6">
             <p className="text-xs font-bold uppercase tracking-wide text-green-800">Local operations</p>

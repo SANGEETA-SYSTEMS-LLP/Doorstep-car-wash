@@ -46,7 +46,7 @@ const faqs = [
 ];
 
 export default function ServiceGuide() {
-  return <section className="bg-white py-16 sm:py-20" aria-labelledby="service-guide-title">
+  return <section className="bg-white py-12 sm:py-20" aria-labelledby="service-guide-title">
     <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
       <div className="grid gap-10 lg:grid-cols-[.78fr_1.22fr] lg:gap-16">
         <div>
@@ -63,12 +63,12 @@ export default function ServiceGuide() {
           </article>)}
         </div>
       </div>
-      <div className="mt-16 grid gap-10 border-t border-slate-200 pt-12 lg:grid-cols-[.65fr_1.35fr] lg:gap-16">
+      <div className="mt-12 grid gap-7 border-t border-slate-200 pt-8 sm:mt-16 sm:gap-10 sm:pt-12 lg:grid-cols-[.65fr_1.35fr] lg:gap-16">
         <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-green-800">Good to know</p><h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Doorstep car wash questions, answered.</h2><p className="mt-4 text-sm leading-6 text-slate-600">A little clarity makes it easier to choose a wash and plan your appointment.</p><p className="mt-5 flex items-center gap-2 text-sm font-semibold text-slate-700"><CircleHelp size={17} className="text-green-800"/>More help is available from your customer account.</p></div>
         <div className="divide-y divide-slate-200 border-y border-slate-200">
-          {faqs.map(({ question, answer }) => <details key={question} className="group py-4">
-            <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-4 text-left text-sm font-bold text-slate-950 marker:hidden">{question}<span aria-hidden="true" className="text-lg font-normal text-green-800 transition-transform group-open:rotate-45">+</span></summary>
-            <p className="max-w-3xl pb-2 pr-8 text-sm leading-6 text-slate-600">{answer}</p>
+          {faqs.map(({ question, answer }) => <details key={question} className="group py-2 sm:py-3">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-4 py-2 text-left text-base font-bold leading-6 text-slate-950 marker:hidden sm:min-h-14">{question}<span aria-hidden="true" className="shrink-0 text-xl font-normal text-green-800 transition-transform group-open:rotate-45">+</span></summary>
+            <p className="max-w-3xl pb-3 pr-8 text-sm leading-6 text-slate-600 sm:text-base">{answer}</p>
           </details>)}
         </div>
       </div>
