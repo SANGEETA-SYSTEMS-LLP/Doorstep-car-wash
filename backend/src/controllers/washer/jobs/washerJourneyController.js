@@ -6,7 +6,8 @@ export async function startJourney(req, res) {
     const { bookingId } = req.params;
     const booking = await getAssignedBooking(bookingId, req.user.id);
 
-    if (booking.status !== "washer_assigned") {
+    const legacyAcceptedPaidJob = booking.status === "payment_completed" && !booking.service_validated_at;
+    if (booking.status !== "washer_assigned" && !legacyAcceptedPaidJob) {
       return res.status(400).json({
         message: `Cannot start journey from status ${booking.status}.`,
       });
@@ -21,7 +22,7 @@ export async function startJourney(req, res) {
       })
       .eq("id", bookingId)
       .eq("assigned_washer_id", booking.assigned_washer_id)
-      .eq("status", "washer_assigned")
+      .eq("status", booking.status)
       .select("*")
       .single();
 

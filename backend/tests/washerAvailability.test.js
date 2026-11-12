@@ -1,20 +1,21 @@
 import { test, mock } from "node:test";
 import assert from "node:assert/strict";
 
-let washer, payoutAccount, calls, updateValues;
+let washer, payoutAccount, calls, updateValues, activeBookings;
 const database = { from(table) {
   const query = {};
   calls.push(table);
   query.select = () => query;
   query.eq = () => query;
   query.in = () => query;
+  query.or = () => query;
   query.limit = () => query;
   query.update = values => { updateValues = values; return query; };
   query.maybeSingle = async () => ({
     data: table === "washer_payout_accounts" ? payoutAccount : { id: washer.id, status: "available" },
     error: null,
   });
-  query.then = (resolve, reject) => Promise.resolve({ data: [], error: null }).then(resolve, reject);
+  query.then = (resolve, reject) => Promise.resolve({ data: table === "bookings" ? activeBookings : [], error: null }).then(resolve, reject);
   return query;
 } };
 
@@ -34,9 +35,11 @@ function reset(overrides = {}) {
     : overrides.payoutAccount;
   calls = [];
   updateValues = null;
+  activeBookings = [];
 }
 
-async function run(online = true) {
+async function run(online = true, bookings = []) {
+  activeBookings = bookings;
   let status = 200;
   let body;
   const response = {
@@ -69,4 +72,19 @@ test("unverified washer cannot go online even with payout details", async () => 
   assert.equal(result.status, 403);
   assert.match(result.body.message, /verification/i);
   assert.deepEqual(calls, []);
+});
+
+test("validated service completion does not block availability even if washer status is stale busy", async () => {
+  reset({ washer: { status: "busy" } });
+  const result = await run(true, [{ id: "booking-1", status: "service_completed", service_validated_at: "2026-11-12T10:00:00Z" }]);
+  assert.equal(result.status, 200);
+  assert.equal(updateValues.status, "available");
+});
+
+test("unfinished assigned service still blocks availability changes", async () => {
+  reset();
+  const result = await run(false, [{ id: "booking-2", status: "washer_arrived", service_validated_at: null }]);
+  assert.equal(result.status, 409);
+  assert.match(result.body.message, /complete your active job/i);
+  assert.equal(updateValues, null);
 });

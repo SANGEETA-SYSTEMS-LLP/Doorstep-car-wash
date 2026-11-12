@@ -64,7 +64,7 @@ export async function validateServiceCompletion({
     })
     .eq("id", bookingId)
     .eq("status", "service_completed")
-    .select("id, status, assigned_washer_id")
+    .select("id, status, assigned_washer_id, service_validated_at")
     .maybeSingle();
 
   if (updateError) throw updateError;

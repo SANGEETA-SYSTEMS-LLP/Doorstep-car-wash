@@ -1,6 +1,6 @@
 import { RefreshCw, UserRound } from "lucide-react";
 
-function EscalationAssignment({ booking, washers, canAssign, loading, assigningId, success, onRefresh, onAssign, navigate }) {
+function EscalationAssignment({ booking, washers, canAssign, paymentPending, loading, assigningId, success, onRefresh, onAssign, navigate }) {
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -20,6 +20,8 @@ function EscalationAssignment({ booking, washers, canAssign, loading, assigningI
         <div className="mt-4 rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
           {booking.assigned_washer_id
             ? "This booking already has an assigned washer."
+            : paymentPending
+              ? "The customer must complete payment before this booking can be offered to a washer."
             : "This booking is not eligible for manual assignment. Check its status and supervisor flag."}
         </div>
       )}

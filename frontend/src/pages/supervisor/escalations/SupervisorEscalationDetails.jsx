@@ -40,8 +40,7 @@ export default function SupervisorEscalationDetails() {
   }
 
   const canAssign = !booking.assigned_washer_id &&
-    booking.requires_supervisor === true &&
-    ["pending", "confirmed", "finding_washer", "support_escalated"].includes(booking.status);
+    booking.requires_supervisor === true && booking.status === "payment_completed";
 
   return (
     <div className="space-y-6">
@@ -71,6 +70,7 @@ export default function SupervisorEscalationDetails() {
         booking={booking}
         washers={washers}
         canAssign={canAssign}
+        paymentPending={!booking.assigned_washer_id && booking.status !== "payment_completed"}
         loading={loading}
         assigningId={assigningId}
         success={success}

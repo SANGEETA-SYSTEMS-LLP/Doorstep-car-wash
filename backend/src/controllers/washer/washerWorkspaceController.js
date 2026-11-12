@@ -20,9 +20,10 @@ export async function setAvailability(req, res) {
       if (payoutError) throw payoutError;
       if (!payoutAccount?.account_label || !(payoutAccount.destination_encrypted || payoutAccount.fund_account_id)) return res.status(403).json({ message: "Add and save your payout account in Profile before going online and receiving job assignments." });
     }
-    const { data: active, error: checkError } = await supabaseAdmin.from("bookings").select("id").eq("assigned_washer_id", washer.id).in("status", activeJobStatuses).limit(1);
+    const { data: active, error: checkError } = await supabaseAdmin.from("bookings").select("id,status,service_validated_at").eq("assigned_washer_id", washer.id).in("status", activeJobStatuses).limit(20);
     if (checkError) throw checkError;
-    if (active?.length || washer.status === "busy") return res.status(409).json({ message: "Complete your active job before changing availability." });
+    const hasActiveJob = (active || []).some(booking => booking.status !== "service_completed" || !booking.service_validated_at);
+    if (hasActiveJob) return res.status(409).json({ message: "Complete your active job before changing availability." });
     const { data, error } = await supabaseAdmin.from("washers").update({ status: req.body.online ? "available" : "offline", updated_at: new Date().toISOString() }).eq("id", washer.id).eq("status", washer.status).select("id, status").maybeSingle();
     if (error) throw error;
     if (!data) return res.status(409).json({ message: "Availability changed. Refresh and try again." });

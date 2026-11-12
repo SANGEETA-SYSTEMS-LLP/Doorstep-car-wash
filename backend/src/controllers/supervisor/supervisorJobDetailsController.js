@@ -49,7 +49,7 @@ export async function getSupervisorJobDetails(req, res) {
     let washers = [];
     if (
       !booking.assigned_washer_id &&
-      ["pending", "confirmed", "finding_washer", "support_escalated", "payment_completed"].includes(booking.status)
+      booking.status === "payment_completed"
     ) {
       let washerQuery = supabaseAdmin
         .from("washers")

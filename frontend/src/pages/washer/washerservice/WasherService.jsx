@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useWasher } from "../../../context/WasherContext";
 import useServiceChecklist from "./useServiceChecklist";
@@ -6,6 +6,7 @@ import useWasherServiceActions from "./useWasherServiceActions";
 import WasherServiceHeader from "./WasherServiceHeader";
 import WasherServiceStages from "./WasherServiceStages";
 import NoActiveService from "./NoActiveService";
+import { getWasherJob, toActiveJob } from "../../../services/washer/washerWorkspaceService";
 
 function WasherService() {
   const context = useWasher();
@@ -26,6 +27,26 @@ function WasherService() {
   const [validating, setValidating] = useState(false);
   const [beforePhotos, setBeforePhotos] = useState([]);
   const [afterPhotos, setAfterPhotos] = useState([]);
+  const [jobLoading, setJobLoading] = useState(true);
+  const [jobError, setJobError] = useState("");
+  const { restoreJob } = context;
+  useEffect(() => {
+    let mounted = true;
+    setJobLoading(true);
+    setJobError("");
+    getWasherJob(jobId)
+      .then(({ booking }) => {
+        if (!mounted) return;
+        restoreJob(toActiveJob(booking));
+      })
+      .catch((err) => {
+        if (mounted) setJobError(err.message || "Unable to load this assigned job.");
+      })
+      .finally(() => {
+        if (mounted) setJobLoading(false);
+      });
+    return () => { mounted = false; };
+  }, [jobId, restoreJob]);
   const checklist = useServiceChecklist(activeJob, serviceStarted, setError);
   const actions = useWasherServiceActions({
     activeJob,
@@ -45,7 +66,15 @@ function WasherService() {
     updateJobStatus: context.updateJobStatus,
   });
 
-  if (!activeJob) {
+  if (jobLoading) {
+    return <main className="flex min-h-[60vh] items-center justify-center p-6"><p role="status" className="text-sm text-slate-600">Loading assigned service...</p></main>;
+  }
+
+  if (jobError) {
+    return <main className="mx-auto max-w-xl p-6"><div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">{jobError}</div><button type="button" onClick={() => navigate("/washer/jobs")} className="mt-4 font-semibold text-green-800 underline">Back to my jobs</button></main>;
+  }
+
+  if (!activeJob || activeJob.databaseId !== jobId) {
     return <NoActiveService onDashboard={() => navigate("/washer")} />;
   }
 

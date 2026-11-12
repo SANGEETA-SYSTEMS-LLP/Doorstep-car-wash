@@ -1,7 +1,7 @@
 import { supabaseAdmin as db } from "../../config/supabase.js";
 import { referenceId } from "../../../../shared/referenceId.mjs";
 export const activeJobStatuses = ["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started", "service_completed"];
-const bookingColumns = "id, booking_number, customer_id, address_id, vehicle_id, package_id, assigned_washer_id, scheduled_date, scheduled_start_time, status, total_amount, customer_notes, service_address, latitude, longitude, tower, flat_number, landmark, created_at";
+const bookingColumns = "id, booking_number, customer_id, address_id, vehicle_id, package_id, assigned_washer_id, scheduled_date, scheduled_start_time, status, service_validated_at, total_amount, customer_notes, service_address, latitude, longitude, tower, flat_number, landmark, created_at";
 
 export async function washerForUser(userId) {
   const { data, error } = await db.from("washers").select("id, user_id, status, is_active, is_verified, rating, jobs_completed").eq("user_id", userId).maybeSingle();
@@ -47,6 +47,11 @@ export async function hydrateWasherJobs(bookings, washer) {
     ].filter(Boolean).join(", ");
     return {
       ...booking,
+      // Older acceptance RPCs kept payment_completed as the booking status.
+      // An accepted, assigned job must enter the operational flow at Assigned.
+      status: booking.status === "payment_completed" && booking.assigned_washer_id && !booking.service_validated_at
+        ? "washer_assigned"
+        : booking.status,
       customer: { name: profile?.full_name || "Customer", phone: profile?.phone || null, referenceId: referenceId("CUS", customer?.user_id) },
       washerReferenceId: washer.referenceId,
       vehicle: vehicles.get(booking.vehicle_id) || null,
@@ -75,9 +80,8 @@ export async function washerWorkspace(userId) {
   const offerBookings = await records("bookings", offers.map(o => o.booking_id), bookingColumns);
   const eligibleOffers = washer.is_verified && payoutAccountConfigured ? offers.filter(o => {
     const booking = offerBookings.get(o.booking_id);
-    // Paid bookings stay in payment_completed while a supervisor's offer is
-    // pending (and after acceptance), so include that state in the washer inbox.
-    return booking && !booking.assigned_washer_id && ["pending", "confirmed", "finding_washer", "support_escalated", "payment_completed"].includes(booking.status);
+    // Paid bookings stay in payment_completed while a supervisor's offer is pending.
+    return booking && !booking.assigned_washer_id && booking.status === "payment_completed";
   }) : [];
   const all = new Map((jobsResult.data || []).map(b => [b.id, b]));
   eligibleOffers.forEach(o => all.set(o.booking_id, offerBookings.get(o.booking_id)));

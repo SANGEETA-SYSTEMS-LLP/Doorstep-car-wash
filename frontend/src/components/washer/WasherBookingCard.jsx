@@ -44,7 +44,7 @@ export function ContactButtons({ phone }) {
 export default function WasherBookingCard({ booking, assignment, busy, onAccept, onReject, hideLink }) {
   const completed = ["service_completed", "completed", "customer_confirmed", "payment_completed", "closed"].includes(booking.status);
   const statusLabel = booking.status === "service_completed"
-    ? "Awaiting validation"
+    ? booking.service_validated_at ? "Completed" : "Awaiting validation"
     : booking.status === "completed"
       ? "Completed"
       : ["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started"].includes(booking.status)
@@ -76,7 +76,7 @@ export default function WasherBookingCard({ booking, assignment, busy, onAccept,
       {!assignment && <ol aria-label="Job progress" className="grid grid-cols-5 gap-1">
         {progressStages.map((defaultStage, index) => {
           const reached = index <= progressIndex(booking.status);
-          const stage = booking.status === "service_completed" && index === 4 ? "Proof sent" : defaultStage;
+          const stage = booking.status === "service_completed" && !booking.service_validated_at && index === 4 ? "Proof sent" : defaultStage;
           return <li key={stage} className="min-w-0 text-center">
             <span className={"mx-auto flex h-7 w-7 items-center justify-center rounded-full " + (reached ? "bg-green-700 text-white" : "bg-slate-100 text-slate-400")}>{reached ? <Check size={14} /> : <span className="text-xs">{index + 1}</span>}</span>
             <span className={"mt-1 block truncate text-[10px] sm:text-xs " + (reached ? "font-semibold text-green-800" : "text-slate-400")}>{stage}</span>

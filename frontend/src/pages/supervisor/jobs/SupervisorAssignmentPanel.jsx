@@ -1,6 +1,6 @@
 import { RefreshCw } from "lucide-react";
 
-function SupervisorAssignmentPanel({ washers, canAssign, loading, assigningId, onRefresh, onAssign }) {
+function SupervisorAssignmentPanel({ washers, canAssign, paymentPending, loading, assigningId, onRefresh, onAssign }) {
   const eligibleCount = washers.filter((washer) => washer.eligible).length;
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-5">
@@ -20,7 +20,7 @@ function SupervisorAssignmentPanel({ washers, canAssign, loading, assigningId, o
       <p className="mt-2 text-sm text-gray-500">Verified washers linked to your account appear here automatically when they are online and eligible for this booking. Review the details, then send an offer. Customer washer details appear after the washer accepts. The washer can request an extra travel charge during service; the customer must approve it.</p>
       {!canAssign && (
         <p className="mt-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
-          This booking has already been accepted or is not eligible for assignment.
+          {paymentPending ? "The customer must complete payment before this booking can be offered to a washer." : "This booking has already been accepted or is not eligible for assignment."}
         </p>
       )}
       {canAssign && washers.length === 0 && (

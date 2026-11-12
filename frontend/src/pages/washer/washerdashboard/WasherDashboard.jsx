@@ -6,13 +6,12 @@ import { ArrowRight, Banknote, BriefcaseBusiness, CalendarDays, CheckCircle2, Cl
 import { useAuth } from "../../../context/AuthContext";
 import { useWasher } from "../../../context/WasherContext";
 import useApi from "../../../hooks/useApi";
-import { ACTIVE_STATUSES, getWasherJob, setWasherAvailability, toActiveJob } from "../../../services/washer/washerWorkspaceService";
+import { isActiveWasherJob, isCompletedWasherJob, getWasherJob, setWasherAvailability, toActiveJob } from "../../../services/washer/washerWorkspaceService";
 import { acceptAssignment, rejectAssignment } from "../../../services/booking/assignmentService";
 import { WASHER_LOCATION_REFRESH_MS } from "../../../services/washer/washerLocationConfig";
 import WasherBookingCard from "../../../components/washer/WasherBookingCard";
 
 const inProgressStatuses = ["washer_on_the_way", "washer_arrived", "otp_verified", "service_started"];
-const closedStatuses = ["completed", "customer_confirmed", "payment_completed", "closed"];
 
 function localDayRange(now) {
   const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -64,13 +63,13 @@ export default function WasherDashboard() {
   const online = data?.washer?.status === "available";
   const jobs = data?.jobs || [];
   const locationTracking = online || jobs.some(job => ["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started"].includes(job.status));
-  const active = jobs.filter(job => ACTIVE_STATUSES.includes(job.status));
+  const active = jobs.filter(isActiveWasherJob);
   const todayJobs = jobs.filter(job => job.scheduled_date === dateKey);
   const pendingCount = jobs.filter(job => job.status === "washer_assigned").length;
   const inProgressCount = jobs.filter(job => inProgressStatuses.includes(job.status)).length;
   const summaryAvailable = Boolean(data);
   const nextJobs = jobs
-    .filter(job => !closedStatuses.includes(job.status))
+    .filter(job => !isCompletedWasherJob(job))
     .sort((first, second) => {
       const firstSchedule = `${first.scheduled_date || "9999-99-99"}T${first.scheduled_start_time || "99:99"}`;
       const secondSchedule = `${second.scheduled_date || "9999-99-99"}T${second.scheduled_start_time || "99:99"}`;

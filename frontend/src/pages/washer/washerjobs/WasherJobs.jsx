@@ -2,11 +2,10 @@ import { useState } from "react";
 import { BriefcaseBusiness, CheckCircle2, Clock3, RefreshCw, Send } from "lucide-react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import WasherBookingCard from "../../../components/washer/WasherBookingCard";
-import { ACTIVE_STATUSES, getWasherJob, toActiveJob } from "../../../services/washer/washerWorkspaceService";
+import { isActiveWasherJob, isCompletedWasherJob, getWasherJob, toActiveJob } from "../../../services/washer/washerWorkspaceService";
 import { acceptAssignment, rejectAssignment } from "../../../services/booking/assignmentService";
 import { useWasher } from "../../../context/WasherContext";
 
-const completedStatuses = ["completed", "customer_confirmed", "payment_completed", "closed"];
 const filters = [
   { label: "All jobs", key: "All", icon: BriefcaseBusiness },
   { label: "New requests", key: "Requests", icon: Send },
@@ -24,12 +23,12 @@ export default function WasherJobs() {
   const allJobs = (data?.jobs || []).filter(Boolean);
   const assignments = (data?.assignments || []).filter(offer => offer?.booking);
   const jobs = filter === "Requests" ? assignments.map(offer => ({ ...offer.booking, assignment: offer })) : allJobs.filter(job => filter === "All"
-    || (filter === "Active" ? ACTIVE_STATUSES.includes(job.status) : completedStatuses.includes(job.status)));
+    || (filter === "Active" ? isActiveWasherJob(job) : isCompletedWasherJob(job)));
   const counts = {
     All: allJobs.length,
     Requests: assignments.length,
-    Active: allJobs.filter(job => ACTIVE_STATUSES.includes(job.status)).length,
-    Completed: allJobs.filter(job => completedStatuses.includes(job.status)).length,
+    Active: allJobs.filter(isActiveWasherJob).length,
+    Completed: allJobs.filter(isCompletedWasherJob).length,
   };
 
   async function respond(offer, accepted) {

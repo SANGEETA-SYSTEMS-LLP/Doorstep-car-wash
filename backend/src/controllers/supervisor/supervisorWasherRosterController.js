@@ -31,7 +31,7 @@ export async function getSupervisorWasherRoster(req, res, next) {
     let areaBookingIds = null;
     if (req.profile?.role === "supervisor") areaBookingIds = await getSupervisorAreaBookingIds(req.supervisorArea);
     const [bookingRows, assignmentRows, earningRows, payoutAccounts] = await Promise.all([
-      allRows("bookings", "id,assigned_washer_id,status", [["not", "assigned_washer_id", "is", null]]),
+      allRows("bookings", "id,assigned_washer_id,status,service_validated_at", [["not", "assigned_washer_id", "is", null]]),
       allRows("booking_assignments", "booking_id,washer_id,status", [["eq", "status", "accepted"]]),
       allRows("washer_earnings", "washer_id,booking_id,gross_amount,platform_commission,washer_amount,status"),
       washers.length ? allRows("washer_payout_accounts", "washer_id,account_label,updated_at") : Promise.resolve([]),
@@ -53,8 +53,11 @@ export async function getSupervisorWasherRoster(req, res, next) {
       if (!job.assigned_washer_id) continue;
       const current = jobsByWasher.get(job.assigned_washer_id) || { assignedJobs: 0, activeJobs: 0, completedJobs: 0 };
       current.assignedJobs += 1;
-      if (["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started", "service_completed"].includes(job.status)) current.activeJobs += 1;
-      if (["completed", "customer_confirmed", "payment_completed", "closed"].includes(job.status)) current.completedJobs += 1;
+      const unfinished = ["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started"].includes(job.status)
+        || (job.status === "service_completed" && !job.service_validated_at);
+      if (unfinished) current.activeJobs += 1;
+      if (["completed", "customer_confirmed", "payment_completed", "closed"].includes(job.status)
+        || (job.status === "service_completed" && job.service_validated_at)) current.completedJobs += 1;
       jobsByWasher.set(job.assigned_washer_id, current);
     }
 

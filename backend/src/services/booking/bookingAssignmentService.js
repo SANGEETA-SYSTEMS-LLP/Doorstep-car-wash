@@ -37,7 +37,7 @@ export async function assignWasherToBooking(
 export async function washerHasScheduleConflict(washerId, booking, bookingPackage) {
   const { data, error } = await supabaseAdmin
     .from("bookings")
-    .select("id, scheduled_date, scheduled_start_time, status")
+    .select("id, scheduled_date, scheduled_start_time, status, service_validated_at")
     .eq("assigned_washer_id", washerId)
     .eq("scheduled_date", booking.scheduled_date)
     .in("status", [
@@ -50,14 +50,15 @@ export async function washerHasScheduleConflict(washerId, booking, bookingPackag
     ]);
 
   if (error) throw error;
-  if (!data || data.length === 0) return false;
+  const unfinishedBookings = (data || []).filter(existing => existing.status !== "service_completed" || !existing.service_validated_at);
+  if (unfinishedBookings.length === 0) return false;
 
   const requestedMinutes = timeToMinutes(booking.scheduled_start_time);
   const requestedDuration = Number(bookingPackage?.duration_minutes || 60);
   const TRAVEL_BUFFER = 30;
   const conflictWindow = requestedDuration + TRAVEL_BUFFER;
 
-  return data.some((existingBooking) => {
+  return unfinishedBookings.some((existingBooking) => {
     const existingMinutes = timeToMinutes(existingBooking.scheduled_start_time);
     return Math.abs(requestedMinutes - existingMinutes) < conflictWindow;
   });

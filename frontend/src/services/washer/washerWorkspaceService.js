@@ -1,5 +1,5 @@
 import { apiRequest } from "../core/api";
-export const ACTIVE_STATUSES = ["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started", "service_completed"];
+export { ACTIVE_STATUSES, isActiveWasherJob, isCompletedWasherJob } from "./washerJobStatus";
 export const getWasherWorkspace = () => apiRequest("/washer/workspace");
 export const getWasherJob = bookingId => apiRequest("/washer/bookings/" + encodeURIComponent(bookingId) + "/details");
 export const setWasherAvailability = online => apiRequest("/washer/availability", { method: "PATCH", body: JSON.stringify({ online }) });
