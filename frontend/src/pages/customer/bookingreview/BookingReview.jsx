@@ -6,7 +6,7 @@ import BookingReviewContent from "./BookingReviewContent";
 import usePaymentWorkflow from "../payment/usePaymentWorkflow";
 import { useBooking } from "../../../context/BookingContext";
 import { validateCustomerOffer } from "../../../services/customer/customerOfferService";
-import { getCheckoutPriceBreakdown } from "../../../services/payments/checkoutPricing";
+import { getCheckoutPriceBreakdown, isGstInclusivePackage, GST_RATE_PERCENT } from "../../../services/payments/checkoutPricing";
 
 function BookingReview() {
   const { booking, paymentError, processing, handlePayment } = usePaymentWorkflow();
@@ -14,9 +14,11 @@ function BookingReview() {
   const [offerCode, setOfferCode] = useState(booking.promoCode || "");
   const [offerError, setOfferError] = useState("");
   const [offerBusy, setOfferBusy] = useState(false);
-  const servicePrice = booking.package?.price || 0;
+  const packagePrice = booking.package?.price || 0;
+  const taxInclusive = isGstInclusivePackage(booking.package);
+  const servicePrice = taxInclusive ? packagePrice * 100 / (100 + GST_RATE_PERCENT) : packagePrice;
   const offerDiscount = Number(booking.appliedOffer?.discountAmount || 0);
-  const { discountAmount: discount, automaticDiscountAmount, offerDiscountAmount, taxAmount, totalAmount: total } = getCheckoutPriceBreakdown(servicePrice, offerDiscount);
+  const { discountAmount: discount, automaticDiscountAmount, offerDiscountAmount, taxAmount, totalAmount: total } = getCheckoutPriceBreakdown(packagePrice, offerDiscount, taxInclusive);
 
   const navigate = useNavigate();
 

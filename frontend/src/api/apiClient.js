@@ -2,14 +2,10 @@ import {
   supabase,
 } from "../services/auth/supabase";
 
-const configuredApiUrl = import.meta.env.VITE_API_URL || "/api";
-// The local API binds to IPv4 loopback. On some Windows setups, localhost
-// resolves to ::1 first, which produces ERR_CONNECTION_REFUSED despite the API
-// being healthy on 127.0.0.1.
-const localApiUrl = !import.meta.env.PROD
-  ? configuredApiUrl.replace(/^http:\/\/localhost(?=:\d|\/)/i, "http://127.0.0.1")
-  : configuredApiUrl;
-const API_URL = import.meta.env.PROD ? "/api" : localApiUrl;
+// Keep browser requests same-origin in both development and production.
+// Vite and the production host proxy /api to the backend, avoiding CORS and
+// localhost/127.0.0.1 IPv4/IPv6 differences in browser sessions.
+const API_URL = "/api";
 
 let refreshing;
 async function refreshAccessToken() {

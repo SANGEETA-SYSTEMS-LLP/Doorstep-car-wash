@@ -121,7 +121,9 @@ export function AuthProvider({ children }) {
           washer_signup_location: requestedRole === "washer" ? signupAddress : null,
           full_name: fullName,
           phone,
-          requested_role: ["supervisor", "washer"].includes(requestedRole) ? requestedRole : "customer",
+          // Record signup intent; the database trigger grants only the
+          // supervisor role from this choice. Other staff roles stay protected.
+          requested_role: ["washer", "supervisor"].includes(requestedRole) ? requestedRole : "customer",
         },
       },
     });

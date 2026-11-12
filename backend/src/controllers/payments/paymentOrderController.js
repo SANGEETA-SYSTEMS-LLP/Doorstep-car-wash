@@ -24,7 +24,7 @@ export async function createPaymentOrder(
     });
     if (reservationError) {
       if (["42883", "PGRST202"].includes(reservationError.code)) {
-        return res.status(503).json({ message: "Payment checkout needs a database update. Apply backend/database/add_atomic_payment_order_reservation.sql, then retry." });
+        return res.status(503).json({ message: "Payment checkout needs a database update. Apply the ordered supabase/migrations SQL, then retry." });
       }
       if (reservationError.code === "P0002") return res.status(404).json({ message: "Booking not found." });
       if (reservationError.code === "55000") {

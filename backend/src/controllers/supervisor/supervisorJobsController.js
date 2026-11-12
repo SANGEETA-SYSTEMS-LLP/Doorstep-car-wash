@@ -6,6 +6,7 @@ export async function getActiveJobs(req, res) {
   try {
     const activeStatuses = [
       "pending",
+      "payment_completed",
       "confirmed",
       "finding_washer",
       "washer_assigned",

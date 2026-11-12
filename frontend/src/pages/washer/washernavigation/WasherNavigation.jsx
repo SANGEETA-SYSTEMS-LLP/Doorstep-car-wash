@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Navigation } from "lucide-react";
 import { useWasher } from "../../../context/WasherContext";
 import WasherNavigationContent from "./WasherNavigationContent";
+import { WASHER_LOCATION_REFRESH_MS } from "../../../services/washer/washerLocationConfig";
 
 function WasherNavigation() {
   const { washerState, updateJobStatus, restoreJob } = useWasher();
@@ -32,28 +33,24 @@ function WasherNavigation() {
     }
 
     let cancelled = false;
+    lastSentRef.current = 0;
+    const sendPosition = async (position) => {
+      if (cancelled) return;
+      const { latitude, longitude, heading, accuracy, speed } = position.coords;
+      setCurrentLocation({ latitude, longitude, accuracy, updatedAt: position.timestamp });
+      const now = Date.now();
+      if (now - lastSentRef.current < WASHER_LOCATION_REFRESH_MS) return;
+      lastSentRef.current = now;
+      try {
+        await sendWasherLocation({ latitude, longitude, heading, accuracy, speed });
+        if (!cancelled) setLocationError("");
+      } catch (error) {
+        console.error("Location update:", error);
+        if (!cancelled) setLocationError("Unable to send your location. Please check your connection.");
+      }
+    };
     const watchId = navigator.geolocation.watchPosition(
-      async (position) => {
-        if (cancelled) return;
-        setCurrentLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-          updatedAt: position.timestamp,
-        });
-        const now = Date.now();
-        if (now - lastSentRef.current < 5000) return;
-        lastSentRef.current = now;
-
-        const { latitude, longitude, heading, accuracy, speed } = position.coords;
-        try {
-          await sendWasherLocation({ latitude, longitude, heading, accuracy, speed });
-          if (!cancelled) setLocationError("");
-        } catch (error) {
-          console.error("Location update:", error);
-          if (!cancelled) setLocationError("Unable to send your location. Please check your connection.");
-        }
-      },
+      (position) => { void sendPosition(position); },
       (error) => {
         if (cancelled) return;
         console.error(error);
@@ -61,9 +58,14 @@ function WasherNavigation() {
       },
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
     );
+    const heartbeat = window.setInterval(() => {
+      if (cancelled) return;
+      navigator.geolocation.getCurrentPosition(position => { void sendPosition(position); }, () => {}, { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 });
+    }, WASHER_LOCATION_REFRESH_MS);
 
     return () => {
       cancelled = true;
+      window.clearInterval(heartbeat);
       navigator.geolocation.clearWatch(watchId);
     };
   }, [activeJob?.databaseId, loadedJobId, jobId]);

@@ -44,7 +44,7 @@ function BookingHistoryCard({ booking, onDetails, onDelete, deleting, onCancel, 
         </div>
         <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${statusStyle}`}>
           {completedStatuses.includes(status) && <Check size={13} />}
-          {awaitingPayment ? "Awaiting payment · not confirmed" : status === "expired" ? "Expired · not confirmed" : formatStatus(status)}
+          {awaitingPayment ? "Awaiting payment · not confirmed" : status === "expired" ? "Expired · not confirmed" : status === "payment_completed" ? "Payment completed · awaiting washer assignment" : formatStatus(status)}
         </span>
       </div>
 

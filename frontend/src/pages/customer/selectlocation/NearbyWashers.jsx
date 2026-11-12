@@ -17,7 +17,7 @@ export default function NearbyWashers({latitude,longitude}) {
     <p className="mt-2 text-sm text-slate-500">Verified washers whose service areas cover your pin. Distances are approximate, based on their last saved or reported location. Assignment depends on availability, skills and your booking time.</p>
     {state.loading&&<p role="status" className="mt-4">Finding nearby washers…</p>}
     {state.error&&<p role="alert" className="mt-4 text-red-700">{state.error} <button type="button" className="underline" onClick={()=>setRevision(n=>n+1)}>Retry</button></p>}
-    {!state.loading&&!state.error&&!state.rows.length&&<p className="mt-4 text-slate-600">No verified washers currently have a saved location covering this pin. You can continue booking; assignment will be checked separately.</p>}
+    {!state.loading&&!state.error&&!state.rows.length&&<p className="mt-4 text-slate-600">No verified washers currently have a saved location covering this pin. Service availability will be checked before you continue.</p>}
     <div className="mt-4 grid gap-3 sm:grid-cols-2">{state.rows.map(washer=><article key={washer.id} className="rounded-xl border p-4">
       <h3 className="font-bold">{washer.name}</h3><span className="text-xs font-semibold text-green-700">Verified washer</span>
       <p className="mt-2 text-sm">Approximately {washer.distanceKm} km away · {washer.jobsCompleted||0} completed jobs</p>

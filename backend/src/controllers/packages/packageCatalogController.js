@@ -1,5 +1,5 @@
 import { supabaseAdmin as db } from "../../config/supabase.js";
-import { fields, failure, normalizeVehicleType, vehicleTypeCandidates, monthlyTiers } from "./packageCatalog.js";
+import { fields, failure, normalizeVehicleType, vehicleTypeCandidates, monthlyTiers, withCanonicalOneTimePrice } from "./packageCatalog.js";
 import { createHash } from "node:crypto";
 
 export async function listPackages(req, res, next) {
@@ -10,7 +10,7 @@ export async function listPackages(req, res, next) {
     if (type !== undefined) query = query.in("vehicle_type", [...vehicleTypeCandidates(type), "all", "all vehicles", "all car types", "one time"]);
     const { data, error } = await query.order("price", { ascending: true });
     if (error) throw error;
-    res.json({ packages: data || [] });
+    res.json({ packages: (data || []).map(withCanonicalOneTimePrice) });
   } catch (error) { next(error); }
 }
 export async function validatePackage(req, res, next) {
@@ -42,7 +42,8 @@ export async function validatePackage(req, res, next) {
     if (!Number.isFinite(Number(pack.data.price)) || Number(pack.data.price) <= 0) throw failure("This package has no valid price. Please choose another package.");
     const packageName = String(pack.data.name || "").toLowerCase();
     const monthlyTier = monthlyTiers.find(tier => packageName.startsWith(tier.name.toLowerCase()));
-    res.json({ package: { ...pack.data, ...(monthlyTier ? { plan_washes: monthlyTier.washes } : {}) } });
+    const normalizedPackage = withCanonicalOneTimePrice(pack.data);
+    res.json({ package: { ...normalizedPackage, ...(monthlyTier ? { plan_washes: monthlyTier.washes } : {}) } });
   } catch (error) { next(error); }
 }
 

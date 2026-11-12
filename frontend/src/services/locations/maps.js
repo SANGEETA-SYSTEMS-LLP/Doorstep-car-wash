@@ -1,4 +1,3 @@
-import { apiRequest } from "../core/api";
 export function coordinates(value) {
   if (value?.latitude == null || value?.longitude == null || String(value.latitude).trim() === "" || String(value.longitude).trim() === "") return null;
   const lat = Number(value.latitude);
@@ -18,5 +17,12 @@ export function currentPosition() {
 }
 
 
-export function reverseGeocode(position) { return apiRequest("/locations/reverse?"+new URLSearchParams({lat:position.lat,lon:position.lng})); }
-export function searchAddresses(query) { return apiRequest("/locations/search?"+new URLSearchParams({q:query})); }
+export async function reverseGeocode(position) {
+  const { apiRequest } = await import("../core/api");
+  return apiRequest("/locations/reverse?" + new URLSearchParams({ lat: position.lat, lon: position.lng }));
+}
+
+export async function searchAddresses(query) {
+  const { apiRequest } = await import("../core/api");
+  return apiRequest("/locations/search?" + new URLSearchParams({ q: query }));
+}

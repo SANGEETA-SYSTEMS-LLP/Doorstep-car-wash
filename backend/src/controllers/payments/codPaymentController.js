@@ -27,7 +27,8 @@ export async function recordCodPayment(
         assigned_washer_id,
         total_amount,
         payment_method,
-        status
+        status,
+        service_validated_at
       `)
       .eq("id", bookingId)
       .eq("assigned_washer_id", washer.id)
@@ -53,10 +54,7 @@ export async function recordCodPayment(
       });
     }
 
-    if (
-      booking.status !==
-      "completed"
-    ) {
+    if (!booking.service_validated_at || !["service_completed", "customer_confirmed", "payment_completed", "closed"].includes(booking.status)) {
       return res.status(400).json({
         message:
           "Service must be validated before recording payment.",

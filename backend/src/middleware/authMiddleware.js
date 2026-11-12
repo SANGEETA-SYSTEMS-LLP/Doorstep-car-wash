@@ -3,6 +3,7 @@ import {
   supabaseAdmin,
 } from "../config/supabase.js";
 import { reconcileWasherSignup } from "../services/washer/washerSignupService.js";
+import { isConfiguredStaffEmail } from "../../../shared/adminAccess.mjs";
 
 export async function requireAuth(
   req,
@@ -81,6 +82,11 @@ export async function requireAuth(
 
     req.user = user;
     req.profile = await reconcileWasherSignup(user, profile);
+
+    if (["accountant", "sub_admin", "super_admin"].includes(req.profile.role) &&
+        !isConfiguredStaffEmail(req.profile.role, user.email)) {
+      return res.status(403).json({ message: "This staff dashboard is restricted to its configured account." });
+    }
 
     next();
   } catch (error) {

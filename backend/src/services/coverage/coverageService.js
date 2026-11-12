@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "../../config/supabase.js";
 import { calculateDistanceKm } from "../../utils/distance.js";
+import { SUPERVISOR_SERVICE_RADIUS_KM } from "../supervisor/supervisorServiceArea.js";
 
 export function findCoverage(latitude, longitude, societies, zones) {
   const validLocation = calculateDistanceKm(latitude, longitude, latitude, longitude) !== null;
@@ -27,5 +28,44 @@ export async function getCoverage(latitude, longitude) {
     }
   }
   const [societies, zones] = await Promise.all([load("societies"), load("service_zones")]);
-  return findCoverage(latitude, longitude, societies, zones);
+  const coverage = findCoverage(latitude, longitude, societies, zones);
+  if (!coverage.available) return { ...coverage, available: false, hasSupervisor: false, hasWasher: false };
+
+  // A location is serviceable only when an active supervisor's configured
+  // area contains it and that supervisor has an active, verified washer whose
+  // service radius contains it too.
+  const { data: supervisors, error: supervisorError } = await supabaseAdmin
+    .from("profiles").select("id").eq("role", "supervisor").eq("is_active", true);
+  if (supervisorError) throw supervisorError;
+  const supervisorIds = (supervisors || []).map(row => row.id);
+  if (!supervisorIds.length) return { ...coverage, available: false, hasSupervisor: false, hasWasher: false };
+
+  const { data: areas, error: areaError } = await supabaseAdmin
+    .from("supervisor_service_areas").select("supervisor_id,latitude,longitude")
+    .in("supervisor_id", supervisorIds);
+  if (areaError) throw areaError;
+  const coveringAreas = (areas || []).filter(area => {
+    const distance = calculateDistanceKm(latitude, longitude, area.latitude, area.longitude);
+    return distance !== null && distance <= SUPERVISOR_SERVICE_RADIUS_KM;
+  });
+  if (!coveringAreas.length) return { ...coverage, available: false, hasSupervisor: false, hasWasher: false };
+
+  const areaSupervisorIds = coveringAreas.map(area => area.supervisor_id);
+  const { data: washers, error: washerError } = await supabaseAdmin
+    .from("washers")
+    .select("id,supervisor_id,service_radius_km,location:washer_locations(latitude,longitude,service_latitude,service_longitude,updated_at)")
+    .in("supervisor_id", areaSupervisorIds).eq("is_active", true).eq("is_verified", true);
+  if (washerError) throw washerError;
+  const now = Date.now();
+  const hasWasher = (washers || []).some(washer => {
+    const location = Array.isArray(washer.location) ? washer.location[0] : washer.location;
+    if (!location?.updated_at || now - Date.parse(location.updated_at) > 15 * 60 * 1000) return false;
+    const lat = location.service_latitude ?? location.latitude;
+    const lon = location.service_longitude ?? location.longitude;
+    const distance = calculateDistanceKm(latitude, longitude, lat, lon);
+    const radius = Number(washer.service_radius_km);
+    return distance !== null && Number.isFinite(radius) && radius > 0 && distance <= radius;
+  });
+
+  return { ...coverage, available: hasWasher, hasSupervisor: true, hasWasher };
 }

@@ -3,7 +3,7 @@ import { getCoverage } from "../../services/coverage/coverageService.js";
 import { calculateOfferDiscount } from "../../services/customer/customerOfferService.js";
 import { calculateCheckoutAmounts } from "../../services/checkout/checkoutPricing.js";
 import { createHash } from "node:crypto";
-import { monthlyTiers, monthlyPrices, normalizeVehicleType as normalizePackageType, fields as packageFields } from "../packages/packageCatalog.js";
+import { monthlyTiers, monthlyPrices, normalizeVehicleType as normalizePackageType, fields as packageFields, withCanonicalOneTimePrice } from "../packages/packageCatalog.js";
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const bad=message=>Object.assign(new Error(message),{status:400});
 const virtualMonthlyId=/^monthly-[a-f0-9]{32}$/;
@@ -38,7 +38,7 @@ export async function createBooking(req,res,next) {
   if(uuid.test(packageId)) {
    const result=await db.from("service_packages").select("id,name,price,vehicle_type,is_active").eq("id",packageId).eq("is_active",true).single();
    if(result.error||!result.data)throw bad("The selected service package is unavailable. Please choose it again.");
-   pack=result.data;
+   pack=withCanonicalOneTimePrice(result.data);
   } else {
    pack=await resolveMonthlyPlan(packageId,vehicle.vehicle_type);
    if(!pack)throw bad("This monthly package is no longer available. Please select it again.");
@@ -47,7 +47,7 @@ export async function createBooking(req,res,next) {
   const {data:existing,error:ee}=await db.from("bookings").select("*").eq("id",requestId).eq("customer_id",customer.id).maybeSingle();if(ee)throw ee;
   if(existing){if(existing.address_id!==addressId||existing.vehicle_id!==vehicleId||existing.package_id!==bookingPackageId||existing.payment_method!==paymentMethod||existing.scheduled_date!==date||existing.scheduled_start_time.slice(0,5)!==time.slice(0,5)||(existing.promo_code||"")!==(typeof promoCode === "string" ? promoCode.trim().toUpperCase() : ""))throw bad("This booking request already exists with different details.");return res.json({booking:existing});}
   if(!sameVehicleCategory(pack.vehicle_type,vehicle.vehicle_type))throw bad("Choose a package for this vehicle type.");
-  if(!(await getCoverage(address.latitude,address.longitude)).available)throw bad("The selected address needs valid map coordinates.");
+  if(!(await getCoverage(address.latitude,address.longitude)).available)throw bad("Service is not available at this location because no supervisor and verified washer currently cover this area. Choose another address.");
   const price=Number(pack.price);if(!Number.isFinite(price)||price<=0)throw bad("Invalid package price.");
   let promoDiscount = 0;
   let normalizedPromoCode = null;
@@ -66,8 +66,10 @@ export async function createBooking(req,res,next) {
    }
    promoDiscount = calculateOfferDiscount({ code: normalizedPromoCode, servicePrice: price, packageName: pack.name, scheduledDate: date, firstBooking }).discountAmount;
   }
-  const checkoutAmounts = calculateCheckoutAmounts(price, promoDiscount);
-  const bookingValues={id:requestId,customer_id:customer.id,address_id:addressId,vehicle_id:vehicleId,package_id:bookingPackageId,service_address:address.address_line,latitude:address.latitude,longitude:address.longitude,tower:address.tower,flat_number:address.flat_number,landmark:address.landmark,scheduled_date:date,scheduled_start_time:time,scheduled_time:time,base_amount:price,service_amount:price,platform_fee:checkoutAmounts.platformFee,discount_amount:checkoutAmounts.discountAmount,tax_amount:checkoutAmounts.taxAmount,total_amount:checkoutAmounts.totalAmount,payment_method:paymentMethod,status:"pending",requires_supervisor:true};
+  const taxInclusive = pack.name === "Essential Exterior Wash" || pack.name === "Plus Exterior Wash" || pack.name === "Premium Exterior Wash";
+  const checkoutAmounts = calculateCheckoutAmounts(price, promoDiscount, taxInclusive);
+  const serviceAmount = taxInclusive ? Number((price * 100 / (100 + Number(process.env.GST_RATE_PERCENT ?? 18))).toFixed(2)) : price;
+  const bookingValues={id:requestId,customer_id:customer.id,address_id:addressId,vehicle_id:vehicleId,package_id:bookingPackageId,service_address:address.address_line,latitude:address.latitude,longitude:address.longitude,tower:address.tower,flat_number:address.flat_number,landmark:address.landmark,scheduled_date:date,scheduled_start_time:time,scheduled_time:time,base_amount:serviceAmount,service_amount:serviceAmount,platform_fee:checkoutAmounts.platformFee,discount_amount:checkoutAmounts.discountAmount,tax_amount:checkoutAmounts.taxAmount,total_amount:checkoutAmounts.totalAmount,payment_method:paymentMethod,status:"pending",requires_supervisor:true};
   if(normalizedPromoCode)bookingValues.promo_code=normalizedPromoCode;
   const {data,error}=await db.from("bookings").insert(bookingValues).select("*").single();
   if(error?.code==="23505")return res.status(409).json({message:normalizedPromoCode?"This offer was already redeemed on another booking.":"This request was already saved. Retry to retrieve it."});if(error)throw error;

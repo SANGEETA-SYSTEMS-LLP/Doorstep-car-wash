@@ -10,10 +10,14 @@ export function vehicleTypeCandidates(value) {
   return [value.trim()];
 }
 export const oneTimeTiers = [
-  { name: "Essential Exterior Wash", price: 100, description: "One exterior wash for one registered vehicle. GST extra. Interior cleaning, vacuuming, polishing, and detailing are not included." },
-  { name: "Plus Exterior Wash", price: 130, description: "One enhanced exterior wash for one registered vehicle. GST extra. Interior cleaning, vacuuming, polishing, and detailing are not included." },
-  { name: "Premium Exterior Wash", price: 150, description: "One premium exterior wash for one registered vehicle. GST extra. Interior cleaning, vacuuming, polishing, and detailing are not included." },
+  { name: "Essential Exterior Wash", price: 100, description: "One exterior wash for one registered vehicle. Price includes GST. Interior cleaning, vacuuming, polishing, and detailing are not included." },
+  { name: "Plus Exterior Wash", price: 130, description: "One enhanced exterior wash for one registered vehicle. Price includes GST. Interior cleaning, vacuuming, polishing, and detailing are not included." },
+  { name: "Premium Exterior Wash", price: 150, description: "One premium exterior wash for one registered vehicle. Price includes GST. Interior cleaning, vacuuming, polishing, and detailing are not included." },
 ];
+export function withCanonicalOneTimePrice(pack) {
+  const tier = oneTimeTiers.find(item => String(pack?.name || "").trim().toLowerCase() === item.name.toLowerCase());
+  return tier ? { ...pack, price: tier.price, description: tier.description } : pack;
+}
 export const monthlyPrices = {
   hatchback: [399, 699, 999],
   sedan: [449, 799, 1099],

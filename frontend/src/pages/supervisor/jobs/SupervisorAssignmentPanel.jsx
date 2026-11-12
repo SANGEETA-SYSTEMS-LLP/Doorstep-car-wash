@@ -17,7 +17,7 @@ function SupervisorAssignmentPanel({ washers, canAssign, loading, assigningId, o
           <RefreshCw size={15} /> Refresh
         </button>
       </div>
-      <p className="mt-2 text-sm text-gray-500">Verified washers linked to your account appear here automatically when they are online and eligible for this booking. Review the details, then send an offer. Customer washer details appear after the washer accepts. The washer can request an extra travel charge during service; the customer must approve it. Working hours and required service skills still need to be configured.</p>
+      <p className="mt-2 text-sm text-gray-500">Verified washers linked to your account appear here automatically when they are online and eligible for this booking. Review the details, then send an offer. Customer washer details appear after the washer accepts. The washer can request an extra travel charge during service; the customer must approve it.</p>
       {!canAssign && (
         <p className="mt-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
           This booking has already been accepted or is not eligible for assignment.

@@ -1,7 +1,6 @@
-import { supabaseAdmin, createWasherEarning } from "./paymentDependencies.js";
+import { supabaseAdmin } from "./paymentDependencies.js";
 import { validateCapturedPayment } from "../../services/payments/paymentValidation.js";
-import { assignWasherToBooking } from "../../services/booking/bookingAssignmentService.js";
-import { refundLateCapturedBookingPayment } from "../../services/booking/cancellationRefundService.js";
+import { completeCapturedBookingPayment } from "../../services/payments/completeCapturedBookingPayment.js";
 import crypto from "node:crypto";
 
 export async function razorpayWebhook(
@@ -126,9 +125,6 @@ export async function razorpayWebhook(
           ?.entity;
 
       if (entity?.order_id) {
-        const now =
-          new Date().toISOString();
-
         const {
           data: payment,
           error: paymentLookupError,
@@ -146,89 +142,11 @@ export async function razorpayWebhook(
         }
 
         if (payment) {
-          validateCapturedPayment(entity, payment);
-          if (payment.status === "paid" && payment.provider_payment_id !== entity.id) {
-            throw new Error("Captured provider payment conflicts with the saved order payment.");
+          validateCapturedPayment(entity, payment, entity.id);
+          const completion = await completeCapturedBookingPayment(payment, entity);
+          if (completion.postPaymentError) {
+            throw new Error("Post-payment work is incomplete; retry the captured-payment webhook.");
           }
-          if (payment.status !== "paid") {
-            const { data: updatedPayment, error: paymentUpdateError } = await supabaseAdmin
-              .from("payments")
-              .update({
-                status: "paid",
-
-                provider_payment_id:
-                  entity.id,
-
-                provider_method:
-                  typeof entity.method === "string" ? entity.method : null,
-
-                paid_at: now,
-
-                updated_at: now,
-              })
-              .eq("id", payment.id)
-              .in("status", ["created", "failed", "paid"])
-              .or(`provider_payment_id.is.null,provider_payment_id.eq.${entity.id}`)
-              .select("id")
-              .maybeSingle();
-
-            if (paymentUpdateError) {
-              throw paymentUpdateError;
-            }
-            if (!updatedPayment) {
-              const { data: latest, error: latestError } = await supabaseAdmin.from("payments")
-                .select("status,provider_payment_id").eq("id", payment.id).maybeSingle();
-              if (latestError) throw latestError;
-              if (latest?.status !== "paid" || latest.provider_payment_id !== entity.id) {
-                throw new Error("Captured provider payment conflicts with the saved order payment.");
-              }
-            }
-          }
-
-          const { data: currentBooking, error: currentBookingError } = await supabaseAdmin.from("bookings")
-            .select("id,status,platform_fee")
-            .eq("id", payment.booking_id)
-            .maybeSingle();
-          if (currentBookingError) throw currentBookingError;
-          if (!currentBooking) throw new Error("Booking not found after payment capture.");
-          if (currentBooking.status === "cancelled") {
-            await refundLateCapturedBookingPayment({ ...payment, provider_payment_id: entity.id }, currentBooking);
-            return res.status(200).send("OK");
-          }
-
-          const {
-            error: bookingUpdateError,
-          } = await supabaseAdmin
-            .from("bookings")
-            .update({
-              status:
-                "payment_completed",
-
-              updated_at: now,
-            })
-            .eq(
-              "id",
-              payment.booking_id
-            )
-            .eq(
-              "status",
-              "customer_confirmed"
-            );
-
-          if (bookingUpdateError) {
-            throw bookingUpdateError;
-          }
-
-          const { error: reviveExpiredBookingError } = await supabaseAdmin.from("bookings")
-            .update({ status: "pending", updated_at: now })
-            .eq("id", payment.booking_id)
-            .eq("status", "expired");
-          if (reviveExpiredBookingError) throw reviveExpiredBookingError;
-
-          await createWasherEarning(
-            payment.booking_id
-          );
-          await assignWasherToBooking(payment.booking_id);
         }
       }
     }

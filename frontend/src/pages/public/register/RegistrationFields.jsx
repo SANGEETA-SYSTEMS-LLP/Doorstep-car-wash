@@ -16,7 +16,7 @@ function RegistrationFields({ accountType, address, setAddress, locationBusy, se
         <Field label="Email address" icon={<Mail size={19} />} type="email" name="email" value={form.email} onChange={handleChange} placeholder="you@example.com" />
       </div>
       <div className="grid items-start gap-5 sm:grid-cols-2">
-        <div className="border-b border-slate-100 pb-3 sm:col-span-2"><h3 className="text-sm font-semibold text-slate-950">Account security</h3><p className="mt-1 text-xs leading-5 text-slate-500">Choose a password you can use to sign in to your washer account.</p></div>
+        <div className="border-b border-slate-100 pb-3 sm:col-span-2"><h3 className="text-sm font-semibold text-slate-950">Account security</h3><p className="mt-1 text-xs leading-5 text-slate-500">Choose a password you can use to sign in to your {accountType} account.</p></div>
         <PasswordField label="Password" name="password" value={form.password} onChange={handleChange} visible={showPassword} setVisible={setShowPassword} />
         <PasswordField label="Confirm password" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} visible={showConfirm} setVisible={setShowConfirm} />
       </div>
@@ -30,7 +30,7 @@ function RegistrationFields({ accountType, address, setAddress, locationBusy, se
         </span>
       </label>
       <button type="submit" disabled={loading || locationBusy} className="w-full rounded-xl bg-green-700 py-3.5 font-semibold text-white shadow-sm transition hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-200 disabled:cursor-not-allowed disabled:opacity-50">
-        {loading ? "Submitting application…" : accountType === "washer" ? "Submit washer application" : "Create Account"}
+        {loading ? "Creating account…" : accountType === "washer" ? "Submit washer application" : accountType === "supervisor" ? "Create supervisor account" : "Create Account"}
       </button>
     </form>
   );

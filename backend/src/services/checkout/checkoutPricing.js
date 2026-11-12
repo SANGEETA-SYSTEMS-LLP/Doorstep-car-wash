@@ -10,7 +10,7 @@ if (!Number.isFinite(configuredTaxRate) || configuredTaxRate < 0 || configuredTa
 
 export const GST_RATE_PERCENT = configuredTaxRate;
 
-export function calculateCheckoutAmounts(serviceAmount, requestedDiscount = 0) {
+export function calculateCheckoutAmounts(serviceAmount, requestedDiscount = 0, taxInclusive = false) {
   const service = Math.max(0, Number(serviceAmount) || 0);
   const automaticDiscountAmount = Math.min(service, Math.round(service * AUTOMATIC_DISCOUNT_PERCENT) / 100);
   const offerDiscountAmount = Math.min(
@@ -18,9 +18,10 @@ export function calculateCheckoutAmounts(serviceAmount, requestedDiscount = 0) {
     Math.max(0, Number(requestedDiscount) || 0),
   );
   const discountAmount = automaticDiscountAmount + offerDiscountAmount;
-  const taxableAmount = Math.max(0, service - discountAmount + PLATFORM_FEE_INR);
-  const taxAmount = Math.round(taxableAmount * GST_RATE_PERCENT) / 100;
-  const totalAmount = Math.round((taxableAmount + taxAmount) * 100) / 100;
+  const quotedAmount = Math.max(0, service - discountAmount + PLATFORM_FEE_INR);
+  const taxableAmount = taxInclusive ? quotedAmount * 100 / (100 + GST_RATE_PERCENT) : quotedAmount;
+  const taxAmount = Math.round((taxInclusive ? quotedAmount - taxableAmount : taxableAmount * GST_RATE_PERCENT / 100) * 100) / 100;
+  const totalAmount = Math.round((taxInclusive ? quotedAmount : taxableAmount + taxAmount) * 100) / 100;
 
   return {
     platformFee: PLATFORM_FEE_INR,

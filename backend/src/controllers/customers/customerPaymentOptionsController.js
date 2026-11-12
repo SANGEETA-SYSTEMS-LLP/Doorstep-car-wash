@@ -22,7 +22,8 @@ export async function getCustomerPaymentOptions(req, res, next) {
         washerName = profile.data?.full_name || washerName;
       }
     }
+    const paid = Boolean(payments.data?.length) || booking.status === "payment_completed";
     res.json({ booking: { id: booking.id, booking_number: booking.booking_number, status: booking.status, total_amount: booking.total_amount },
-      paid: Boolean(payments.data?.length), washerName, paymentMode: "Razorpay" });
+      paid, washerName, paymentMode: "Razorpay" });
   } catch (error) { next(error); }
 }

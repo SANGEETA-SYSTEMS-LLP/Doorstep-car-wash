@@ -11,7 +11,7 @@ export const GST_RATE_PERCENT = Number.isFinite(configuredGstRate)
   ? configuredGstRate
   : 18;
 
-export function getCheckoutPriceBreakdown(serviceAmount, requestedDiscount = 0) {
+export function getCheckoutPriceBreakdown(serviceAmount, requestedDiscount = 0, taxInclusive = false) {
   const service = Math.max(0, Number(serviceAmount) || 0);
   if (service === 0) {
     return { serviceAmount: 0, platformFee: 0, discountAmount: 0, automaticDiscountAmount: 0, offerDiscountAmount: 0, taxAmount: 0, totalAmount: 0 };
@@ -22,8 +22,9 @@ export function getCheckoutPriceBreakdown(serviceAmount, requestedDiscount = 0) 
     Math.max(0, Number(requestedDiscount) || 0),
   );
   const discountAmount = automaticDiscountAmount + offerDiscountAmount;
-  const taxableAmount = Math.max(0, service - discountAmount + PLATFORM_FEE_INR);
-  const taxAmount = Math.round(taxableAmount * GST_RATE_PERCENT) / 100;
+  const quotedAmount = Math.max(0, service - discountAmount + PLATFORM_FEE_INR);
+  const taxableAmount = taxInclusive ? quotedAmount * 100 / (100 + GST_RATE_PERCENT) : quotedAmount;
+  const taxAmount = Math.round((taxInclusive ? quotedAmount - taxableAmount : taxableAmount * GST_RATE_PERCENT / 100) * 100) / 100;
 
   return {
     serviceAmount: service,
@@ -32,8 +33,12 @@ export function getCheckoutPriceBreakdown(serviceAmount, requestedDiscount = 0) 
     automaticDiscountAmount,
     offerDiscountAmount,
     taxAmount,
-    totalAmount: Math.round((taxableAmount + taxAmount) * 100) / 100,
+    totalAmount: Math.round((taxInclusive ? quotedAmount : taxableAmount + taxAmount) * 100) / 100,
   };
+}
+
+export function isGstInclusivePackage(pkg) {
+  return ["Essential Exterior Wash", "Plus Exterior Wash", "Premium Exterior Wash"].includes(pkg?.name);
 }
 
 export function formatRupees(amount) {

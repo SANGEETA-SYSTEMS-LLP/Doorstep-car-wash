@@ -70,14 +70,12 @@ export function assignWasherToBooking(
   bookingId,
   washerId
 ) {
-  return apiRequest(
-    `/supervisor/jobs/${bookingId}/assign`,
-    {
-      method: "POST",
-      body: JSON.stringify({
-        washerId,
-      }),
-    }
-  );
+  const endpoint = `/supervisor/jobs/${bookingId}/assign`;
+  const options = { method: "POST", body: JSON.stringify({ washerId }) };
+  return apiRequest(endpoint, options).catch(async error => {
+    if (![502, 503, 504].includes(error.status)) throw error;
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return apiRequest(endpoint, options);
+  });
 }
 export const acceptSupervisorBooking = id => apiRequest(`/supervisor/jobs/${encodeURIComponent(id)}/accept`, { method: "POST" });

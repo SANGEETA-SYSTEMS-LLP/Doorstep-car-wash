@@ -26,11 +26,15 @@ Deploy the updated backend with them. The second migration removes browser write
 
 ## Backend configuration
 
-Customer cancellation is available before service starts. It retains the recorded platform fee and returns the remaining captured online amount through Razorpay. Apply `backend/database/add_customer_booking_cancellation_refunds.sql` before enabling the cancel action. In Razorpay webhook settings, enable `refund.processed` and `refund.failed` in addition to `payment.captured` so the cancellation ledger and customer history receive final refund status.
+The current ordered SQL source under `supabase/migrations/` installs the payment completion and supervisor assignment RPCs in `20261016150000_carwash_payment_and_supervisor_assignment.sql`. It adds the payment-completed state where needed, reserves checkout atomically, and records capture before retryable assignment/earning work. Payment verification and the `payment.captured` webhook both use this function. A payment-completed booking stays in that status while supervisor assignment is pending; washer earnings are created only after a washer is assigned. The function locks the booking before its payment row to match cancellation and checkout reservation. For a new project, follow [`supabase/README.md`](../supabase/README.md). For an existing project, check migration history and apply only missing reviewed migrations.
 
-If online checkout is retried after a booking has advanced to washer assignment or service, apply `backend/database/repair_razorpay_checkout_booking_statuses.sql` in the hosted database. It updates the payment reservation function to accept active unpaid online bookings while keeping cancelled/expired bookings and COD checkout protected. Deploy the app after applying the SQL.
+Vercel runs the payment completion reconciler once a minute through `/api/cron/reconcile-payment-completions`. Set a strong private `CRON_SECRET` in the Vercel backend environment before deploying; Vercel sends it as a bearer token to the scheduled route. The standalone `backend/server.js` process also runs the reconciler every minute.
 
-`backend/database/repair_customer_cancellation_pending_payments.sql` updates the cancellation RPC so customers can cancel while an online payment is still pending. It records the open payment against the cancellation and automatically initiates a refund if that payment is captured after cancellation. Apply this repair after the cancellation/refund migration and deploy the matching backend code together.
+Customer cancellation is available before service starts. It retains the recorded platform fee and returns the remaining captured online amount through Razorpay. The ordered SQL chain applies the cancellation/refund table and RPC before the payment-completion repair. In Razorpay webhook settings, enable `refund.processed` and `refund.failed` in addition to `payment.captured` so the cancellation ledger and customer history receive final refund status.
+
+Online checkout retries after a booking has advanced to washer assignment or service are accepted by the final reservation RPC while cancelled/expired bookings and COD checkout remain protected.
+
+The ordered `repair_customer_cancellation_pending_payments` migration lets customers cancel while an online payment is pending. It records the open payment against the cancellation and starts the refund flow if that payment is captured after cancellation.
 
 Set these privately in backend/.env (examples are in backend/.env.example):
 

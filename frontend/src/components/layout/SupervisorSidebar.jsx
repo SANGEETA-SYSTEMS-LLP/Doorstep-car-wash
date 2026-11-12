@@ -61,7 +61,7 @@ export default function SupervisorSidebar() {
     };
 
   return (
-    <ResponsiveNavigation title="Supervisor workspace"><aside className="flex min-h-screen w-72 flex-col border-r border-slate-200/80 bg-white">
+    <ResponsiveNavigation title="Supervisor workspace"><aside className="flex min-h-screen w-72 shrink-0 flex-col border-r border-slate-200/80 bg-white">
       <div className="border-b border-slate-100 px-5 py-5">
         <div className="flex items-center gap-3"><WashNowMark /><div><h1 className="text-lg font-black tracking-tight text-slate-950">WashNow</h1><p className="mt-0.5 text-xs text-slate-500">Supervisor workspace</p></div></div>
         <div className="mt-4 flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-[11px] font-semibold text-slate-600"><span className="h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-100" />Operations access <span className="ml-auto text-slate-400">Secure</span></div>

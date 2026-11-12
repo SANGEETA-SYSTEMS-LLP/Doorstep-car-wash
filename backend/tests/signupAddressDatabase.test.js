@@ -10,7 +10,7 @@ test('signup address persists for customer before verification and skips invalid
    create table public.customers(id uuid primary key, user_id uuid references auth.users);
    create table public.customer_addresses(customer_id uuid, label text, address_line text, latitude double precision, longitude double precision, city text, state text, postal_code text, flat_number text, landmark text, is_default boolean);
   `);
-  const sql=await readFile(new URL('../../database-history/supabase-before-cleanup-20261015/migrations/20261015150000_customer_signup_address.sql',import.meta.url),'utf8');
+  const sql=await readFile(new URL('../../supabase/archive/supabase-before-cleanup-20261015/migrations/20261015150000_customer_signup_address.sql',import.meta.url),'utf8');
   await db.exec(sql); await db.exec(sql);
   const address={address:'123 Test Street, Bhubaneswar',latitude:20.29,longitude:85.82,city:'Bhubaneswar',state:'Odisha',postalCode:'751001',flatNumber:'A-2'};
   const inputs=[{requested_role:'customer',signup_address:address},{requested_role:'washer',signup_address:address},{signup_address:{...address,latitude:'bad'}},{signup_address:{...address,latitude:120}},{signup_address:{...address,postalCode:'bad'}},{}];

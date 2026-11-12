@@ -61,6 +61,12 @@ export async function createWasherEarning(
       "customer_confirmed",
       "closed",
       "payment_completed",
+      "washer_assigned",
+      "washer_on_the_way",
+      "washer_arrived",
+      "otp_verified",
+      "service_started",
+      "service_completed",
     ].includes(booking.status)
   ) {
     return null;

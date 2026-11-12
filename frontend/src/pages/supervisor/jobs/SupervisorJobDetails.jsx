@@ -48,7 +48,7 @@ export default function SupervisorJobDetails() {
   }
 
   const canAssign = !job.assigned_washer_id &&
-    ["pending", "confirmed", "finding_washer", "support_escalated"].includes(job.status);
+    ["pending", "confirmed", "finding_washer", "support_escalated", "payment_completed"].includes(job.status);
   const status = job.status === "service_completed"
     ? "Awaiting validation"
     : job.status === "completed"

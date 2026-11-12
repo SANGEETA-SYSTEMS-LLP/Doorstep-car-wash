@@ -17,7 +17,7 @@ function RegistrationForm(props) {
         <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
         <p className="text-xs font-semibold tracking-widest text-green-600">{props.accountType.toUpperCase()} SIGN UP</p>
         <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">{props.accountType !== "customer" ? "Join as a " + props.accountType : "Create your account"}</h2>
-        <p className="mt-3 text-slate-500">{props.accountType !== "customer" ? "Register your details. An administrator must activate your " + props.accountType + " access." : "A few details now. Effortless car care starts here."}</p>
+        <p className="mt-3 text-slate-500">{props.accountType === "supervisor" ? "Create your supervisor account and start managing operations after signup." : props.accountType === "washer" ? "Register your details. A supervisor will verify your washer account before you can accept jobs." : "A few details now. Effortless car care starts here."}</p>
         <RegistrationFields {...props} form={{ ...props.form, handleSubmit }} />
         <p className="mt-7 text-center text-sm text-slate-500">
           Already have an account?{" "}

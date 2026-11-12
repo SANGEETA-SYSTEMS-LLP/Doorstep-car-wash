@@ -84,7 +84,7 @@ export default function SelectLocation() {
     try {
       const selected = { ...location, address: location.address.trim(), name: location.name || location.address.trim() };
       const latest = await checkCoverage(selected);
-      if (!latest.available) { setCoverage(latest); throw new Error("Please select a valid map location."); }
+      if (!latest.available) { setCoverage(latest); throw new Error("Service is not available at this location. Please choose another address."); }
       const saved = await saveServiceAddress(user.id, selected, address, latest.society?.id);
       updateBooking({ location: { ...selected, addressId: saved.id }, society: latest.society, serviceZone: latest.zone });
       updateAddress(address);
@@ -119,7 +119,7 @@ export default function SelectLocation() {
           {location && <p className="text-sm text-slate-600">Pin selected: {Number(location.latitude).toFixed(5)}, {Number(location.longitude).toFixed(5)}</p>}
           {busy && <p role="status" className="text-sm text-green-700">Checking address and service availability…</p>}
           {coverage && <div role="status" className={"rounded-xl p-4 text-sm " + (coverage.available ? "bg-green-50 text-green-800" : "bg-amber-50 text-amber-900")}>
-            {coverage.available ? "You can book at this location. Washer assignment depends on nearby availability." : "Please choose a valid location on the map."}
+            {coverage.available ? "Service is available at this location. Washer assignment depends on the selected date and time." : "Service is not available at this location because a supervisor or verified washer does not cover this area. Please choose another address."}
           </div>}
           {location && !coverage && !busy && <button type="button" onClick={() => selectPosition(coordinates(location), location)} className="text-green-700 underline">Retry availability check</button>}
           <label className="block text-sm font-semibold">Complete street address <span className="text-red-600">*</span><textarea required minLength={10} maxLength={500} rows={3} disabled={!location || saving} value={location?.address || ""} onChange={e => editLocation("address", e.target.value)} placeholder="Building or society, street, area and city" className={fieldClass} /><span className="text-xs font-normal text-slate-500">Make sure this address matches the pin. Moving the pin clears the previous address.</span></label>

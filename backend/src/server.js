@@ -74,3 +74,15 @@ setInterval(async () => {
   catch (error) { console.error("Cancellation refund reconciliation unavailable:", error.message); }
   finally { reconcilingCancellationRefunds = false; }
 }, 60000).unref();
+
+// Reconcile payment-completed bookings whose supervisor marker or washer
+// earning could not be written during the original request/webhook.
+const { reconcilePaymentCompletedBookings } = await import("./services/payments/paymentCompletionReconciliationService.js");
+let reconcilingPaymentCompletions = false;
+setInterval(async () => {
+  if (reconcilingPaymentCompletions) return;
+  reconcilingPaymentCompletions = true;
+  try { await reconcilePaymentCompletedBookings(); }
+  catch (error) { console.error("Payment completion reconciliation unavailable:", error.message); }
+  finally { reconcilingPaymentCompletions = false; }
+}, 60000).unref();

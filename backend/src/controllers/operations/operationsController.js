@@ -20,7 +20,7 @@ async function queryRows(query) {
 }
 export async function getOperations(req, res, next) {
   try {
-    let jobsQuery = db.from("bookings").select("id,booking_number,status,assigned_washer_id,latitude,longitude,service_address,scheduled_date,scheduled_start_time").not("status", "in", "(closed,cancelled,payment_completed)");
+    let jobsQuery = db.from("bookings").select("id,booking_number,status,assigned_washer_id,latitude,longitude,service_address,scheduled_date,scheduled_start_time").not("status", "in", "(closed,cancelled)");
     let locationsQuery = db.from("washer_locations").select("id,washer_id,latitude,longitude,service_latitude,service_longitude,updated_at");
     if (req.profile?.role === "supervisor") {
       jobsQuery = boundQueryToSupervisorArea(jobsQuery, req.supervisorArea);

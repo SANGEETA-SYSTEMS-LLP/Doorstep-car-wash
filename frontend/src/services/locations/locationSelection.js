@@ -20,3 +20,11 @@ export async function resolveLocationSelection(position, resolvedAddress, { look
 export function validServiceAddress(location) {
   return Boolean(coordinates(location) && typeof location.address === "string" && location.address.trim().length >= 10 && location.address.trim().length <= 500);
 }
+export function validPostalAddress(location) {
+  return Boolean(
+    typeof location?.address === "string" && location.address.trim().length >= 10 && location.address.trim().length <= 500 &&
+    typeof location.city === "string" && location.city.trim().length > 0 && location.city.trim().length <= 100 &&
+    typeof location.state === "string" && location.state.trim().length > 0 && location.state.trim().length <= 100 &&
+    /^\d{6}$/.test(location.postalCode || "")
+  );
+}

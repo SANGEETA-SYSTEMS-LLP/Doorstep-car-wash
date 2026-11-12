@@ -39,7 +39,7 @@ export async function cancelCustomerBooking(req, res, next) {
     });
     if (error) {
       if (["42883", "42P01", "PGRST202"].includes(error.code)) {
-        return res.status(503).json({ message: "Booking cancellation needs a database update. Apply backend/database/add_customer_booking_cancellation_refunds.sql, then retry." });
+        return res.status(503).json({ message: "Booking cancellation needs a database update. Apply the ordered supabase/migrations SQL, then retry." });
       }
       if (error.code === "55000") {
         const { data: booking, error: bookingError } = await db.from("bookings")

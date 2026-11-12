@@ -8,6 +8,7 @@ import { useWasher } from "../../../context/WasherContext";
 import useApi from "../../../hooks/useApi";
 import { ACTIVE_STATUSES, getWasherJob, setWasherAvailability, toActiveJob } from "../../../services/washer/washerWorkspaceService";
 import { acceptAssignment, rejectAssignment } from "../../../services/booking/assignmentService";
+import { WASHER_LOCATION_REFRESH_MS } from "../../../services/washer/washerLocationConfig";
 import WasherBookingCard from "../../../components/washer/WasherBookingCard";
 
 const inProgressStatuses = ["washer_on_the_way", "washer_arrived", "otp_verified", "service_started"];
@@ -117,7 +118,7 @@ export default function WasherDashboard() {
     let lastSent = 0;
     let sending = false;
     const sendPosition = async (coords) => {
-      if (!activeWatch || sending || Date.now() - lastSent < 10000) return;
+      if (!activeWatch || sending || Date.now() - lastSent < WASHER_LOCATION_REFRESH_MS) return;
       lastSent = Date.now();
       sending = true;
       try { await sendWasherLocation(coords.toJSON ? coords.toJSON() : { latitude: coords.latitude, longitude: coords.longitude, heading: coords.heading, speed: coords.speed }); }
@@ -130,7 +131,7 @@ export default function WasherDashboard() {
     const heartbeat = setInterval(() => {
       if (!activeWatch || sending) return;
       navigator.geolocation.getCurrentPosition(({ coords }) => { void sendPosition(coords); }, () => {}, { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 });
-    }, 60000);
+    }, WASHER_LOCATION_REFRESH_MS);
     return () => { activeWatch = false; clearInterval(heartbeat); navigator.geolocation.clearWatch(watch); };
   }, [locationTracking]);
 
@@ -221,6 +222,7 @@ export default function WasherDashboard() {
       <div className="mt-7 flex flex-wrap items-center gap-2 border-t border-white/15 pt-5 text-sm">
         <span className={"h-2.5 w-2.5 rounded-full ring-2 ring-white/20 " + (online ? "bg-green-300" : "bg-slate-400")} />
         <span className="font-semibold">{online ? "You’re online and ready for work" : active.length ? "You’re focused on an active job" : "You’re currently offline"}</span>
+        {locationTracking && <span className="text-xs text-green-100">Live location refreshes every 5 minutes.</span>}
         {!data?.washer?.is_verified && data && <span className="rounded-full bg-amber-300/15 px-3 py-1 text-xs font-semibold text-amber-100">Verification required to go online</span>}
       </div>
     </section>

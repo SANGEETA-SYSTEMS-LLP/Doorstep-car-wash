@@ -1,8 +1,9 @@
-import { validServiceAddress } from "../../../services/locations/locationSelection";
+import { validPostalAddress, validServiceAddress } from "../../../services/locations/locationSelection";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import { apiRequest } from "../../../services/core/api";
+import { loginErrorMessage } from "../../../services/auth/authTransport";
 import RegisterContent from "./RegisterContent";
 
 function Register() {
@@ -25,18 +26,6 @@ function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  if (accountType !== "customer") {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-5 py-10">
-        <section className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-8 text-center">
-          <h1 className="text-2xl font-bold text-slate-950">Staff accounts require an administrator</h1>
-          <p className="mt-3 text-sm leading-6 text-slate-600">Public registration is only available for customer accounts. Contact an administrator to request staff access.</p>
-          <a href="/login" className="mt-6 inline-flex rounded-lg bg-green-800 px-5 py-3 text-sm font-semibold text-white hover:bg-green-900">Go to sign in</a>
-        </section>
-      </main>
-    );
-  }
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((previous) => ({ ...previous, [name]: value }));
@@ -56,18 +45,20 @@ function Register() {
       setError("Passwords do not match.");
       return;
     }
-    if (form.password.length < 12 || form.password.length > 128) {
-      setError("Use a password between 12 and 128 characters.");
+    if (form.password.length < 8 || form.password.length > 128) {
+      setError("Use a password with at least 8 characters.");
       return;
     }
 
-    const addressComplete = validServiceAddress(address) && address.city?.trim() && address.state?.trim() && /^\d{6}$/.test(address.postalCode || "");
-    if (accountType === "washer" && !addressComplete) {
+    const hasAddressInput = Object.values(address).some(value => value != null && String(value).trim() !== "");
+    const postalAddressComplete = validPostalAddress(address);
+    const serviceAddressComplete = validServiceAddress(address) && postalAddressComplete;
+    if (accountType === "washer" && !serviceAddressComplete) {
       setError("Washer signup requires a selected map location, complete street address, city, state and 6-digit PIN code for supervisor verification.");
       return;
     }
-    if (accountType === "customer" && Object.values(address).some(Boolean) && !addressComplete) {
-      setError("Choose your location, enter a complete address (at least 10 characters), city, state and 6-digit PIN code, or clear the optional address.");
+    if (accountType === "customer" && hasAddressInput && !postalAddressComplete) {
+      setError("Enter a complete street address (at least 10 characters), city, state and 6-digit PIN code, or clear the optional address. Map location is optional.");
       return;
     }
 
@@ -79,7 +70,9 @@ function Register() {
         email: form.email,
         password: form.password,
         requestedRole: accountType,
-        signupAddress: ["customer", "washer"].includes(accountType) && validServiceAddress(address) ? address : null,
+        signupAddress: accountType === "customer" && postalAddressComplete
+          ? address
+          : accountType === "washer" && serviceAddressComplete ? address : null,
       });
       if (accountType === "washer") {
         try {
@@ -96,8 +89,12 @@ function Register() {
         else setSuccess("Washer account created and sent for supervisor verification. Verify your email, then sign in to your washer dashboard. After the supervisor approves it, you can choose to go online and receive eligible jobs.");
         return;
       }
-      if (accountType !== "customer") {
-        setSuccess("Registration received. Verify your email if prompted, then contact your administrator to activate " + accountType + " access. Account ID: " + (data.user?.id || "Available from your profile after verification"));
+      if (accountType === "supervisor") {
+        if (data.session) {
+          navigate("/dashboard");
+        } else {
+          setSuccess("Supervisor account created. Please verify your email, then sign in to open your supervisor dashboard.");
+        }
         return;
       }
       if (data.session) {
@@ -106,7 +103,7 @@ function Register() {
       }
       setSuccess("Account created. Please check your email to verify your account.");
     } catch (error) {
-      setError(error?.message || "Unable to create account.");
+      setError(loginErrorMessage(error));
     } finally {
       setLoading(false);
     }

@@ -16,7 +16,7 @@ test('assignment migration replaces legacy signatures and denies nonexistent sup
  create table washer_skills(washer_id uuid,service_id uuid);
  create function accept_booking_assignment(uuid) returns uuid language sql as $$select $1$$;
  `);
- const sql=await readFile(new URL('../../database-history/supabase-before-cleanup-20261015/migrations/20261015110000_refresh_assignment_contract.sql',import.meta.url),'utf8');
+ const sql=await readFile(new URL('../../supabase/archive/supabase-before-cleanup-20261015/migrations/20261015110000_refresh_assignment_contract.sql',import.meta.url),'utf8');
  await db.exec(sql); await db.exec(sql);
  assert.equal((await db.query("select pg_get_function_result('public.accept_booking_assignment(uuid)'::regprocedure) as result")).rows[0].result,'jsonb');
  await assert.rejects(db.query('select supervisor_assign_washer(null,null,null)'),/Supervisor permission required/);

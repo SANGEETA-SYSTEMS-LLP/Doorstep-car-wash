@@ -25,6 +25,7 @@ import { errorMiddleware } from "./middleware/errorMiddleware.js";
 import {
   razorpayWebhook,
 } from "./controllers/payments/paymentController.js";
+import { reconcilePaymentCompletions } from "./controllers/payments/paymentCompletionReconciliationController.js";
 const app =
   express();
 app.set("etag", false);
@@ -148,6 +149,8 @@ app.get(
     });
   }
 );
+
+app.get("/api/cron/reconcile-payment-completions", reconcilePaymentCompletions);
 
 app.use("/api/locations", locationRoutes);
 app.use("/api/auth", washerSignupRoutes);

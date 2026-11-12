@@ -8,6 +8,7 @@ export async function getSupervisorDashboard(
   try {
     const activeStatuses = [
       "pending",
+      "payment_completed",
       "confirmed",
       "finding_washer",
       "washer_assigned",

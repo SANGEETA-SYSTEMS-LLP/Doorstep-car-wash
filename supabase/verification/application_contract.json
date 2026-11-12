@@ -1,0 +1,237 @@
+{
+  "tables": {
+    "profiles": [
+      "id",
+      "full_name",
+      "phone",
+      "role",
+      "avatar_url",
+      "is_active"
+    ],
+    "washers": [
+      "id",
+      "user_id",
+      "rating",
+      "jobs_completed",
+      "status",
+      "is_active",
+      "is_verified"
+    ],
+    "washer_earnings": [
+      "id",
+      "booking_id",
+      "gross_amount",
+      "platform_commission",
+      "washer_amount",
+      "status",
+      "settled_at",
+      "created_at",
+      "washer_id"
+    ],
+    "customers": [
+      "id",
+      "user_id",
+      "total_bookings",
+      "total_spent",
+      "is_active",
+      "created_at"
+    ],
+    "bookings": [
+      "id",
+      "customer_id",
+      "status",
+      "payment_method",
+      "total_amount",
+      "assigned_washer_id",
+      "booking_number",
+      "service_address",
+      "scheduled_date",
+      "base_amount",
+      "service_amount",
+      "platform_fee",
+      "discount_amount",
+      "tax_amount",
+      "extra_charge",
+      "scheduled_start_time",
+      "service_validated_at",
+      "requires_supervisor",
+      "service_completed_at",
+      "customer_hidden_at",
+      "promo_code"
+    ],
+    "payments": [
+      "id",
+      "amount",
+      "status",
+      "provider_order_id",
+      "booking_id",
+      "payment_method",
+      "created_at",
+      "paid_at",
+      "provider_method"
+    ],
+    "booking_assignments": [
+      "id",
+      "booking_id",
+      "washer_id",
+      "status",
+      "distance_km",
+      "expires_at",
+      "offered_at"
+    ],
+    "customer_addresses": [
+      "latitude",
+      "longitude"
+    ],
+    "vehicles": [
+      "id",
+      "vehicle_type",
+      "brand",
+      "model",
+      "vehicle_number",
+      "colour"
+    ],
+    "service_packages": [
+      "id",
+      "price",
+      "vehicle_type",
+      "is_active",
+      "name",
+      "description",
+      "duration_minutes",
+      "service_id",
+      "washer_commission_percent"
+    ],
+    "booking_service_checklist": [
+      "id",
+      "completed"
+    ],
+    "extra_charge_requests": [
+      "id"
+    ],
+    "finance_operations": [],
+    "booking_invoices": [],
+    "reviews": [
+      "rating"
+    ],
+    "booking_service_photos": [
+      "id",
+      "photo_type",
+      "photo_url",
+      "created_at",
+      "washer_id"
+    ],
+    "service_checklist_items": [
+      "id"
+    ],
+    "customer_notifications": [
+      "id",
+      "booking_id",
+      "booking_number",
+      "event_type",
+      "title",
+      "message",
+      "created_at",
+      "read_at"
+    ],
+    "washer_locations": [
+      "washer_id",
+      "latitude",
+      "longitude",
+      "heading",
+      "speed",
+      "updated_at",
+      "service_latitude",
+      "service_longitude"
+    ],
+    "washer_payout_accounts": [
+      "destination_encrypted",
+      "fund_account_id",
+      "account_label"
+    ],
+    "supervisor_service_areas": [
+      "supervisor_id",
+      "address",
+      "latitude",
+      "longitude",
+      "updated_at"
+    ],
+    "booking_cancellations": [
+      "booking_id",
+      "customer_id",
+      "payment_id",
+      "refund_amount_paise",
+      "status"
+    ],
+    "supervisor_earnings": [
+      "booking_id",
+      "supervisor_id",
+      "washer_id",
+      "supervisor_amount",
+      "status"
+    ],
+    "supervisor_payout_accounts": [
+      "supervisor_id",
+      "account_label"
+    ],
+    "supervisor_payout_operations": [
+      "id",
+      "supervisor_id",
+      "amount_paise",
+      "status"
+    ],
+    "support_tickets": [],
+    "societies": [
+      "id",
+      "name",
+      "formatted_address",
+      "area",
+      "city",
+      "state",
+      "postal_code",
+      "latitude",
+      "longitude",
+      "service_radius_km",
+      "is_active"
+    ],
+    "service_zones": [
+      "id",
+      "name",
+      "society_id",
+      "latitude",
+      "longitude",
+      "radius_km",
+      "is_active"
+    ],
+    "services": [
+      "id",
+      "name",
+      "description",
+      "is_active"
+    ],
+    "washer_settlements": [
+      "id",
+      "washer_id",
+      "amount",
+      "status",
+      "payment_reference",
+      "processed_at"
+    ]
+  },
+  "rpcs": [
+    "respond_extra_charge",
+    "confirm_customer_service",
+    "begin_finance_operation",
+    "reconcile_finance_operation",
+    "reserve_finance_operation",
+    "record_cod_payment_once",
+    "supervisor_assign_washer",
+    "supervisor_add_washer",
+    "hash_service_otp",
+    "verify_service_otp_hash",
+    "accept_booking_assignment",
+    "reserve_razorpay_payment_order",
+    "complete_booking_payment",
+    "cancel_customer_booking"
+  ]
+}

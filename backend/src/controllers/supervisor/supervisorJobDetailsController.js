@@ -49,7 +49,7 @@ export async function getSupervisorJobDetails(req, res) {
     let washers = [];
     if (
       !booking.assigned_washer_id &&
-      ["pending", "confirmed", "finding_washer", "support_escalated"].includes(booking.status)
+      ["pending", "confirmed", "finding_washer", "support_escalated", "payment_completed"].includes(booking.status)
     ) {
       let washerQuery = supabaseAdmin
         .from("washers")
@@ -104,9 +104,10 @@ export async function getSupervisorJobDetails(req, res) {
     const profiles = new Map();
     const payoutWasherIds = new Set();
     if (userIds.length) {
+      const washerIds = washers.map(washer => washer.id);
       const [profilesResult, payoutResult] = await Promise.all([
         supabaseAdmin.from("profiles").select("id,full_name,phone,is_active").in("id", userIds),
-        supabaseAdmin.from("washer_payout_accounts").select("washer_id,account_label,destination_encrypted,fund_account_id").in("washer_id", washers.map(washer => washer.id)),
+        supabaseAdmin.from("washer_payout_accounts").select("washer_id,account_label,destination_encrypted,fund_account_id").in("washer_id", washerIds),
       ]);
       if (profilesResult.error) throw profilesResult.error;
       if (payoutResult.error) throw payoutResult.error;
@@ -133,6 +134,8 @@ export async function getSupervisorJobDetails(req, res) {
       if (washer.status !== "available") reasons.push(washer.status === "busy" ? "Washer is currently busy." : "Washer must go online.");
       if (booking.latitude == null || booking.longitude == null) reasons.push("Booking map coordinates are missing.");
       if (distanceKm == null) reasons.push("Valid booking and washer map locations are required.");
+      const radiusKm = Math.min(Math.max(Number(washer.service_radius_km) || 5, 5), 100);
+      if (distanceKm != null && distanceKm > radiusKm) reasons.push("Booking is outside this washer's service radius.");
       if (!Number.isFinite(age) || age > 15) reasons.push("Washer must refresh their live location.");
       if (exclusionReasonByWasherId.has(washer.id)) reasons.push(exclusionReasonByWasherId.get(washer.id));
       if (await washerHasScheduleConflict(washer.id, booking, bookingPackage)) reasons.push("Washer has a conflicting booking.");
@@ -176,4 +179,5 @@ export async function getSupervisorJobDetails(req, res) {
     });
   }
 }
+
 

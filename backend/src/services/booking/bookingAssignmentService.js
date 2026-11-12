@@ -5,6 +5,26 @@ import {
 export async function assignWasherToBooking(
   bookingId
 ) {
+  // A successful online payment waits for supervisor review in this state.
+  // Never roll it back to pending while assignment is being prepared.
+  const { data: paymentCompletedBooking, error: paymentCompletedError } = await supabaseAdmin.from("bookings")
+    .update({ requires_supervisor: true, updated_at: new Date().toISOString() })
+    .eq("id", bookingId)
+    .eq("status", "payment_completed")
+    .is("assigned_washer_id", null)
+    .select("id,status,assigned_washer_id")
+    .maybeSingle();
+  if (paymentCompletedError) throw paymentCompletedError;
+  if (paymentCompletedBooking) {
+    return {
+      assigned: false,
+      requires_supervisor: true,
+      supervisorReviewRequired: true,
+      bookingId: paymentCompletedBooking.id,
+      status: paymentCompletedBooking.status,
+    };
+  }
+
   const { data, error } = await supabaseAdmin.from("bookings")
     .update({ status: "pending", requires_supervisor: true, updated_at: new Date().toISOString() })
     .eq("id", bookingId).is("assigned_washer_id", null)

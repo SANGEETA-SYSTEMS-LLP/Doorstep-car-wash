@@ -15,8 +15,8 @@ The repository now applies API security headers, strict frontend-origin checks, 
 9. In Supabase Auth, require verified email where appropriate, configure strong password rules and MFA for staff, and enable CAPTCHA or abuse protection for public sign-up and recovery flows. The browser client also throttles direct Auth requests to 20 attempts per 15 minutes per browser profile; this is an additional UX guard and can be reset by clearing browser storage, so Supabase Auth controls remain required.
 10. Keep service-photo storage private. The backend should issue short-lived signed URLs only after checking booking ownership or assignment.
 11. Configure the payment provider webhook with the matching server-side webhook secret. Review payout permissions and run a controlled provider test before enabling live transfers.
-12. Apply `backend/database/add_atomic_payment_order_reservation.sql` before deploying the payment-order controller. It requires resolving duplicate active payment rows first. Confirm the live `payments` schema supports a nullable `provider_order_id` and the `failed` status before applying it.
-13. Apply `backend/database/repair_customer_offers.sql` to enforce one redemption of each offer code per customer. Resolve any duplicate code redemptions before running the migration.
+12. Follow the complete database run order in [`supabase/README.md`](../supabase/README.md). For an existing database, inspect the deployed migration history and apply only reviewed missing migrations; the final migration installs checkout reservation and payment completion. Resolve duplicate active payment rows before applying its unique index.
+13. The ordered migrations also install one-use customer offer enforcement. Resolve duplicate offer-code redemptions before applying that migration.
 
 ## Local development
 
@@ -28,4 +28,4 @@ Production startup rejects common placeholder Supabase service-role and Razorpay
 
 ## Verification limits
 
-This repository does not contain the complete production database schema, Supabase project settings, hosting configuration, CDN rules, or provider account settings. Those controls must be checked in the corresponding dashboards before calling a production deployment secure. The in-process limiter is a useful baseline, not a substitute for a shared production rate-limit store or edge protection. Configure the Vercel firewall/edge rate limits for API and Auth endpoints, set the exact trusted `TRUST_PROXY_HOPS`, and confirm Supabase Auth email, password, MFA and CAPTCHA settings in the live project.
+The repository now contains the versioned application database source, but not the deployed Supabase migration history/settings, hosting configuration, CDN rules, or provider account settings. Those controls must be checked in the corresponding dashboards before calling a production deployment secure. The in-process limiter is a useful baseline, not a substitute for a shared production rate-limit store or edge protection. Configure the Vercel firewall/edge rate limits for API and Auth endpoints, set the exact trusted `TRUST_PROXY_HOPS`, and confirm Supabase Auth email, password, MFA and CAPTCHA settings in the live project.

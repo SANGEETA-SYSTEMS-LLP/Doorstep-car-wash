@@ -68,13 +68,13 @@ No application MFA assurance check was found. Configure MFA for privileged roles
 
 ## Operational follow-up
 
-Apply the security migrations after resolving duplicate-row prerequisites, and apply `backend/database/add_supervisor_service_areas.sql` before using supervisor operations. Then verify the live Supabase RLS/grants, storage bucket policies, Auth settings (MFA, email verification, password strength, CAPTCHA), trusted proxy count, shared rate limits, Vercel CSP in a real browser, and Razorpay webhook/payout configuration. Backend logs currently go to process stdout; configure centralized retention, access controls, and alerting in the hosting platform for durable security monitoring.
+This audit predates restoration of the ordered SQL source. Current database setup is documented in `supabase/README.md`; on an existing project, compare deployed history before applying its missing migrations, including supervisor service areas and the final assignment SQL. Then verify the live Supabase RLS/grants, storage bucket policies, Auth settings (MFA, email verification, password strength, CAPTCHA), trusted proxy count, shared rate limits, Vercel CSP in a real browser, and Razorpay webhook/payout configuration. Backend logs currently go to process stdout; configure centralized retention, access controls, and alerting in the hosting platform for durable security monitoring.
 
 ## Follow-up remediation review — 2026-10-28
 
 The following source-level remediations were added during the follow-up review:
 
-- **Payment order/cancellation coordination:** checkout now reserves the payment through `reserve_razorpay_payment_order`, which locks the booking and inserts a single active payment row before calling Razorpay. It uses the booking-first lock order shared by cancellation. Apply `backend/database/add_atomic_payment_order_reservation.sql` before deploying this handler. The migration intentionally stops if duplicate active payments exist. Late captures are handled through the cancellation refund path.
+- **Payment order/cancellation coordination:** checkout reserves the payment through `reserve_razorpay_payment_order`, which locks the booking and inserts a single active payment row before calling Razorpay. It uses the booking-first lock order shared by cancellation. The current ordered migration is in `supabase/migrations/`; it intentionally stops if duplicate active payments exist. Late captures are handled through the cancellation refund path.
 - **Supervisor support-ticket boundary:** ticket listing, creation, and updates now restrict supervisors to bookings inside their saved service area. The update query is also constrained to the booking ID rechecked for that area.
 - **One-use promo concurrency:** `repair_customer_offers.sql` now adds a unique per-customer/per-code constraint, after checking for duplicates.
 - **Refund event ordering:** webhook transitions are conditional so delayed `refund.failed` events cannot downgrade a processed refund. Refund ID, payment ID, amount, and currency are matched against the cancellation record.

@@ -190,7 +190,7 @@ export async function deleteMyBooking(req, res, next) {
       .eq("id", booking.id).eq("customer_id", customer.id).is("customer_hidden_at", null)
       .select("id").maybeSingle();
     if (missingHiddenColumn(error)) {
-      return res.status(503).json({ message: "Apply backend/database/add_customer_booking_history_visibility.sql, then retry removing this booking." });
+      return res.status(503).json({ message: "Apply the ordered supabase/migrations SQL, then retry removing this booking." });
     }
     if (error) throw error;
     if (!data) return res.status(404).json({ message: "Booking is already removed from your history." });

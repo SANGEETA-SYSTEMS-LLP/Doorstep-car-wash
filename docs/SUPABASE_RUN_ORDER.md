@@ -1,11 +1,17 @@
-# Supabase run order
+# Supabase SQL run order
 
-Start with [the setup instructions](../supabase/README.md).
+The complete database source is restored and maintained under [`supabase/`](../supabase/README.md).
 
-1. For a NEW EMPTY database, run all SQL files in supabase/setup in numeric filename order (001–100).
-2. Run verification/verify_installation.sql.
-3. Run verification/verify_application_contract.sql.
+For a **new empty Supabase project**:
 
-[Every file explained](../supabase/setup/README.md). Stop on the first error; complete all security files before using the app.
+1. Run `supabase/setup/*.sql` in numeric order (001–051).
+2. Run `supabase/migrations/*.sql` in filename order.
+3. Run `supabase/verification/verify_installation.sql`.
+4. Run `supabase/verification/verify_application_contract.sql`.
+5. Keep the app offline until all security/workflow SQL has succeeded; then configure authorized staff accounts and provider credentials.
 
-For an existing database, do not replay fresh setup. Compare its schema and apply appropriate forward migrations. The former large files are preserved in database-history/large-setup-before-split-20261015. No hosted database was modified.
+Optionally generate and run `supabase/FRESH_INSTALL.sql` as one file on a new empty project only. Stop on the first error.
+
+For an existing database, do not run the baseline or combined fresh installer. Compare the deployed schema and migration history, back up the database, and apply only reviewed missing forward migrations. One-off scripts that are not in the install chain are under `supabase/operations/` and must be reviewed individually.
+
+SQL has not been applied to hosted Supabase as part of this work.

@@ -27,7 +27,7 @@ export default function SignupAddress({ value, onChange, disabled, onBusy, accou
   };
   return <fieldset disabled={disabled || busy} className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
     <legend className="px-2 font-semibold text-slate-950">{isWasher ? "Service location" : "Your service address"} <span className="ml-1 text-xs font-normal text-slate-500">{isWasher ? "Required" : "Optional"}</span></legend>
-    <p className="mb-4 text-sm leading-6 text-slate-600">{isWasher ? "Choose your service area and add your full address. Our team uses these details to verify your application." : "Save your location for faster booking. You can also add it later."}</p>
+    <p className="mb-4 text-sm leading-6 text-slate-600">{isWasher ? "Choose your service area and add your full address. Our team uses these details to verify your application." : "Type your complete address below; choosing a map location is optional. You can also add an address later."}</p>
     <button type="button" onClick={locate} disabled={disabled || busy} className="mb-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-green-200 hover:bg-green-50 hover:text-green-800 disabled:opacity-50"><LocateFixed size={19}/>{busy ? "Finding your location…" : "Use my current location"}</button>
     <AddressSearch disabled={disabled || busy} onStart={start} onSelect={select} onError={(message, id) => { if (id === sequence.current) { onBusy(false); setNotice(message); } }}/>
     <ServiceMap location={value} className="mt-4 h-64 rounded-xl"/>

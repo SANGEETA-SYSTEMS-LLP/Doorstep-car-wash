@@ -75,7 +75,9 @@ export async function washerWorkspace(userId) {
   const offerBookings = await records("bookings", offers.map(o => o.booking_id), bookingColumns);
   const eligibleOffers = washer.is_verified && payoutAccountConfigured ? offers.filter(o => {
     const booking = offerBookings.get(o.booking_id);
-    return booking && !booking.assigned_washer_id && ["pending", "confirmed", "finding_washer", "support_escalated"].includes(booking.status);
+    // Paid bookings stay in payment_completed while a supervisor's offer is
+    // pending (and after acceptance), so include that state in the washer inbox.
+    return booking && !booking.assigned_washer_id && ["pending", "confirmed", "finding_washer", "support_escalated", "payment_completed"].includes(booking.status);
   }) : [];
   const all = new Map((jobsResult.data || []).map(b => [b.id, b]));
   eligibleOffers.forEach(o => all.set(o.booking_id, offerBookings.get(o.booking_id)));

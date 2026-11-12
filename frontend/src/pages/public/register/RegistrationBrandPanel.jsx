@@ -11,15 +11,15 @@ const content = {
   },
   supervisor: {
     title: "Help every service run smoothly.",
-    description: "Register as a supervisor to coordinate jobs, support washers and resolve customer issues after your account is activated.",
+    description: "Create your account to coordinate jobs, support washers and resolve customer issues.",
     label: "SUPERVISOR REGISTRATION",
-    steps: ["Enter your details", "Verify your email if prompted", "Contact your administrator for activation", "Start managing operations"],
+    steps: ["Enter your details", "Verify your email if prompted", "Sign in to your supervisor dashboard", "Start managing operations"],
   },
   washer: {
     title: "Bring great car care to every doorstep.",
-    description: "Register as a washer to receive assigned jobs, follow service details and track your work after your account is activated.",
+    description: "Register as a washer to receive assigned jobs, follow service details and track your work after supervisor verification.",
     label: "WASHER REGISTRATION",
-    steps: ["Enter your details", "Verify your email if prompted", "Contact your administrator for activation", "Start receiving wash jobs"],
+    steps: ["Enter your details", "Verify your email if prompted", "Wait for supervisor verification", "Start receiving wash jobs"],
   },
 };
 

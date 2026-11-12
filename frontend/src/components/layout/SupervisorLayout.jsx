@@ -40,10 +40,10 @@ export default function SupervisorLayout() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-clip bg-[#f5f8fb] lg:flex-row">
+    <div className="flex min-h-screen min-w-0 overflow-x-clip bg-[#f5f8fb] lg:flex-row">
       <SupervisorSidebar />
 
-      <main className="min-w-0 flex-1">
+      <main className="min-w-0 flex-1 overflow-x-clip">
         <header className="sticky top-0 z-20 flex min-h-[76px] flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 bg-[#f8faf9] px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <span className="hidden h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-800 ring-1 ring-green-100 sm:flex"><ShieldCheck size={20} /></span>

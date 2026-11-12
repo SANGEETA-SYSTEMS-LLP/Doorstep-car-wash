@@ -12,7 +12,7 @@ test('supplied baseline and repository migrations apply in order',async()=>{
  create publication supabase_realtime;
  `);
  for(const directory of ['baseline','migrations']){
-  const folder=new URL('../../database-history/supabase-before-cleanup-20261015/'+directory+'/',import.meta.url);
+  const folder=new URL('../../supabase/archive/supabase-before-cleanup-20261015/'+directory+'/',import.meta.url);
   for(const file of (await readdir(folder)).filter(f=>f.endsWith('.sql')).sort()){
    let sql=await readFile(new URL(file,folder),'utf8');
    // PGlite includes gen_random_uuid but not the Supabase pgcrypto extension.
@@ -20,9 +20,9 @@ test('supplied baseline and repository migrations apply in order',async()=>{
    try{await db.exec(sql);}catch(error){throw new Error(directory+'/'+file+': '+error.message,{cause:error});}
   }
  }
- await db.exec(await readFile(new URL('../../database-history/supabase-before-cleanup-20261015/verification/verify_installation.sql',import.meta.url),'utf8'));
- await db.exec(await readFile(new URL('../../database-history/supabase-before-cleanup-20261015/verification/verify_application_contract.sql',import.meta.url),'utf8'));
- const contract=JSON.parse(await readFile(new URL('../../database-history/supabase-before-cleanup-20261015/verification/application_contract.json',import.meta.url),'utf8'));
+ await db.exec(await readFile(new URL('../../supabase/archive/supabase-before-cleanup-20261015/verification/verify_installation.sql',import.meta.url),'utf8'));
+ await db.exec(await readFile(new URL('../../supabase/archive/supabase-before-cleanup-20261015/verification/verify_application_contract.sql',import.meta.url),'utf8'));
+ const contract=JSON.parse(await readFile(new URL('../../supabase/archive/supabase-before-cleanup-20261015/verification/application_contract.json',import.meta.url),'utf8'));
  const columns=(await db.query("select table_name,column_name from information_schema.columns where table_schema='public'")).rows;
  for(const [table,fields] of Object.entries(contract.tables)){
   assert.ok(columns.some(row=>row.table_name===table),'Missing table '+table);

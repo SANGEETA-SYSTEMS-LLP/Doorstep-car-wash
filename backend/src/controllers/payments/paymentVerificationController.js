@@ -1,37 +1,28 @@
-import { supabaseAdmin, getRazorpay, createWasherEarning } from "./paymentDependencies.js";
+import { supabaseAdmin, getRazorpay } from "./paymentDependencies.js";
 import { customerIdForUser } from "./paymentDependencies.js";
 import { validateCapturedPayment } from "../../services/payments/paymentValidation.js";
-import { assignWasherToBooking } from "../../services/booking/bookingAssignmentService.js";
-import { refundLateCapturedBookingPayment } from "../../services/booking/cancellationRefundService.js";
+import { completeCapturedBookingPayment } from "../../services/payments/completeCapturedBookingPayment.js";
 import crypto from "node:crypto";
 
-export async function verifyPayment(
-  req,
-  res
-) {
+export async function verifyPayment(req, res) {
   try {
-    const razorpay = getRazorpay();
     const {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-    } = req.body;
-    const customerId = await customerIdForUser(req.user.id);
+    } = req.body || {};
 
-    if (typeof razorpay_order_id !== "string" || !/^order_[A-Za-z0-9]{6,64}$/.test(razorpay_order_id) ||
-      typeof razorpay_payment_id !== "string" || !/^pay_[A-Za-z0-9]{6,64}$/.test(razorpay_payment_id) ||
-      typeof razorpay_signature !== "string" || !/^[a-f0-9]{64}$/i.test(razorpay_signature)) {
-      return res.status(400).json({
-        message:
-          "Payment verification details are missing.",
-      });
+    if (typeof razorpay_order_id !== "string" || !/^order_[A-Za-z0-9]{6,64}$/.test(razorpay_order_id)
+      || typeof razorpay_payment_id !== "string" || !/^pay_[A-Za-z0-9]{6,64}$/.test(razorpay_payment_id)
+      || typeof razorpay_signature !== "string" || !/^[a-f0-9]{64}$/i.test(razorpay_signature)) {
+      return res.status(400).json({ success: false, message: "Payment verification details are missing." });
     }
 
-    const {
-      data: payment,
-      error: paymentError,
-    } = await supabaseAdmin
-      .from("payments")
+    const secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!secret) throw Object.assign(new Error("Online payments are not configured."), { status: 503 });
+
+    const customerId = await customerIdForUser(req.user.id);
+    const { data: payment, error: paymentError } = await supabaseAdmin.from("payments")
       .select(`
         *,
         booking:bookings (
@@ -41,158 +32,98 @@ export async function verifyPayment(
           platform_fee
         )
       `)
-      .eq(
-        "provider_order_id",
-        razorpay_order_id
-      )
+      .eq("provider_order_id", razorpay_order_id)
       .maybeSingle();
+    if (paymentError) throw paymentError;
+    if (!payment) return res.status(404).json({ success: false, message: "Payment order not found." });
+    if (payment.customer_id !== customerId) return res.status(403).json({ success: false, message: "Not authorized." });
 
-    if (
-      paymentError ||
-      !payment
-    ) {
-      return res.status(404).json({
-        message:
-          "Payment order not found.",
-      });
+    const expectedSignature = crypto.createHmac("sha256", secret)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest();
+    const suppliedSignature = Buffer.from(razorpay_signature, "hex");
+    if (suppliedSignature.length !== expectedSignature.length
+      || !crypto.timingSafeEqual(suppliedSignature, expectedSignature)) {
+      return res.status(400).json({ success: false, message: "Invalid payment signature." });
     }
 
-    if (payment.customer_id !== customerId) {
-      return res.status(403).json({
-        message:
-          "Not authorized.",
-      });
-    }
-
-    const body =
-      `${razorpay_order_id}|${razorpay_payment_id}`;
-
-    const expectedSignature =
-      crypto
-        .createHmac(
-          "sha256",
-          process.env
-            .RAZORPAY_KEY_SECRET
-        )
-        .update(body)
-        .digest("hex");
-
-    const supplied =
-      Buffer.from(
-        razorpay_signature,
-        "utf8"
-      );
-
-    const expected =
-      Buffer.from(
-        expectedSignature,
-        "utf8"
-      );
-
-    const valid =
-      supplied.length ===
-        expected.length &&
-      crypto.timingSafeEqual(
-        supplied,
-        expected
-      );
-
-    if (!valid) {
-      return res.status(400).json({
-        message:
-          "Invalid payment signature.",
-      });
-    }
-
+    const razorpay = getRazorpay();
     const captured = await razorpay.payments.fetch(razorpay_payment_id);
-    validateCapturedPayment(captured, payment);
+    const razorpayOrder = await razorpay.orders.fetch(razorpay_order_id);
+    const orderPayments = await razorpay.orders.fetchPayments(razorpay_order_id);
 
-    const now =
-      new Date().toISOString();
+    console.log("ORDER PAYMENT DETAILS", {
+      count: orderPayments.count,
+      payments: (orderPayments.items || []).map((item) => ({
+        id: item.id,
+        amount: item.amount,
+        status: item.status,
+        order_id: item.order_id,
+        method: item.method,
+        fee: item.fee,
+        tax: item.tax,
+        amount_refunded: item.amount_refunded,
+      })),
+    });
 
-    const { data: updatedPayment, error: updatePaymentError } = await supabaseAdmin
-      .from("payments")
-      .update({
-        status:
-          "paid",
+    console.log("Razorpay payment reconciliation", {
+      payment: {
+        status: captured.status,
+        amountPaise: captured.amount,
+        currency: captured.currency,
+        captured: captured.captured,
+        feePaise: captured.fee,
+        taxPaise: captured.tax,
+        orderIdMatches: captured.order_id === razorpay_order_id,
+      },
+      order: {
+        amountPaise: razorpayOrder.amount,
+        amountPaidPaise: razorpayOrder.amount_paid,
+        amountDuePaise: razorpayOrder.amount_due,
+        currency: razorpayOrder.currency,
+        status: razorpayOrder.status,
+        idMatches: razorpayOrder.id === razorpay_order_id,
+      },
+      database: {
+        amountRupees: payment.amount,
+        expectedAmountPaise: Math.round(Number(payment.amount) * 100),
+        orderIdMatches: payment.provider_order_id === razorpay_order_id,
+      },
+    });
 
-        provider_payment_id:
-          razorpay_payment_id,
+    validateCapturedPayment(captured, payment, razorpay_payment_id, razorpayOrder);
 
-        provider_method:
-          typeof captured.method === "string" ? captured.method : null,
-
-        paid_at:
-          now,
-
-        updated_at:
-          now,
-      })
-      .eq("id", payment.id)
-      .in("status", ["created", "failed", "paid"])
-      .or(`provider_payment_id.is.null,provider_payment_id.eq.${razorpay_payment_id}`)
-      .select("id,status,provider_payment_id")
-      .maybeSingle();
-
-    if (updatePaymentError) {
-      throw updatePaymentError;
-    }
-
-    // A previously paid row is idempotent only for the same provider payment.
-    // Never replace the provider payment ID attached to a successful order.
-    const { data: latestPayment, error: latestPaymentError } = await supabaseAdmin.from("payments")
-      .select("id,status,provider_payment_id")
-      .eq("id", payment.id)
-      .maybeSingle();
-    if (latestPaymentError) throw latestPaymentError;
-    if (!updatedPayment && (latestPayment?.status !== "paid" || latestPayment.provider_payment_id !== razorpay_payment_id)) {
-      return res.status(409).json({ success: false, message: "This order has already been completed with a different payment. Contact support." });
-    }
-
-    const { data: currentBooking, error: currentBookingError } = await supabaseAdmin.from("bookings")
-      .select("id,status,platform_fee")
-      .eq("id", payment.booking_id)
-      .maybeSingle();
-    if (currentBookingError) throw currentBookingError;
-    if (!currentBooking) throw new Error("Booking not found after payment capture.");
-    if (currentBooking.status === "cancelled") {
-      const cancellation = await refundLateCapturedBookingPayment({ ...payment, provider_payment_id: razorpay_payment_id, amount: captured.amount / 100 }, currentBooking);
+    const completion = await completeCapturedBookingPayment(payment, captured);
+    if (completion.outcome === "cancelled") {
       return res.json({
         success: true,
-        bookingId: payment.booking_id,
+        bookingId: completion.booking_id,
         status: "cancelled",
-        refundStatus: cancellation?.status || "not_applicable",
-        message: "This booking was cancelled. Any captured payment is being returned to the original payment method, excluding the platform fee.",
+        paymentStatus: "paid",
+        refundStatus: completion.refundStatus,
+        message: "The booking was cancelled before payment capture. The captured payment is being returned to the original payment method.",
       });
     }
-
-    const { error: reviveExpiredBookingError } = await supabaseAdmin.from("bookings")
-      .update({ status: "pending", updated_at: now })
-      .eq("id", payment.booking_id)
-      .eq("status", "expired");
-    if (reviveExpiredBookingError) throw reviveExpiredBookingError;
-
-    await createWasherEarning(
-      payment.booking_id
-    );
-    await assignWasherToBooking(payment.booking_id);
 
     return res.json({
       success: true,
-
-      bookingId:
-        payment.booking_id,
-
-      status:
-        payment.booking?.status || "pending",
+      bookingId: completion.booking_id,
+      status: completion.booking?.status || completion.status,
+      paymentStatus: "paid",
+      message: "Payment completed successfully. Your booking is awaiting washer assignment.",
     });
   } catch (error) {
     console.error("Payment verification failed", {
       name: typeof error.name === "string" ? error.name : "Error",
       code: typeof error.code === "string" ? error.code : undefined,
+      status: Number.isInteger(error.status) ? error.status : undefined,
+      message: typeof error.message === "string" ? error.message : undefined,
     });
 
-    return res.status(error.status || 502).json({
+    const status = Number.isInteger(error.status) && error.status >= 400 && error.status < 500
+      ? error.status
+      : error.status === 503 ? 503 : 502;
+    return res.status(status).json({
       success: false,
       message: error.status === 503
         ? error.message

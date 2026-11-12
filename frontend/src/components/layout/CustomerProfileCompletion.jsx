@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { MapPin, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getSavedAddresses, saveServiceAddress } from "../../services/locations/locationService";
-import { validServiceAddress } from "../../services/locations/locationSelection";
+import { validPostalAddress } from "../../services/locations/locationSelection";
 import SignupAddress from "../../pages/public/register/SignupAddress";
 
 export default function CustomerProfileCompletion({ embedded = false }) {
@@ -23,7 +23,7 @@ export default function CustomerProfileCompletion({ embedded = false }) {
     let active = true;
     setStatus("loading");
     getSavedAddresses(user.id).then(rows => {
-      if (active) setStatus(rows.some(row => validServiceAddress({ address: row.address_line, latitude: row.latitude, longitude: row.longitude })) ? "complete" : "missing");
+      if (active) setStatus(rows.some(row => validPostalAddress({ address: row.address_line, city: row.city, state: row.state, postalCode: row.postal_code })) ? "complete" : "missing");
     }).catch(() => { if (active) setStatus("error"); });
     return () => { active = false; };
   }, [user?.id, pathname, visible, retry]);
@@ -36,8 +36,8 @@ export default function CustomerProfileCompletion({ embedded = false }) {
     event.preventDefault();
     if (saving || busy) return;
     setError("");
-    if (!validServiceAddress(address) || !address.city?.trim() || !address.state?.trim() || !/^\d{6}$/.test(address.postalCode || "")) {
-      setError("Select your location and enter a complete street address, city, state and 6-digit PIN code."); return;
+    if (!validPostalAddress(address)) {
+      setError("Enter a complete street address, city, state and 6-digit PIN code. Choosing a map location is optional."); return;
     }
     setSaving(true);
     try {

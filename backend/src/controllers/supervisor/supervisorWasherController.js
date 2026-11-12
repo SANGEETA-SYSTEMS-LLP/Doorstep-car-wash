@@ -14,7 +14,7 @@ export async function addSupervisorWasher(req, res) {
   if (fullName.length < 2 || fullName.length > 100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail) || mail.length > 254 || !/^\+?[0-9]{10,15}$/.test(mobile)) return res.status(400).json({ message: "Enter a valid washer name, email and phone number." });
   if (!validWasherLocation(location) || !Number.isFinite(radius) || radius <= 0 || radius > 100) return res.status(400).json({ message: "Select a map location, enter a complete address and a service radius up to 100 km." });
   if (req.profile?.role === "supervisor" && !isWithinSupervisorArea({ latitude: location.latitude, longitude: location.longitude }, req.supervisorArea)) return res.status(400).json({ message: `Add this washer within your saved ${SUPERVISOR_SERVICE_RADIUS_KM} km service area.` });
-  if (typeof password !== "string" || password.length < 12 || password.length > 128) return res.status(400).json({ message: "Enter a password between 12 and 128 characters." });
+  if (typeof password !== "string" || password.length < 8 || password.length > 128) return res.status(400).json({ message: "Enter a password with at least 8 characters." });
   let createdUser;
   try {
     const { data, error } = await supabaseAdmin.auth.admin.createUser({

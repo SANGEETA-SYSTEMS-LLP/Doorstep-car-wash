@@ -17,7 +17,7 @@ function FindingWasherStatus({ booking, databaseBooking, navigate, washerFound }
 
                   <div className="mt-5 text-center">
                     <h2 className="text-2xl font-bold">
-                      {databaseBooking?.status === "pending" ? "Waiting for supervisor review" : databaseBooking?.status === "confirmed" ? "Booking accepted" : databaseBooking?.status === "finding_washer"
+                      {databaseBooking?.status === "payment_completed" ? "Payment completed · waiting for supervisor review" : databaseBooking?.status === "pending" ? "Waiting for supervisor review" : databaseBooking?.status === "confirmed" ? "Booking accepted" : databaseBooking?.status === "finding_washer"
                         ? "Finding your washer..."
                         : databaseBooking
                           ? "Booking status: " + (databaseBooking.status || "pending").split("_").join(" ")

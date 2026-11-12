@@ -1,5 +1,6 @@
-import { validServiceAddress } from "./locationSelection";
+import { validPostalAddress, validServiceAddress } from "./locationSelection";
 import { apiRequest } from "../core/api";
+import { coordinates } from "./maps";
 
 export function checkCoverage(location) {
   return apiRequest("/locations/coverage?" + new URLSearchParams({ latitude: location.latitude, longitude: location.longitude }));
@@ -9,13 +10,17 @@ function requireUser(userId) {
 }
 export async function saveServiceAddress(userId, location, address = {}, societyId) {
   requireUser(userId);
-  if (!validServiceAddress(location)) throw new Error("Select a map pin and enter a complete street address.");
+  const point = coordinates(location);
+  const hasCoordinates = location.latitude != null || location.longitude != null;
+  if ((hasCoordinates ? !point || !validServiceAddress(location) : !validPostalAddress(location))) {
+    throw new Error("Enter a complete postal address. Map coordinates are optional.");
+  }
   const result = await apiRequest("/account/addresses", { method: "POST", body: JSON.stringify({
     address_id: location.addressId || null,
     label: location.name?.trim() || "Service location", address_line: location.address.trim(),
     society_id: societyId || null, tower: address.tower || null, flat_number: address.flatNumber || null,
     landmark: address.landmark || null, city: location.city || null, state: location.state || null,
-    postal_code: location.postalCode || null, latitude: Number(location.latitude), longitude: Number(location.longitude),
+    postal_code: location.postalCode || null, latitude: point?.lat ?? null, longitude: point?.lng ?? null,
   }) });
   // The endpoint may return either the address row or a small { id } result.
   // Normalize here so the checkout always receives the saved address ID.
@@ -30,10 +35,14 @@ export async function getSavedAddresses(userId) {
 }
 export async function updateSavedAddress(userId, addressId, location) {
   requireUser(userId);
-  if (!validServiceAddress(location)) throw new Error("Select a location and enter a complete address (10–500 characters).");
+  const point = coordinates(location);
+  const hasCoordinates = location.latitude != null || location.longitude != null;
+  if ((hasCoordinates ? !point || !validServiceAddress(location) : !validPostalAddress(location))) {
+    throw new Error("Enter a complete postal address. Map coordinates are optional.");
+  }
   return apiRequest(`/account/addresses/${encodeURIComponent(addressId)}`, { method: "PATCH", body: JSON.stringify({
     label: location.label?.trim() || "Home", address_line: location.address.trim(),
-    latitude: Number(location.latitude), longitude: Number(location.longitude),
+    latitude: point?.lat ?? null, longitude: point?.lng ?? null,
     city: location.city?.trim() || null, state: location.state?.trim() || null,
     postal_code: location.postalCode?.trim() || null, tower: location.tower?.trim() || null,
     flat_number: location.flatNumber?.trim() || null, landmark: location.landmark?.trim() || null,

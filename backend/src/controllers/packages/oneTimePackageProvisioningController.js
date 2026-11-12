@@ -1,5 +1,5 @@
 import { supabaseAdmin as db } from "../../config/supabase.js";
-import { fields, failure, normalizeVehicleType, vehicleTypeCandidates, monthlyTiers } from "./packageCatalog.js";
+import { fields, failure, normalizeVehicleType, vehicleTypeCandidates, monthlyTiers, withCanonicalOneTimePrice } from "./packageCatalog.js";
 
 export async function ensureOneTimeWashPackages(req, res, next) {
   try {
@@ -23,7 +23,7 @@ export async function ensureOneTimeWashPackages(req, res, next) {
       const isRemovedOneTimePackage = Number(pack.price) === 399
         && ["interior cleaning", "complete detailing", "basic car wash"].includes(name);
       return !isRemovedOneTimePackage && !isMonthlyPlan && (candidates.has(type) || ["all", "all vehicles", "all car types", "one time"].includes(type));
-    });
+    }).map(withCanonicalOneTimePrice);
     res.json({ packages, vehicleType: vehicle.vehicle_type });
   } catch (error) { next(error); }
 }

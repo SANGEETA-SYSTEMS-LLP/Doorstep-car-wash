@@ -13,9 +13,17 @@ function payload(body) {
   }
   if (!result.address_line || result.address_line.length < 10) throw fail("Enter a complete street address (10–500 characters).");
   if (result.postal_code && !/^\d{6}$/.test(result.postal_code)) throw fail("Enter a six-digit PIN code.");
-  for (const [key, max] of [["latitude", 90], ["longitude", 180]]) {
-    if (typeof body[key] !== "number" || !Number.isFinite(body[key]) || Math.abs(body[key]) > max) throw fail("Select a valid map location.");
-    result[key] = body[key];
+  const hasLatitude = body.latitude != null;
+  const hasLongitude = body.longitude != null;
+  if (hasLatitude !== hasLongitude) throw fail("Provide both map coordinates or leave both blank.");
+  if (!hasLatitude) {
+    result.latitude = null;
+    result.longitude = null;
+  } else {
+    for (const [key, max] of [["latitude", 90], ["longitude", 180]]) {
+      if (typeof body[key] !== "number" || !Number.isFinite(body[key]) || Math.abs(body[key]) > max) throw fail("Select a valid map location.");
+      result[key] = body[key];
+    }
   }
   if (body.society_id != null && !uuid(body.society_id)) throw fail("Invalid society.");
   if (body.address_id != null && !uuid(body.address_id)) throw fail("Invalid address.");
@@ -36,7 +44,9 @@ export async function saveAddress(req, res, next) {
       if (error) throw error;
       if (!data) throw fail("Address not found.", 404);
       const unchanged = Object.entries(values).every(([key, value]) => key === "label" ||
-        (["latitude", "longitude"].includes(key) ? data[key] != null && Number(data[key]) === value : (data[key] || null) === value));
+        (["latitude", "longitude"].includes(key)
+          ? (data[key] == null && value == null) || (data[key] != null && value != null && Number(data[key]) === value)
+          : (data[key] || null) === value));
       if (unchanged) return res.json({ id: data.id });
     }
     // A changed booking address is a new record, preserving earlier booking locations.
