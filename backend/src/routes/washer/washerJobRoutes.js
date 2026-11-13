@@ -24,6 +24,7 @@ import { getChecklist, updateChecklistItem } from "../../controllers/bookings/ch
 
 import { requestExtraCharge } from "../../controllers/serviceOperations/extraChargeController.js";
 import { validateService } from "../../controllers/serviceOperations/serviceValidationController.js";
+import { reportServiceFailure } from "../../controllers/washer/jobs/washerServiceFailureController.js";
 
 const router =
   express.Router();
@@ -88,5 +89,7 @@ router.post(
   "/bookings/:bookingId/validate-service",
   validateService
 );
+
+router.post("/bookings/:bookingId/service-failure", reportServiceFailure);
 
 export default router;

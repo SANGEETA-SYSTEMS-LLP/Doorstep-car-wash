@@ -7,13 +7,18 @@ import { paymentActionRateLimit } from "../../middleware/rateLimitMiddleware.js"
 import { allowRoles } from "../../middleware/roleMiddleware.js";
 import { listSupervisorPayouts, paySupervisor } from "../../controllers/finance/supervisorPayoutController.js";
 import { requireSupervisorServiceArea } from "../../services/supervisor/supervisorServiceArea.js";
+import { listServiceFailureReports } from "../../controllers/finance/serviceFailureReportController.js";
+import { getInvoiceSettings, saveInvoiceSettings } from "../../controllers/finance/invoiceSettingsController.js";
 const router=express.Router();
 router.use(requireAuth);
 router.get("/invoices/:bookingId",getInvoice);
 router.get("/service-completions",allowRoles("accountant","sub_admin","super_admin","supervisor"),requireSupervisorServiceArea,getServiceCompletions);
 router.use(requireFinanceRole);
 router.get("/provider-status",getFinanceProviderStatus);
+router.get("/invoice-settings",getInvoiceSettings);
+router.put("/invoice-settings",saveInvoiceSettings);
 router.get("/operations",listOperations);
+router.get("/service-failure-reports",listServiceFailureReports);
 router.get("/washer-payouts",listWasherPayouts);
 router.get("/supervisor-payouts",listSupervisorPayouts);
 router.post("/supervisor-payouts/pay",paymentActionRateLimit,paySupervisor);

@@ -7,7 +7,6 @@ function PaymentMethodOptions({ paymentMethod, onChange }) {
     { id: "card", icon: <CreditCard />, title: "Credit / Debit Card", description: "Visa, Mastercard, RuPay and other cards" },
     { id: "netbanking", icon: <Landmark />, title: "Net Banking", description: "Pay securely using your bank account" },
     { id: "wallet", icon: <Wallet />, title: "Wallet", description: "Use supported digital wallets" },
-    { id: "cod", icon: <Wallet />, title: "Pay After Service", description: "Pay after your car wash is completed" },
   ];
   return (
     <div className="mt-7 space-y-4">

@@ -9718,105 +9718,6 @@ NOTIFY pgrst, 'reload schema';
 
 
 
--- ===== migrations/20261112180000_require_payment_before_washer_offer.sql =====
-
-BEGIN;
-
--- Washer offers are created and accepted only after the full online payment
--- has been recorded as paid. COD remains payable after service, so it cannot
--- enter washer dispatch under this rule.
-CREATE OR REPLACE FUNCTION public.booking_washer_is_eligible(p_booking_id uuid, p_washer_id uuid)
-RETURNS boolean
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_temp
-AS $function$
-DECLARE b record; w record; loc record; pkg record; d double precision; conflict boolean;
-BEGIN
-  SELECT id, status, assigned_washer_id, package_id, scheduled_date, scheduled_start_time,
-         latitude, longitude, service_address, total_amount
-    INTO b FROM public.bookings WHERE id = p_booking_id;
-  IF NOT FOUND OR b.assigned_washer_id IS NOT NULL OR b.status::text <> 'payment_completed'
-     OR b.scheduled_date IS NULL OR b.scheduled_start_time IS NULL
-     OR b.latitude IS NULL OR b.longitude IS NULL
-     OR NOT EXISTS (
-       SELECT 1 FROM public.payments p
-        WHERE p.booking_id = b.id AND p.status::text = 'paid'
-          AND p.amount >= b.total_amount
-     ) THEN
-    RETURN false;
-  END IF;
-
-  SELECT id, status, is_active, is_verified, current_address, supervisor_id, service_radius_km
-    INTO w FROM public.washers WHERE id = p_washer_id;
-  IF NOT FOUND OR w.is_active IS DISTINCT FROM true OR w.is_verified IS DISTINCT FROM true
-     OR w.status::text <> 'available' THEN
-    RETURN false;
-  END IF;
-  IF NOT EXISTS (
-    SELECT 1 FROM public.washer_payout_accounts p
-     WHERE p.washer_id = p_washer_id AND p.account_label IS NOT NULL
-       AND (p.destination_encrypted IS NOT NULL OR p.fund_account_id IS NOT NULL)
-  ) THEN
-    RETURN false;
-  END IF;
-
-  SELECT latitude, longitude, updated_at, service_latitude, service_longitude
-    INTO loc FROM public.washer_locations WHERE washer_id = p_washer_id;
-  IF NOT FOUND OR loc.updated_at IS NULL OR loc.latitude IS NULL OR loc.longitude IS NULL
-     OR loc.latitude NOT BETWEEN -90 AND 90 OR loc.longitude NOT BETWEEN -180 AND 180
-     OR loc.updated_at < now() - interval '15 minutes' THEN
-    RETURN false;
-  END IF;
-
-  d := 2 * 6371 * asin(sqrt(least(1::double precision, greatest(0::double precision,
-    power(sin(radians((coalesce(loc.service_latitude, loc.latitude) - b.latitude) / 2)), 2)
-    + cos(radians(b.latitude)) * cos(radians(coalesce(loc.service_latitude, loc.latitude)))
-    * power(sin(radians((coalesce(loc.service_longitude, loc.longitude) - b.longitude) / 2)), 2)))));
-  IF nullif(regexp_replace(lower(coalesce(b.service_address, '')), '[^[:alnum:]]', '', 'g'), '')
-     = nullif(regexp_replace(lower(coalesce(w.current_address, '')), '[^[:alnum:]]', '', 'g'), '') THEN
-    d := 0;
-  END IF;
-
-  SELECT duration_minutes INTO pkg FROM public.service_packages WHERE id = b.package_id;
-  IF d > least(greatest(coalesce(w.service_radius_km, 5), 5), 100) THEN RETURN false; END IF;
-
-  SELECT EXISTS (
-    SELECT 1 FROM public.bookings x
-      LEFT JOIN public.service_packages xp ON xp.id = x.package_id
-     WHERE x.assigned_washer_id = p_washer_id AND x.id <> p_booking_id
-       AND (
-         x.status::text IN ('washer_assigned', 'washer_on_the_way', 'washer_arrived', 'otp_verified', 'service_started')
-         OR (x.status::text = 'service_completed' AND x.service_validated_at IS NULL)
-         OR (x.status::text = 'payment_completed' AND x.service_validated_at IS NULL
-             AND EXISTS (SELECT 1 FROM public.booking_assignments a WHERE a.booking_id = x.id AND a.status = 'accepted'))
-       )
-       AND (b.scheduled_date + b.scheduled_start_time) <
-           (x.scheduled_date + x.scheduled_start_time + make_interval(mins => coalesce(xp.duration_minutes, 60) + 30))
-       AND (x.scheduled_date + x.scheduled_start_time) <
-           (b.scheduled_date + b.scheduled_start_time + make_interval(mins => coalesce(pkg.duration_minutes, 60) + 30))
-  ) INTO conflict;
-  RETURN NOT conflict;
-END;
-$function$;
-
-REVOKE ALL ON FUNCTION public.booking_washer_is_eligible(uuid, uuid) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.booking_washer_is_eligible(uuid, uuid) TO service_role;
-
--- Do not leave stale unpaid offers visible to washers after this rule is
--- deployed. Their history remains intact for supervisor review.
-UPDATE public.booking_assignments a
-   SET status = 'cancelled', responded_at = now(),
-       rejection_reason = 'Offer cancelled because booking payment is incomplete.'
-  FROM public.bookings b
- WHERE b.id = a.booking_id AND a.status = 'pending'
-   AND b.status::text <> 'payment_completed';
-
-COMMIT;
-NOTIFY pgrst, 'reload schema';
-
-
-
 -- ===== migrations/20261112190000_restore_washer_acceptance_progression.sql =====
 
 BEGIN;
@@ -9920,3 +9821,387 @@ UPDATE public.bookings b
 
 COMMIT;
 NOTIFY pgrst, 'reload schema';
+
+
+
+-- ===== migrations/20261112200000_online_only_and_balanced_partner_payouts.sql =====
+
+BEGIN;
+
+-- COD is no longer part of the booking flow. Keep the enum value for old
+-- records, but reject it for new booking writes and remove the cash RPC.
+CREATE OR REPLACE FUNCTION public.require_online_booking_payment()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = public, pg_temp
+AS $function$
+BEGIN
+  IF lower(coalesce(NEW.payment_method::text, '')) IN ('cod', 'cash') THEN
+    RAISE EXCEPTION 'Cash on delivery is unavailable. Complete online payment to confirm this booking.'
+      USING ERRCODE = '23514';
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+
+DROP TRIGGER IF EXISTS bookings_require_online_payment ON public.bookings;
+CREATE TRIGGER bookings_require_online_payment
+BEFORE INSERT OR UPDATE OF payment_method ON public.bookings
+FOR EACH ROW EXECUTE FUNCTION public.require_online_booking_payment();
+
+DROP FUNCTION IF EXISTS public.record_cod_payment_once(uuid, uuid);
+
+-- Checkout reservations are online only. The booking row is locked before the
+-- payment row so reservation remains serialized with cancellation.
+CREATE OR REPLACE FUNCTION public.reserve_razorpay_payment_order(
+  p_booking_id uuid,
+  p_customer_id uuid
+) RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $function$
+DECLARE
+  b public.bookings%rowtype;
+  p public.payments%rowtype;
+  made boolean := false;
+BEGIN
+  SELECT * INTO b FROM public.bookings
+   WHERE id = p_booking_id AND customer_id = p_customer_id FOR UPDATE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'Booking not found.' USING errcode = 'P0002'; END IF;
+  IF lower(coalesce(b.payment_method::text, '')) IN ('cod', 'cash') THEN
+    RAISE EXCEPTION 'Cash on delivery is unavailable. Create a booking and complete online payment.' USING errcode = '55000';
+  END IF;
+  IF b.status::text IN ('cancelled', 'expired') THEN
+    RAISE EXCEPTION 'This booking is not available for checkout.' USING errcode = '55000';
+  END IF;
+  IF b.status::text = 'pending' AND b.created_at <= now() - interval '30 minutes' THEN
+    RAISE EXCEPTION 'The booking payment window has expired.' USING errcode = '55000';
+  END IF;
+  IF b.status::text NOT IN (
+    'pending', 'confirmed', 'finding_washer', 'support_escalated',
+    'washer_assigned', 'washer_on_the_way', 'washer_arrived', 'otp_verified',
+    'service_started', 'service_completed', 'customer_confirmed',
+    'payment_completed', 'closed'
+  ) THEN
+    RAISE EXCEPTION 'This booking is not eligible for online payment.' USING errcode = '55000';
+  END IF;
+  IF b.total_amount IS NULL OR b.total_amount <= 0 THEN
+    RAISE EXCEPTION 'Invalid booking amount.' USING errcode = '22023';
+  END IF;
+
+  UPDATE public.payments SET status = 'failed', updated_at = now()
+   WHERE booking_id = p_booking_id AND status = 'created'
+     AND provider_order_id IS NULL AND created_at <= now() - interval '2 minutes';
+  SELECT * INTO p FROM public.payments
+   WHERE booking_id = p_booking_id AND status IN ('created', 'paid')
+   ORDER BY created_at DESC LIMIT 1 FOR UPDATE;
+  IF NOT FOUND THEN
+    INSERT INTO public.payments(booking_id, customer_id, amount, payment_method, status, provider)
+    VALUES (p_booking_id, p_customer_id, b.total_amount, 'online', 'created', 'razorpay')
+    RETURNING * INTO p;
+    made := true;
+  END IF;
+  RETURN jsonb_build_object('booking', to_jsonb(b), 'payment', to_jsonb(p), 'created', made);
+END;
+$function$;
+REVOKE ALL ON FUNCTION public.reserve_razorpay_payment_order(uuid, uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.reserve_razorpay_payment_order(uuid, uuid) TO service_role;
+
+-- Fund the supervisor from the platform commission remaining after the
+-- washer share. This keeps washer + supervisor + platform shares within the
+-- captured service amount, with GST and platform fee accounted separately.
+UPDATE public.supervisor_earnings supervisor
+   SET commission_base_amount = greatest(coalesce(washer.platform_commission, 0), 0),
+       supervisor_amount = round(greatest(coalesce(washer.platform_commission, 0), 0)
+         * supervisor.commission_percent / 100, 2)
+  FROM public.washer_earnings washer
+ WHERE washer.booking_id = supervisor.booking_id
+   AND supervisor.status = 'pending'
+   AND supervisor.payout_operation_id IS NULL;
+
+-- Quarantine legacy earnings that were recorded before service validation.
+-- They stay in the ledger and are released by createWasherEarning after the
+-- validated service is customer-confirmed.
+ALTER TABLE public.supervisor_earnings
+  DROP CONSTRAINT IF EXISTS supervisor_earnings_status_check;
+ALTER TABLE public.supervisor_earnings
+  ADD CONSTRAINT supervisor_earnings_status_check
+  CHECK (status IN ('pending', 'settled', 'held'));
+
+UPDATE public.washer_earnings earning
+   SET status = 'held'
+ WHERE earning.status = 'pending'
+   AND NOT EXISTS (
+     SELECT 1 FROM public.finance_payout_items item
+      WHERE item.earning_id = earning.id
+   )
+   AND NOT EXISTS (
+     SELECT 1 FROM public.bookings booking
+      WHERE booking.id = earning.booking_id
+        AND booking.service_validated_at IS NOT NULL
+        AND booking.status::text IN ('service_completed', 'customer_confirmed', 'payment_completed', 'closed', 'completed')
+   );
+
+UPDATE public.supervisor_earnings earning
+   SET status = 'held'
+ WHERE earning.status = 'pending'
+   AND earning.payout_operation_id IS NULL
+   AND NOT EXISTS (
+     SELECT 1 FROM public.bookings booking
+      WHERE booking.id = earning.booking_id
+        AND booking.service_validated_at IS NOT NULL
+        AND booking.status::text IN ('service_completed', 'customer_confirmed', 'payment_completed', 'closed', 'completed')
+   );
+
+COMMIT;
+NOTIFY pgrst, 'reload schema';
+
+
+
+-- ===== migrations/20261112210000_paid_service_failure_refund_cases.sql =====
+
+-- Track paid bookings whose washer could not complete the service so finance
+-- can review the reason and issue the customer refund through finance operations.
+create table if not exists public.service_failure_reports (
+  id uuid primary key default gen_random_uuid(),
+  booking_id uuid not null unique references public.bookings(id),
+  payment_id uuid not null references public.payments(id),
+  washer_id uuid not null references public.washers(id),
+  reason text not null check (length(trim(reason)) between 5 and 1000),
+  status text not null default 'pending_review'
+    check (status in ('pending_review','refund_pending','refund_processed','refund_failed')),
+  reported_by uuid not null references auth.users(id),
+  reviewed_by uuid references auth.users(id),
+  finance_operation_id uuid references public.finance_operations(id),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.service_failure_reports enable row level security;
+revoke all on public.service_failure_reports from anon, authenticated;
+grant all on public.service_failure_reports to service_role;
+create index if not exists service_failure_reports_status_created_idx
+  on public.service_failure_reports(status, created_at desc);
+
+-- Failed-service refunds may be issued while the booking is still in its
+-- operational status. A failure report is required for these additional states.
+create or replace function public.reserve_finance_operation(p_id uuid, p_kind text, p_target uuid, p_amount bigint, p_reason text, p_actor uuid, p_account_number text default null)
+returns jsonb language plpgsql security definer set search_path=public,pg_temp as $$
+declare op public.finance_operations%rowtype; pay public.payments%rowtype; total bigint; fund text; ids uuid[];
+begin
+ perform pg_advisory_xact_lock(73619842);
+ if not exists(select 1 from profiles where id=p_actor and role in ('accountant','sub_admin','super_admin') and is_active) then raise exception 'Finance role required.'; end if;
+ if p_reason is null or length(trim(p_reason)) < 3 or length(p_reason)>500 then raise exception 'A reason is required.'; end if;
+ select * into op from finance_operations where id=p_id;
+ if found then
+   if op.kind<>p_kind or op.reason<>p_reason or (p_kind='refund' and (op.payment_id<>p_target or op.amount_paise<>p_amount)) or (p_kind='payout' and op.washer_id<>p_target) then raise exception 'Idempotency key already used for another request.'; end if;
+   return to_jsonb(op);
+ end if;
+ if p_kind='refund' then
+   select * into pay from payments where id=p_target for update;
+   if not found or pay.status<>'paid' or pay.provider<>'razorpay' or pay.provider_payment_id is null then raise exception 'A captured Razorpay payment is required.'; end if;
+  if exists(select 1 from service_failure_reports s where s.payment_id=pay.id and s.status='refund_processed') then raise exception 'This payment has already been refunded for incomplete service.'; end if;
+   if not exists(select 1 from bookings b where b.id=pay.booking_id and (
+     b.status in ('completed','closed','payment_completed','customer_confirmed','cancelled')
+     or exists(select 1 from service_failure_reports s where s.booking_id=b.id and s.payment_id=pay.id and s.status in ('pending_review','refund_pending','refund_failed'))
+   )) then raise exception 'Cancel or complete the booking, or submit a service failure report, before refunding.'; end if;
+   if exists(select 1 from finance_payout_items i join washer_earnings e on e.id=i.earning_id join finance_operations o on o.id=i.operation_id where e.booking_id=pay.booking_id and o.status<>'processed') then raise exception 'This booking has a payout reservation. Reconcile that payout before refunding.'; end if;
+   select coalesce(sum(amount_paise),0) into total from finance_operations where payment_id=p_target and kind='refund' and status not in ('failed');
+   if p_amount is null or p_amount<100 or p_amount+total>round(pay.amount*100) then raise exception 'Refund exceeds the remaining paid amount or is less than INR 1.'; end if;
+   insert into finance_operations(id,kind,payment_id,amount_paise,reason,created_by,provider_request)
+   values(p_id,p_kind,p_target,p_amount,p_reason,p_actor,jsonb_build_object('payment_id',pay.provider_payment_id,'amount',p_amount,'speed','normal','receipt',p_id::text)) returning * into op;
+ elsif p_kind='payout' then
+   select fund_account_id into fund from washer_payout_accounts where washer_id=p_target;
+   if fund is null or p_account_number is null or length(p_account_number)<3 then raise exception 'Configure a verified fund account and RazorpayX account first.'; end if;
+   if not exists(select 1 from washers where id=p_target and is_active and is_verified) then raise exception 'An active verified washer is required.'; end if;
+   select array_agg(e.id),sum(round(e.washer_amount*100)) into ids,total
+   from washer_earnings e join bookings b on b.id=e.booking_id
+   where e.washer_id=p_target and e.status='pending' and e.washer_amount>0
+   and b.status in ('completed','closed','payment_completed','customer_confirmed')
+   and not exists(select 1 from finance_payout_items i where i.earning_id=e.id)
+   and exists(select 1 from payments p where p.booking_id=b.id and p.status='paid' and p.provider='razorpay' and p.amount>=b.total_amount)
+   and not exists(select 1 from finance_operations r join payments p on p.id=r.payment_id where p.booking_id=b.id and r.kind='refund' and r.status<>'failed');
+   if total is null or total<100 then raise exception 'No eligible online-paid earnings (minimum INR 1). Cash collections are reconciled separately.'; end if;
+   insert into finance_operations(id,kind,washer_id,amount_paise,reason,created_by,provider_request)
+   values(p_id,p_kind,p_target,total,p_reason,p_actor,jsonb_build_object('account_number',p_account_number,'fund_account_id',fund,'amount',total,'currency','INR','mode','IMPS','purpose','payout','queue_if_low_balance',true,'reference_id',p_id::text)) returning * into op;
+   insert into finance_payout_items(operation_id,earning_id) select p_id,unnest(ids);
+ else raise exception 'Invalid operation.';
+ end if;
+ return to_jsonb(op);
+end $$;
+
+revoke all on function public.reserve_finance_operation(uuid,text,uuid,bigint,text,uuid,text) from public,anon,authenticated;
+grant execute on function public.reserve_finance_operation(uuid,text,uuid,bigint,text,uuid,text) to service_role;
+
+create or replace function public.link_service_failure_refund(p_report uuid, p_operation uuid, p_actor uuid)
+returns jsonb language plpgsql security definer set search_path=public,pg_temp as $$
+declare report public.service_failure_reports%rowtype; op public.finance_operations%rowtype;
+begin
+ if not exists(select 1 from profiles where id=p_actor and role in ('accountant','sub_admin','super_admin') and is_active) then raise exception 'Finance role required.'; end if;
+ select * into report from service_failure_reports where id=p_report for update;
+ if not found then raise exception 'Service failure report not found.'; end if;
+ if report.status = 'refund_processed' then raise exception 'This service failure refund is already processed.'; end if;
+ select * into op from finance_operations where id=p_operation and kind='refund' and payment_id=report.payment_id;
+ if not found then raise exception 'Refund operation does not match this report payment.'; end if;
+ if op.amount_paise <> (select round(amount*100) from payments where id=report.payment_id) then raise exception 'The incomplete-service report requires a full refund of the captured payment.'; end if;
+ if report.finance_operation_id is not null and report.finance_operation_id<>p_operation then raise exception 'A refund operation is already linked to this case.'; end if;
+ if op.status='failed' and op.provider_id is null then raise exception 'This refund draft was cancelled before submission.'; end if;
+ update service_failure_reports set finance_operation_id=p_operation, reviewed_by=p_actor,
+   status=case when op.status='processed' then 'refund_processed' when op.status='failed' then 'refund_failed' else 'refund_pending' end,
+   updated_at=now() where id=p_report returning * into report;
+ return to_jsonb(report);
+end $$;
+revoke all on function public.link_service_failure_refund(uuid,uuid,uuid) from public,anon,authenticated;
+grant execute on function public.link_service_failure_refund(uuid,uuid,uuid) to service_role;
+
+create or replace function public.reconcile_finance_operation(p_id uuid, p_provider_id text, p_status text)
+returns jsonb language plpgsql security definer set search_path=public,pg_temp as $$
+declare op public.finance_operations%rowtype;
+begin
+ perform pg_advisory_xact_lock(73619842);
+ select * into op from finance_operations where id=p_id for update;
+ if not found then raise exception 'Operation not found.'; end if;
+ if op.provider_id is not null and op.provider_id<>p_provider_id then raise exception 'Provider reference mismatch.'; end if;
+ if op.status='failed' then return to_jsonb(op); end if;
+ if op.status='processed' and not (op.kind='payout' and p_status='reversed') then return to_jsonb(op); end if;
+ if p_status not in ('created','pending','queued','processing','processed','failed','rejected','cancelled','reversed') then raise exception 'Unknown provider status.'; end if;
+ update finance_operations set provider_id=p_provider_id,provider_status=p_status,
+ processed_at=case when p_status='processed' then coalesce(processed_at,now()) else processed_at end,
+ status=case when p_status='processed' then 'processed' when p_status in ('failed','rejected','cancelled','reversed') then 'failed' else 'pending' end,updated_at=now() where id=p_id returning * into op;
+ if op.kind='payout' then
+   if p_status='processed' then
+     update washer_earnings set status='settled',settled_at=now() where id in(select earning_id from finance_payout_items where operation_id=p_id);
+   elsif p_status in ('failed','rejected','cancelled','reversed') then
+     update washer_earnings set status='pending',settled_at=null where id in(select earning_id from finance_payout_items where operation_id=p_id);
+     delete from finance_payout_items where operation_id=p_id;
+   end if;
+ else
+   update service_failure_reports set status=case when op.status='processed' then 'refund_processed' when op.status='failed' then 'refund_failed' else 'refund_pending' end, updated_at=now()
+   where finance_operation_id=p_id;
+ end if;
+ return to_jsonb(op);
+end $$;
+revoke all on function public.reconcile_finance_operation(uuid,text,text) from public,anon,authenticated;
+grant execute on function public.reconcile_finance_operation(uuid,text,text) to service_role;
+
+
+
+-- ===== migrations/20261112220000_auto_cancel_overdue_paid_bookings.sql =====
+
+-- Automatically cancel a paid booking when the scheduled start plus its
+-- package duration and the standard 30-minute scheduling buffer have passed.
+-- Full captured payment is sent back to the original payment method.
+create or replace function public.cancel_overdue_paid_service_bookings()
+returns integer language plpgsql security definer set search_path=public,pg_temp as $$
+declare
+  item record;
+  cancelled_count integer := 0;
+  paid_paise bigint;
+begin
+  for item in
+    select b.id, b.customer_id, b.assigned_washer_id, b.status, b.platform_fee,
+           p.id as payment_id, p.amount
+      from public.bookings b
+      join public.service_packages package on package.id=b.package_id
+      join public.payments p on p.booking_id=b.id and p.status='paid'
+        and lower(coalesce(p.provider,''))='razorpay'
+        and nullif(p.provider_payment_id,'') is not null
+     where b.status::text in ('payment_completed','washer_assigned','washer_on_the_way',
+           'washer_arrived','otp_verified','service_started','service_completed')
+       and b.service_validated_at is null
+       and b.scheduled_date is not null and b.scheduled_start_time is not null
+       and (((b.scheduled_date + b.scheduled_start_time) at time zone 'Asia/Kolkata')
+           + make_interval(mins => coalesce(package.duration_minutes,60) + 30)) <= now()
+       and not exists(select 1 from public.booking_cancellations c where c.booking_id=b.id)
+       -- Payment-completed bookings with an unaccepted offer also expire after
+       -- their service window, but only after at least one offer expired and
+       -- there is no active offer or accepted washer remaining.
+       and (b.status::text <> 'payment_completed' or (
+         b.assigned_washer_id is null
+         and exists(select 1 from public.booking_assignments expired_offer
+           where expired_offer.booking_id=b.id and expired_offer.status in ('expired','rejected')
+             and expired_offer.expires_at <= now())
+         and not exists(select 1 from public.booking_assignments active_offer
+           where active_offer.booking_id=b.id and active_offer.status='pending'
+             and active_offer.expires_at > now())
+         and not exists(select 1 from public.booking_assignments accepted_offer
+           where accepted_offer.booking_id=b.id and accepted_offer.status='accepted')
+       ))
+     order by b.scheduled_date, b.scheduled_start_time
+     limit 200
+     for update of b skip locked
+  loop
+    paid_paise := round(item.amount * 100)::bigint;
+    insert into public.booking_cancellations (
+      booking_id, customer_id, payment_id, refund_amount_paise,
+      platform_fee_paise, status, provider_status
+    ) values (
+      item.id, item.customer_id, item.payment_id, paid_paise,
+      0, 'refund_pending', 'auto_service_deadline_exceeded'
+    ) on conflict (booking_id) do nothing;
+
+    if not found then continue; end if;
+
+    update public.bookings set status='cancelled', updated_at=now()
+      where id=item.id and service_validated_at is null;
+    if not found then
+      delete from public.booking_cancellations where booking_id=item.id
+        and provider_status='auto_service_deadline_exceeded';
+      continue;
+    end if;
+
+    update public.booking_assignments set status='cancelled', responded_at=now(),
+      rejection_reason='Booking auto-cancelled because the paid service deadline passed.'
+      where booking_id=item.id and status in ('pending','accepted');
+
+    if item.assigned_washer_id is not null then
+      update public.washers w set status='available', updated_at=now()
+       where w.id=item.assigned_washer_id and w.status='busy'
+         and not exists(select 1 from public.bookings other
+          where other.assigned_washer_id=w.id and other.id<>item.id
+            and other.status::text in ('washer_assigned','washer_on_the_way','washer_arrived',
+              'otp_verified','service_started','service_completed'));
+    end if;
+    cancelled_count := cancelled_count + 1;
+  end loop;
+  return cancelled_count;
+end $$;
+
+revoke all on function public.cancel_overdue_paid_service_bookings() from public,anon,authenticated;
+grant execute on function public.cancel_overdue_paid_service_bookings() to service_role;
+
+
+
+-- ===== migrations/20261112230000_customer_refund_accounts.sql =====
+
+-- Optional customer bank/UPI destination for finance-managed fallback refunds.
+-- Full account details are encrypted in the backend and never returned to clients.
+create table if not exists public.customer_refund_accounts (
+  customer_id uuid primary key references public.customers(id) on delete cascade,
+  destination_encrypted text not null,
+  account_label text not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.customer_refund_accounts enable row level security;
+revoke all on public.customer_refund_accounts from public, anon, authenticated;
+grant all on public.customer_refund_accounts to service_role;
+
+
+
+-- ===== migrations/20261112240000_invoice_seller_settings.sql =====
+
+-- Allow finance staff to configure the real seller details required on new
+-- service invoices without changing or redeploying backend environment values.
+create table if not exists public.invoice_seller_settings (
+  id boolean primary key default true check (id),
+  business_name text not null check (length(trim(business_name)) between 2 and 120),
+  business_address text not null check (length(trim(business_address)) between 10 and 500),
+  updated_by uuid not null references auth.users(id),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.invoice_seller_settings enable row level security;
+revoke all on public.invoice_seller_settings from public, anon, authenticated;
+grant all on public.invoice_seller_settings to service_role;

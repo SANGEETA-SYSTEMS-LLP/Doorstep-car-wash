@@ -127,11 +127,16 @@ export async function createPaymentOrder(
       code: typeof error.code === "string" ? error.code : undefined,
     });
 
-    return res.status(error.status || 502).json({
+    // This endpoint is idempotent per booking: after a transient failure the
+    // customer can safely retry and receive the order already attached to the
+    // reserved payment. Report temporary backend/provider failures as 503 so
+    // the client can perform that bounded retry instead of surfacing a dead-end 502.
+    const status = error.status === 502 ? 503 : error.status || 503;
+    return res.status(status).json({
       success: false,
       message: error.status === 503
         ? error.message
-        : "Unable to create the payment right now. Please retry shortly.",
+        : "Payment checkout is temporarily unavailable. Retrying the same booking is safe.",
     });
   }
 }

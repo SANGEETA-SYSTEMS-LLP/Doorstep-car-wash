@@ -5,6 +5,7 @@ import SavedCustomerDetails from "./SavedCustomerDetails";
 import { useAuth } from "../../../context/AuthContext";
 import useApi from "../../../hooks/useApi";
 import { referenceId } from "../../../../../shared/referenceId.mjs";
+import CustomerRefundAccount from "./CustomerRefundAccount";
 
 export default function CustomerProfile() {
   const { user, refreshProfile } = useAuth();
@@ -47,6 +48,7 @@ export default function CustomerProfile() {
         </dl><button type="button" onClick={() => {setDraft({full_name: profile.full_name || "",phone: profile.phone || ""});setEditing(true);setSaved(false);setSaveError("");}} className="mt-6 rounded-xl bg-green-700 px-5 py-3 text-sm font-semibold text-white hover:bg-green-800">Edit profile</button></>}
       </section>}
       <div className="mt-6"><CustomerProfileCompletion key={user?.id || "guest"} embedded/></div>
+      <CustomerRefundAccount key={`refund-${user?.id || "guest"}`} />
       <SavedCustomerDetails key={user?.id || "guest"}/>
     </div>
   </div>;

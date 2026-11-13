@@ -12,7 +12,7 @@ function safeDestination(label = "") {
 export async function listSupervisorPayouts(req, res, next) {
   try {
     const { data: earnings, error } = await db.from("supervisor_earnings")
-      .select("id,supervisor_id,supervisor_amount,platform_fee_amount,gst_amount,status,created_at,payout_operation_id")
+      .select("id,supervisor_id,supervisor_amount,commission_base_amount,platform_fee_amount,gst_amount,status,created_at,payout_operation_id")
       .eq("status", "pending").is("payout_operation_id", null).order("created_at", { ascending: true }).limit(5000);
     if (error) throw error;
     const ids = [...new Set((earnings || []).map(row => row.supervisor_id))];
@@ -27,8 +27,9 @@ export async function listSupervisorPayouts(req, res, next) {
     const grouped = new Map();
     for (const earning of earnings || []) {
       if (!profiles.get(earning.supervisor_id)?.is_active) continue;
-      const row = grouped.get(earning.supervisor_id) || { earnings_count: 0, total: 0, platformFee: 0, gst: 0 };
+      const row = grouped.get(earning.supervisor_id) || { earnings_count: 0, total: 0, platformCommission: 0, platformFee: 0, gst: 0 };
       row.earnings_count += 1; row.total += Number(earning.supervisor_amount) || 0;
+      row.platformCommission += Number(earning.commission_base_amount) || 0;
       row.platformFee += Number(earning.platform_fee_amount) || 0;
       row.gst += Number(earning.gst_amount) || 0;
       grouped.set(earning.supervisor_id, row);
@@ -39,6 +40,7 @@ export async function listSupervisorPayouts(req, res, next) {
       const safe = safeDestination(payout?.account_label);
       return { supervisor_id, supervisor_name: profile.full_name || "Name not provided", supervisor_phone: profile.phone || null,
         pending_earning_count: total.earnings_count, pending_total_amount: Number(total.total.toFixed(2)),
+        admin_remaining_commission_amount: Number((total.platformCommission - total.total).toFixed(2)),
         admin_platform_fee_amount: Number(total.platformFee.toFixed(2)), admin_gst_amount: Number(total.gst.toFixed(2)),
         payment_method: safe?.method || "Not configured", payment_destination: safe?.destination || null,
         payout_account_type: safe?.type || null, available_payment_methods: safe?.modes || [],

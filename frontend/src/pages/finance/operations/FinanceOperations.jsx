@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Banknote, RotateCcw, Users } from "lucide-react";
+import { RotateCcw, Users } from "lucide-react";
 import useApi from "../../../hooks/useApi";
 import { apiRequest } from "../../../api/apiClient";
 import OperationHistory from "./OperationHistory";
@@ -21,17 +21,19 @@ export default function FinanceOperations() {
   const [refundAmount, setRefundAmount] = useState("");
   const [refundReason, setRefundReason] = useState("");
   const [refundDraft, setRefundDraft] = useState(null);
+  const [selectedFailureReport, setSelectedFailureReport] = useState(null);
   const [payout, setPayout] = useState(null);
   const { data: payoutOperations, error: payoutOperationsError, refresh: payoutOperationsRefresh } = useApi(`/finance/operations?kind=payout&page=${payoutPage}`);
   const { data: refundOperations, error: refundOperationsError, refresh: refundOperationsRefresh } = useApi(`/finance/operations?kind=refund&page=${refundPage}`);
   const { data: payoutData, error: payoutError, refresh: payoutRefresh } = useApi(`/finance/washer-payouts?status=pending&page=${payoutPage}`);
   const { data: providerStatus, error: providerStatusError } = useApi("/finance/provider-status");
-  const pageError = payoutOperationsError || refundOperationsError || payoutError || providerStatusError;
+  const { data: failureData, error: failureError, refresh: failureRefresh } = useApi("/finance/service-failure-reports");
+  const pageError = payoutOperationsError || refundOperationsError || payoutError || providerStatusError || failureError;
 
   useEffect(() => {
-    const timer = setInterval(() => { payoutOperationsRefresh(); refundOperationsRefresh(); payoutRefresh(); }, 30000);
+    const timer = setInterval(() => { payoutOperationsRefresh(); refundOperationsRefresh(); payoutRefresh(); failureRefresh(); }, 30000);
     return () => clearInterval(timer);
-  }, [payoutOperationsRefresh, refundOperationsRefresh, payoutRefresh]);
+  }, [payoutOperationsRefresh, refundOperationsRefresh, payoutRefresh, failureRefresh]);
 
   async function perform(path, body, method = "POST") {
     setBusy(true);
@@ -49,6 +51,7 @@ export default function FinanceOperations() {
       payoutOperationsRefresh();
       refundOperationsRefresh();
       payoutRefresh();
+      failureRefresh();
       return result;
     } catch (requestError) {
       setMessage(requestError.message === "Payment provider credentials are not configured."
@@ -82,8 +85,9 @@ export default function FinanceOperations() {
     }
     const draft = refundDraft;
     if (draft) {
-      if (await perform("/finance/operations", draft)) {
+      if (await perform("/finance/operations", { ...draft, ...(selectedFailureReport ? { serviceFailureReportId: selectedFailureReport.id } : {}) })) {
         setRefundDraft(null); setRefundTarget(""); setRefundAmount(""); setRefundReason("");
+        setSelectedFailureReport(null);
       }
       return;
     }
@@ -107,6 +111,15 @@ export default function FinanceOperations() {
     setSelectedWasher(row);
     setPayout(row.payment_destination ? { method: row.payment_method, destination: row.payment_destination, accountType: row.payout_account_type, selectedMode: row.payout_account_type === "vpa" ? "UPI" : "IMPS", availableMethods: row.available_payment_methods || [] } : null);
     document.getElementById("washer-payments")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function reviewServiceFailure(report) {
+    if (busy || refundDraft || !report.payment) return;
+    setSelectedFailureReport(report);
+    setRefundTarget(report.payment.id);
+    setRefundAmount(Number(report.payment.amount).toFixed(2));
+    setRefundReason(`Paid service incomplete · ${report.reason}`.slice(0, 500));
+    document.getElementById("customer-refunds-heading")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   const pagination = (currentPage, setCurrentPage, records) => <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-5 py-4"><button type="button" disabled={currentPage === 1} onClick={() => setCurrentPage(value => value - 1)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold disabled:opacity-40">Previous</button><span className="text-xs text-slate-500">Page {currentPage} · {records?.count || 0} records</span><button type="button" disabled={!records || currentPage * 25 >= records.count} onClick={() => setCurrentPage(value => value + 1)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold disabled:opacity-40">Next</button></div>;
@@ -137,8 +150,12 @@ export default function FinanceOperations() {
 
     <section aria-labelledby="customer-refunds-heading" className="space-y-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-6">
       <div className="flex items-start gap-3"><span className="rounded-xl bg-green-50 p-2.5 text-green-700"><RotateCcw size={20} aria-hidden="true" /></span><div><h2 id="customer-refunds-heading" className="text-xl font-bold text-slate-950">Customer refunds</h2><p className="mt-1 text-sm text-slate-600">Review and submit refunds against eligible Razorpay payments.</p></div></div>
+      <div className="overflow-hidden rounded-xl border border-amber-200 bg-white"><div className="border-b border-amber-100 bg-amber-50 p-5"><h3 className="font-bold text-amber-950">Paid service not completed</h3><p className="mt-1 text-sm text-amber-900">Washer reports awaiting accountant review. Confirm the reason, then review and submit a customer refund.</p></div>
+        {!failureError && !failureData?.reports?.length && <p className="p-5 text-sm text-slate-500">No paid incomplete-service reports need review.</p>}
+        {(failureData?.reports || []).map(report => <article key={report.id} className="grid gap-3 border-b border-slate-100 p-5 last:border-0 md:grid-cols-[1fr_auto] md:items-center"><div><div className="flex flex-wrap items-center gap-2"><strong className="text-slate-900">Booking {report.booking?.booking_number || report.booking_id}</strong><span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-900">{report.status.replaceAll("_", " ")}</span></div><p className="mt-2 text-sm text-slate-700"><strong>Reason:</strong> {report.reason}</p><p className="mt-1 text-sm text-slate-600">Customer: {report.customer_name}{report.customer_phone ? ` · ${report.customer_phone}` : ""} · Washer: {report.washer_name}</p><p className="mt-1 text-sm text-slate-600">Payment captured: {money(Math.round(Number(report.payment?.amount || 0) * 100))} · {report.booking?.status?.replaceAll("_", " ") || "status unavailable"}</p><p className="mt-1 text-sm text-slate-600">Customer fallback refund account: {report.refund_account_label || "Not provided · refund returns to original payment method"}</p></div><button type="button" disabled={busy || Boolean(refundDraft) || !report.payment} onClick={() => reviewServiceFailure(report)} className="rounded-lg bg-amber-800 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50">Review refund</button></article>)}
+      </div>
       <form onSubmit={event => submitOperation(event, "refund")} className="grid gap-3 rounded-xl border border-slate-200 bg-white p-5 md:grid-cols-2">
-        <div className="md:col-span-2"><h3 className="font-bold text-slate-900">Review customer refund</h3><p className="mt-1 text-sm text-slate-500">Check the amount and reason before submitting. Provider confirmation updates the final status.</p></div>
+        <div className="md:col-span-2"><h3 className="font-bold text-slate-900">Review customer refund</h3><p className="mt-1 text-sm text-slate-500">Check the amount and reason before submitting. Provider confirmation updates the final status.{selectedFailureReport ? ` · Failure report for booking ${selectedFailureReport.booking?.booking_number || selectedFailureReport.booking_id}` : ""}</p></div>
         <label className="text-sm font-medium text-slate-700">Payment record UUID<input required disabled={!!refundDraft} className={`${inputClass} mt-1.5`} value={refundTarget} onChange={event => setRefundTarget(event.target.value)} /></label>
         <label className="text-sm font-medium text-slate-700">Refund amount (INR)<input required disabled={!!refundDraft} type="number" min="1" step="0.01" className={`${inputClass} mt-1.5`} value={refundAmount} onChange={event => setRefundAmount(event.target.value)} /></label>
         <label className="text-sm font-medium text-slate-700 md:col-span-2">Reason<input required minLength={3} maxLength={500} disabled={!!refundDraft} className={`${inputClass} mt-1.5`} value={refundReason} onChange={event => setRefundReason(event.target.value)} /></label>

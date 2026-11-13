@@ -12,7 +12,6 @@ import {
 import {
   createPaymentOrder,
   verifyPayment,
-  recordCodPayment,
 } from "../../controllers/payments/paymentController.js";
 
 import { paymentActionRateLimit } from "../../middleware/rateLimitMiddleware.js";
@@ -35,14 +34,6 @@ router.post(
   allowRoles("customer"),
   paymentActionRateLimit,
   verifyPayment
-);
-
-router.post(
-  "/bookings/:bookingId/cod",
-  requireAuth,
-  allowRoles("washer"),
-  paymentActionRateLimit,
-  recordCodPayment
 );
 
 export default router;

@@ -47,16 +47,6 @@ function PaymentMethodDetails({ paymentMethod, upiId, setUpiId }) {
       </div>
     );
   }
-  if (paymentMethod === "cod") {
-    return (
-      <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 p-6">
-        <h3 className="font-bold text-green-900">Pay After Service</h3>
-        <p className="mt-2 text-sm leading-6 text-green-700">
-          Your booking will be confirmed now. Payment can be collected after the car wash is completed.
-        </p>
-      </div>
-    );
-  }
   return null;
 }
 

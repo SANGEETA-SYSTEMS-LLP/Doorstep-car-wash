@@ -4,11 +4,12 @@ export async function getCustomerPaymentOptions(req, res, next) {
     const customer = await db.from("customers").select("id").eq("user_id", req.user.id).maybeSingle();
     if (customer.error) throw customer.error;
     if (!customer.data) return res.status(404).json({ message: "Booking not found." });
-    const result = await db.from("bookings").select("id,booking_number,status,total_amount,assigned_washer_id")
+    const result = await db.from("bookings").select("id,booking_number,status,total_amount,assigned_washer_id,payment_method")
       .eq("id", req.params.bookingId).eq("customer_id", customer.data.id).maybeSingle();
     if (result.error) throw result.error;
     const booking = result.data;
     if (!booking) return res.status(404).json({ message: "Booking not found." });
+    if (["cod", "cash"].includes(String(booking.payment_method || "").toLowerCase())) return res.status(409).json({ message: "Cash on delivery is no longer available. Contact support to resolve this legacy booking." });
     if (!["customer_confirmed", "payment_completed", "closed"].includes(booking.status)) return res.status(409).json({ message: "Confirm the completed service before making this payment." });
     const payments = await db.from("payments").select("id").eq("booking_id", booking.id).eq("status", "paid").limit(1);
     if (payments.error) throw payments.error;

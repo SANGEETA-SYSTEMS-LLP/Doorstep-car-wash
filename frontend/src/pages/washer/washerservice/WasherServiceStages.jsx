@@ -1,4 +1,4 @@
-import { CheckCircle2, Phone, Play } from "lucide-react";
+import { CheckCircle2, Phone, Play, TriangleAlert } from "lucide-react";
 import PhotoStage from "./PhotoStage";
 import ServiceChecklist from "./ServiceChecklist";
 import CompletedService from "./CompletedService";
@@ -8,7 +8,7 @@ function WasherServiceStages({
   checklist, checklistLoading, savingTask, retryChecklist, activeJob,
   allTasksCompleted, toggleTask, moveToAfterPhotos,
   onBeforePhotos, onStartService, onAfterPhotos, onCompleteJob,
-  jobStatus, validating, onValidate, onDashboard,
+  jobStatus, validating, onValidate, onDashboard, canReportFailure, failureReason, setFailureReason, onReportFailure, reportingFailure,
 }) {
   return (
     <>
@@ -34,10 +34,11 @@ function WasherServiceStages({
             disabled={loading || !beforePhotos.length}
             onContinue={onStartService}
           />
+          {canReportFailure && <ServiceFailureForm failureReason={failureReason} setFailureReason={setFailureReason} onReportFailure={onReportFailure} reportingFailure={reportingFailure} />}
         </div>
       )}
       {stage === "service" && (
-        <ServiceChecklist
+        <div className="space-y-4"><ServiceChecklist
           checklist={checklist}
           loading={checklistLoading}
           saving={savingTask}
@@ -46,7 +47,7 @@ function WasherServiceStages({
           toggleTask={toggleTask}
           allTasksCompleted={allTasksCompleted}
           moveToAfterPhotos={moveToAfterPhotos}
-        />
+        />{canReportFailure && <ServiceFailureForm failureReason={failureReason} setFailureReason={setFailureReason} onReportFailure={onReportFailure} reportingFailure={reportingFailure} />}</div>
       )}
       {stage === "after" && (
         <PhotoStage
@@ -70,6 +71,15 @@ function WasherServiceStages({
       )}
     </>
   );
+}
+
+function ServiceFailureForm({ failureReason, setFailureReason, onReportFailure, reportingFailure }) {
+  return <form onSubmit={onReportFailure} className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+    <div className="flex items-start gap-3"><TriangleAlert size={20} className="mt-0.5 text-amber-700" /><div className="flex-1"><h2 className="font-bold text-amber-950">Service cannot be completed?</h2><p className="mt-1 text-sm text-amber-900">Tell Accounts why. They will review the paid booking and process a customer refund if approved.</p>
+      <textarea required minLength={5} maxLength={1000} value={failureReason} onChange={event => setFailureReason(event.target.value)} rows={3} className="mt-3 w-full rounded-lg border border-amber-300 bg-white p-3 text-sm" placeholder="Describe the issue preventing the wash" />
+      <button disabled={reportingFailure || failureReason.trim().length < 5} className="mt-3 rounded-lg bg-amber-800 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50">{reportingFailure ? "Sending report…" : "Report incomplete service"}</button>
+    </div></div>
+  </form>;
 }
 
 export default WasherServiceStages;

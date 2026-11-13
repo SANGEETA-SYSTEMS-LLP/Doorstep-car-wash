@@ -7,6 +7,7 @@ import WasherServiceHeader from "./WasherServiceHeader";
 import WasherServiceStages from "./WasherServiceStages";
 import NoActiveService from "./NoActiveService";
 import { getWasherJob, toActiveJob } from "../../../services/washer/washerWorkspaceService";
+import { apiRequest } from "../../../api/apiClient";
 
 function WasherService() {
   const context = useWasher();
@@ -29,6 +30,9 @@ function WasherService() {
   const [afterPhotos, setAfterPhotos] = useState([]);
   const [jobLoading, setJobLoading] = useState(true);
   const [jobError, setJobError] = useState("");
+  const [failureReason, setFailureReason] = useState("");
+  const [reportingFailure, setReportingFailure] = useState(false);
+  const [clockTime, setClockTime] = useState(null);
   const { restoreJob } = context;
   useEffect(() => {
     let mounted = true;
@@ -47,6 +51,10 @@ function WasherService() {
       });
     return () => { mounted = false; };
   }, [jobId, restoreJob]);
+  useEffect(() => {
+    const timer = window.setInterval(() => setClockTime(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
   const checklist = useServiceChecklist(activeJob, serviceStarted, setError);
   const actions = useWasherServiceActions({
     activeJob,
@@ -65,6 +73,30 @@ function WasherService() {
     completeService: context.completeService,
     updateJobStatus: context.updateJobStatus,
   });
+
+  const reportFailure = async event => {
+    event.preventDefault();
+    if (reportingFailure) return;
+    setReportingFailure(true);
+    setError("");
+    try {
+      await apiRequest(`/washer/bookings/${jobId}/service-failure`, { method: "POST", body: JSON.stringify({ reason: failureReason.trim() }) });
+      setError("Service issue sent to Accounts. The paid booking is now awaiting refund review.");
+      setFailureReason("");
+    } catch (reportError) { setError(reportError.message || "Unable to send the service issue report."); }
+    finally { setReportingFailure(false); }
+  };
+
+  const scheduledStart = activeJob?.scheduled_date && activeJob?.scheduled_start_time
+    ? Date.parse(`${activeJob.scheduled_date}T${String(activeJob.scheduled_start_time).slice(0, 8)}+05:30`)
+    : NaN;
+  const serviceDeadlinePassed = Number.isFinite(scheduledStart)
+    && clockTime != null
+    && clockTime >= scheduledStart + (Number(activeJob?.package?.duration_minutes) || 60) * 60_000 + 30 * 60_000;
+  const canReportFailure = serviceDeadlinePassed
+    && !activeJob?.service_validated_at
+    && ["washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified", "service_started"].includes(activeJob?.status)
+    && ["paid", "captured", "success", "completed"].includes(String(activeJob?.payment?.status || "").toLowerCase());
 
   if (jobLoading) {
     return <main className="flex min-h-[60vh] items-center justify-center p-6"><p role="status" className="text-sm text-slate-600">Loading assigned service...</p></main>;
@@ -114,6 +146,11 @@ function WasherService() {
             context.closeActiveJob();
             navigate("/washer");
           }}
+          canReportFailure={canReportFailure}
+          failureReason={failureReason}
+          setFailureReason={setFailureReason}
+          onReportFailure={reportFailure}
+          reportingFailure={reportingFailure}
         />
       </main>
     </div>

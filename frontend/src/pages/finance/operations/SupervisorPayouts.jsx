@@ -28,12 +28,12 @@ export default function SupervisorPayouts() {
   }
 
   return <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
-    <div><h3 className="font-bold text-slate-900">Supervisor commission payouts</h3><p className="mt-1 text-sm text-slate-500">Each linked supervisor receives the same package commission as the washer on eligible completed, paid jobs.</p></div>
+    <div><h3 className="font-bold text-slate-900">Supervisor commission payouts</h3><p className="mt-1 text-sm text-slate-500">For completed, paid jobs, the configured commission rate is applied to the platform commission remaining after the washer's share. Admin or finance sends these payouts from the platform account.</p></div>
     {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
     {message && <p role="status" className="rounded-lg bg-green-50 p-3 text-sm text-green-900">{message}</p>}
     {!data?.rows?.length && !error && <p className="text-sm text-slate-500">No pending supervisor commissions.</p>}
     <div className="space-y-2">{(data?.rows || []).map(row => <div key={row.supervisor_id} className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4 ${selected?.supervisor_id === row.supervisor_id ? "border-green-400 bg-green-50" : "border-slate-200"}`}>
-      <div><p className="font-semibold text-slate-900">{row.supervisor_name}</p><p className="text-sm text-slate-600">{row.payment_method} · {row.payment_destination || "Payout account not saved"}</p><p className="mt-1 text-xs text-slate-500">{row.pending_earning_count} eligible job(s) · Supervisor commission {inr(row.pending_total_amount)}</p><p className="text-xs text-slate-500">Admin retains platform fee {inr(row.admin_platform_fee_amount)} + GST {inr(row.admin_gst_amount)}</p></div>
+      <div><p className="font-semibold text-slate-900">{row.supervisor_name}</p><p className="text-sm text-slate-600">{row.payment_method} · {row.payment_destination || "Payout account not saved"}</p><p className="mt-1 text-xs text-slate-500">{row.pending_earning_count} eligible job(s) · Supervisor commission {inr(row.pending_total_amount)}</p><p className="text-xs text-slate-500">Platform retains commission {inr(row.admin_remaining_commission_amount)} + fee {inr(row.admin_platform_fee_amount)} + GST {inr(row.admin_gst_amount)}</p></div>
       <button type="button" disabled={!row.available_payment_methods?.length || busy || Boolean(requestId && selected?.supervisor_id !== row.supervisor_id)} onClick={() => { if (selected?.supervisor_id !== row.supervisor_id) setRequestId(null); setSelected(row); setMode(row.available_payment_methods[0] || ""); }} className="rounded-lg border border-green-300 px-3 py-2 text-sm font-semibold text-green-800 disabled:opacity-40">Select</button>
     </div>)}</div>
     {selected && <div className="flex flex-wrap items-end gap-3 rounded-xl bg-slate-50 p-4">

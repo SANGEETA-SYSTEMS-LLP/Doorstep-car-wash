@@ -52,11 +52,10 @@ export async function startAssignment(
 
     if (booking.status === "pending") return res.status(409).json({ message: "Your booking is waiting for supervisor review." });
 
-    if (booking.payment_method !== "cod") {
-      const {data:paid,error:paidError}=await supabaseAdmin.from("payments").select("id,amount").eq("booking_id",booking.id).eq("status","paid").maybeSingle();
-      if(paidError)throw paidError;
-      if(!paid || Number(paid.amount)<Number(booking.total_amount))return res.status(409).json({message:"Complete online payment before requesting a washer."});
-    }
+    if (booking.payment_method === "cod" || booking.payment_method === "cash") return res.status(409).json({ message: "Cash on delivery is no longer available. Create a booking and complete online payment." });
+    const {data:paid,error:paidError}=await supabaseAdmin.from("payments").select("id,amount").eq("booking_id",booking.id).eq("status","paid").maybeSingle();
+    if(paidError)throw paidError;
+    if(!paid || Number(paid.amount)<Number(booking.total_amount))return res.status(409).json({message:"Complete online payment before requesting a washer."});
     const result =
       await assignWasherToBooking(
         booking.id

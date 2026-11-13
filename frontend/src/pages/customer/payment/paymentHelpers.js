@@ -12,7 +12,7 @@ function loadRazorpayScript() {
 }
 
 export async function openRazorpayPayment(savedBooking, completeBooking, onError, onDone) {
-  const order = await createPaymentOrder(savedBooking.id);
+  const order = await createPaymentOrderWithRetry(savedBooking.id);
   const scriptLoaded = await loadRazorpayScript();
   if (!scriptLoaded) {
     throw new Error("Unable to load Razorpay checkout. Check your connection and try again.");
@@ -51,4 +51,18 @@ export async function openRazorpayPayment(savedBooking, completeBooking, onError
     onDone();
   });
   checkout.open();
+}
+
+async function createPaymentOrderWithRetry(bookingId) {
+  const delays = [500, 1000, 2000, 3000];
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await createPaymentOrder(bookingId);
+    } catch (error) {
+      const checkoutPreparing = error.status === 409 && /already being prepared/i.test(error.message || "");
+      const transient = !error.status || [502, 503, 504].includes(error.status);
+      if ((!transient && !checkoutPreparing) || attempt >= delays.length) throw error;
+      await new Promise((resolve) => setTimeout(resolve, delays[attempt]));
+    }
+  }
 }

@@ -16,6 +16,8 @@ const { processExpiredAssignments } =
   await import("./services/booking/assignmentTimeoutService.js");
 const { processUnpaidBookingExpiry } =
   await import("./services/booking/unpaidBookingExpiryService.js");
+const { cancelOverduePaidServiceBookings } =
+  await import("./services/booking/overdueServiceBookingCancellationService.js");
 
 const PORT =
   process.env.PORT || 5000;
@@ -53,6 +55,15 @@ setInterval(() => {
   processUnpaidBookingExpiry()
     .catch((error) => console.error("Unpaid booking expiry processor:", error.message))
     .finally(() => { expiringUnpaidBookings = false; });
+}, 60 * 1000).unref();
+
+let cancellingOverduePaidBookings = false;
+setInterval(async () => {
+  if (cancellingOverduePaidBookings) return;
+  cancellingOverduePaidBookings = true;
+  try { await cancelOverduePaidServiceBookings(); }
+  catch (error) { console.error("Overdue paid service cancellation:", error.message); }
+  finally { cancellingOverduePaidBookings = false; }
 }, 60 * 1000).unref();
 
 // Reconcile asynchronous provider outcomes. Never initiates an unsubmitted transfer.

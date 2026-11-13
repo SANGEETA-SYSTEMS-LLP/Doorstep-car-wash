@@ -1,4 +1,5 @@
 import { supabaseAdmin as db } from "../../config/supabase.js";
+import { loadInvoiceSellerSettings } from "./invoiceSettingsController.js";
 const staff = ["accountant", "sub_admin", "super_admin"];
 export function reportRange(from, to) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(from || "") || !/^\d{4}-\d{2}-\d{2}$/.test(to || "")) throw Object.assign(new Error("Choose a start and end date."), { status: 400 });
@@ -58,14 +59,14 @@ export async function getInvoice(req,res,next) {
   if(readError) throw readError;
   if(existing) return res.json({invoice:existing});
   if(!["completed","closed","payment_completed","customer_confirmed"].includes(booking.status)) return res.status(409).json({message:"An invoice is available after service completion."});
-  const invoiceBusinessName = process.env.INVOICE_BUSINESS_NAME || "doorstep car wash";
-  if(!process.env.INVOICE_BUSINESS_ADDRESS) return res.status(503).json({
+  const seller = await loadInvoiceSellerSettings();
+  if(!seller.businessAddress) return res.status(409).json({
     code:"INVOICE_SELLER_DETAILS_REQUIRED",
-    message:"Invoice setup is incomplete. Set INVOICE_BUSINESS_ADDRESS in the backend deployment environment, then redeploy. The configured seller name is doorstep car wash.",
+    message:"Invoice seller details are not configured. An Admin or Accountant must add the actual business name and address in Finance → Invoices before invoices can be issued.",
   });
   const {data:profile,error:profileError} = await db.from("profiles").select("full_name").eq("id",customer.user_id).single();
   if(profileError) throw profileError;
-  const snapshot={seller:{name:invoiceBusinessName,address:process.env.INVOICE_BUSINESS_ADDRESS},customerName:profile.full_name,currency:"INR",booking};
+  const snapshot={seller:{name:seller.businessName,address:seller.businessAddress},customerName:profile.full_name,currency:"INR",booking};
   const {error:insertError} = await db.from("booking_invoices").upsert({booking_id:booking.id,snapshot},{onConflict:"booking_id",ignoreDuplicates:true});
   if(insertError) throw insertError;
   const {data:invoice,error:finalError} = await db.from("booking_invoices").select("*").eq("booking_id",booking.id).single();

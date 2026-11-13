@@ -64,7 +64,8 @@ async function preparePayoutRequest(operation, paymentMethod) {
 
 export async function createOperation(req, res, next) {
   try {
-    const { id, kind, targetId, amount, reason, paymentMethod } = req.body || {};
+    const { id, kind, targetId, amount, reason, paymentMethod, serviceFailureReportId } = req.body || {};
+    if (serviceFailureReportId && (kind !== "refund" || !uuid.test(serviceFailureReportId))) throw invalid("A valid service failure report can only be linked to a refund.");
     if (!uuid.test(id || "") || !uuid.test(targetId || "") || !["refund", "payout"].includes(kind) || typeof reason !== "string" || reason.trim().length < 3 || reason.length > 500) throw invalid("Enter a valid target ID, reason and request ID.");
     if (kind === "payout" && !["IMPS", "NEFT", "RTGS", "UPI"].includes(String(paymentMethod || "").toUpperCase())) throw invalid("Choose a supported bank or UPI payout method.");
     if (kind === "refund" && paymentMethod !== undefined) throw invalid("A payout method is only valid for washer payouts.");
@@ -75,6 +76,10 @@ export async function createOperation(req, res, next) {
     const { data: reserved, error } = await db.rpc("reserve_finance_operation", { p_id: id, p_kind: kind, p_target: targetId, p_amount: paise, p_reason: operationReason, p_actor: req.user.id, p_account_number: process.env.RAZORPAYX_ACCOUNT_NUMBER || null });
     if (error) throw Object.assign(new Error(error.message), { status: 409 });
     let data = reserved;
+    if (serviceFailureReportId) {
+      const { error: linkError } = await db.rpc("link_service_failure_refund", { p_report: serviceFailureReportId, p_operation: id, p_actor: req.user.id });
+      if (linkError) throw Object.assign(new Error(linkError.message), { status: 409 });
+    }
     if (kind === "payout") {
       try { data = await preparePayoutRequest(reserved, paymentMethod); }
       catch (error) {

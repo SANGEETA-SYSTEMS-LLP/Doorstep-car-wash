@@ -25,7 +25,7 @@ export async function createBooking(req,res,next) {
   if(!uuid.test(addressId||""))throw bad("Choose a service address before checkout.");
   if(!uuid.test(vehicleId||""))throw bad("Choose a vehicle before checkout.");
   if(!uuid.test(packageId||"")&&!virtualMonthlyId.test(packageId||""))throw bad("Choose a service package before checkout.");
-  if(!["cod","upi","card","netbanking","wallet","online"].includes(paymentMethod))throw bad("Choose a supported payment method.");
+  if(!["upi","card","netbanking","wallet","online"].includes(paymentMethod))throw bad("Cash on delivery is not available. Complete online payment to confirm this booking.");
   const {data:customer,error:ce}=await db.from("customers").select("id").eq("user_id",req.user.id).single();if(ce)throw ce;
   validateSchedule(date,time);
   const results=await Promise.all([

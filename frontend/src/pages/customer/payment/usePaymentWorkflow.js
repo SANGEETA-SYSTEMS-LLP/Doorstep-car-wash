@@ -11,13 +11,17 @@ function usePaymentWorkflow() {
   const { booking, updateBooking } = useBooking();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const requestId = useRef(crypto.randomUUID());
+  const requestId = useRef(null);
   const processingRef = useRef(false);
   const [paymentError, setPaymentError] = useState("");
   const [createdBooking, setCreatedBooking] = useState(null);
   const [processing, setProcessing] = useState(false);
 
   const completeBooking = async (savedBooking) => {
+    if (requestId.current?.storageKey) {
+      try { sessionStorage.removeItem(requestId.current.storageKey); } catch { /* storage may be disabled */ }
+      requestId.current = null;
+    }
     updateBooking({
       databaseBookingId: savedBooking.id,
       bookingId: savedBooking.booking_number,
@@ -47,12 +51,38 @@ function usePaymentWorkflow() {
     try {
       let savedBooking = createdBooking;
       if (!savedBooking) {
+        // Keep the same idempotency key when the customer retries checkout or
+        // the review page is re-mounted after a transient network failure.
+        const requestPayload = {
+          addressId: booking.location?.addressId,
+          vehicleId: booking.vehicle?.id,
+          packageId: booking.package?.id,
+          date: booking.schedule?.date?.iso,
+          time: booking.schedule?.time,
+          promoCode: booking.promoCode || null,
+        };
+        const storageKey = `washnow-checkout:${user.id}:${JSON.stringify(requestPayload)}`;
+        if (requestId.current?.storageKey !== storageKey) {
+          let persistedId = null;
+          try { persistedId = sessionStorage.getItem(storageKey); } catch { /* storage may be disabled */ }
+          const id = persistedId || crypto.randomUUID();
+          requestId.current = { storageKey, id };
+          try { sessionStorage.setItem(storageKey, id); } catch { /* in-memory key still protects this attempt */ }
+        }
         savedBooking = await createBooking({
           userId: user.id,
-          requestId: requestId.current,
+          requestId: requestId.current.id,
           booking: { ...booking, paymentMethod: "online" },
         });
         setCreatedBooking(savedBooking);
+        // Save the server booking id before opening payment, so a reload or
+        // retry can resume this booking instead of creating another one.
+        updateBooking({
+          databaseBookingId: savedBooking.id,
+          bookingId: savedBooking.booking_number,
+          paymentMethod: "online",
+          status: savedBooking.status,
+        });
       }
       await openRazorpayPayment(
         savedBooking,
