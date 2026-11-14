@@ -8,7 +8,7 @@ function SupervisorServiceValidation({ job, validating, onValidate }) {
             Review the washer&apos;s before and after photos before completing the booking.
           </p>
         </div>
-        {job.status === "service_completed" && (
+        {job.status === "service_completed" && !job.service_validated_at && (
           <button
             type="button"
             onClick={onValidate}
@@ -18,7 +18,7 @@ function SupervisorServiceValidation({ job, validating, onValidate }) {
             {validating ? "Validating..." : "Validate and complete"}
           </button>
         )}
-        {job.status === "completed" && (
+        {(["completed", "customer_confirmed", "payment_completed", "closed"].includes(job.status) || (job.status === "service_completed" && job.service_validated_at)) && (
           <span className="rounded-full bg-green-50 px-3 py-1.5 text-sm font-semibold text-green-700">
             Booking completed
           </span>

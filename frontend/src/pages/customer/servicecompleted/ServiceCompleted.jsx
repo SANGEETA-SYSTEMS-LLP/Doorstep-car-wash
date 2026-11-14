@@ -14,7 +14,8 @@ import CompletionPayment from "./CompletionPayment";
 function ServiceCompleted() {
   const { booking, updateBooking, updateStatus } = useBooking();
   const washer = booking.washer;
-  const servicePrice = booking.package?.price || 0;
+  const bookingAmount = Number(booking.total_amount);
+  const servicePrice = Number.isFinite(bookingAmount) ? bookingAmount : Number(booking.package?.price || 0);
   const [photos, setPhotos] = useState([]);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
   const [photoError, setPhotoError] = useState("");
@@ -44,6 +45,13 @@ function ServiceCompleted() {
         updateBooking({
           status: updated.status,
           service_validated_at: updated.service_validated_at || null,
+          total_amount: updated.total_amount,
+          extra_charge: updated.extra_charge,
+          service_amount: updated.service_amount,
+          platform_fee: updated.platform_fee,
+          tax_amount: updated.tax_amount,
+          package: updated.package || booking.package,
+          vehicle: updated.vehicle || booking.vehicle,
           washer: updated.washer || booking.washer,
         });
       }

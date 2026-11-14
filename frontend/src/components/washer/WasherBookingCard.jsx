@@ -42,7 +42,8 @@ export function ContactButtons({ phone }) {
 }
 
 export default function WasherBookingCard({ booking, assignment, busy, onAccept, onReject, hideLink }) {
-  const completed = ["service_completed", "completed", "customer_confirmed", "payment_completed", "closed"].includes(booking.status);
+  const completed = ["completed", "customer_confirmed", "payment_completed", "closed"].includes(booking.status)
+    || (booking.status === "service_completed" && Boolean(booking.service_validated_at));
   const statusLabel = booking.status === "service_completed"
     ? booking.service_validated_at ? "Completed" : "Awaiting validation"
     : booking.status === "completed"

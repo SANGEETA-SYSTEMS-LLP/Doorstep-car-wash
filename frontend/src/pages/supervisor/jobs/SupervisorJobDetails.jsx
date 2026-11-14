@@ -48,9 +48,9 @@ export default function SupervisorJobDetails() {
   }
 
   const canAssign = !job.assigned_washer_id && job.status === "payment_completed";
-  const status = job.status === "service_completed"
+  const status = job.status === "service_completed" && !job.service_validated_at
     ? "Awaiting validation"
-    : job.status === "completed"
+    : ["completed", "customer_confirmed", "payment_completed", "closed"].includes(job.status) || (job.status === "service_completed" && job.service_validated_at)
       ? "Completed"
       : job.assigned_washer_id
         ? "In Progress"

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../../../context/AuthContext";
-import { cancelBooking as cancelBookingRequest, getMyBookings, removeBookingFromHistory } from "../../../services/booking/bookingService";
+import { cancelBooking as cancelBookingRequest, getMyBookings } from "../../../services/booking/bookingService";
 import BookingHistoryCard from "./BookingHistoryCard";
 import {
   cancelledStatuses,
@@ -49,7 +49,6 @@ function BookingHistory() {
   const [error, setError] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [reloadCount, setReloadCount] = useState(0);
-  const [deletingId, setDeletingId] = useState("");
   const [cancellingId, setCancellingId] = useState("");
   const [actionError, setActionError] = useState("");
   const [actionNotice, setActionNotice] = useState("");
@@ -129,20 +128,6 @@ function BookingHistory() {
       return cancelledStatuses.includes(booking.status);
     });
   }, [activeFilter, bookings]);
-
-  async function removeBooking(booking) {
-    if (deletingId || !window.confirm("Remove this booking from your history? Payment and service records will be retained.")) return;
-    setDeletingId(booking.id);
-    setActionError("");
-    try {
-      await removeBookingFromHistory(booking.id);
-      setBookings(previous => previous.filter(item => item.id !== booking.id));
-    } catch (error) {
-      setActionError(error.message || "Unable to remove this booking from your history.");
-    } finally {
-      setDeletingId("");
-    }
-  }
 
   async function cancelBooking(booking) {
     if (cancellingId || !window.confirm("Cancel this booking? Any online refund will exclude the platform fee and return to your original payment method.")) return;
@@ -333,8 +318,6 @@ function BookingHistory() {
                 key={booking.id}
                 booking={booking}
                 onDetails={() => navigate(`/customer/bookings/${booking.id}`)}
-                onDelete={() => removeBooking(booking)}
-                deleting={deletingId === booking.id}
                 onCancel={() => cancelBooking(booking)}
                 cancelling={cancellingId === booking.id}
                 onCheckRefund={() => checkCancellationRefund(booking)}

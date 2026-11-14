@@ -27,8 +27,9 @@ export function WasherProvider({ children }) {
   });
 
   const restoreJob = useCallback((job) => {
-    const completed = ["service_completed", "completed"].includes(job.status);
-    const serviceStarted = ["service_started", "service_completed", "completed"].includes(job.status);
+    const completed = ["completed", "customer_confirmed", "payment_completed", "closed"].includes(job.status)
+      || (job.status === "service_completed" && Boolean(job.service_validated_at));
+    const serviceStarted = ["service_started", "service_completed", "completed", "customer_confirmed", "payment_completed", "closed"].includes(job.status);
     setWasherState(previous => ({
       ...(previous.activeJob?.databaseId === job.databaseId ? previous : initialWasherState),
       online: previous.online,

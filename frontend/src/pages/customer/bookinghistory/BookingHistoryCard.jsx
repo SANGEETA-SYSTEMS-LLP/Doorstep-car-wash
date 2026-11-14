@@ -5,7 +5,6 @@ import {
   ChevronRight,
   Clock3,
   MapPin,
-  Trash2,
   XCircle,
   RefreshCw,
 } from "lucide-react";
@@ -14,7 +13,7 @@ import {
   completedStatuses,
 } from "./bookingHistoryUtils";
 
-function BookingHistoryCard({ booking, onDetails, onDelete, deleting, onCancel, cancelling, onCheckRefund }) {
+function BookingHistoryCard({ booking, onDetails, onCancel, cancelling, onCheckRefund }) {
   const status = booking.status || "unknown";
   const awaitingPayment = status === "pending"
     && !["cod", "cash"].includes(String(booking.payment?.payment_method || booking.payment_method || "").toLowerCase())
@@ -28,7 +27,6 @@ function BookingHistoryCard({ booking, onDetails, onDelete, deleting, onCancel, 
     ? [booking.vehicle.brand, booking.vehicle.model].filter(Boolean).join(" ")
     : "Vehicle details unavailable";
   const amount = Number(booking.total_amount);
-  const removable = ["completed", "customer_confirmed", "payment_completed", "closed", "cancelled", "rejected", "expired"].includes(status);
   const cancellable = ["pending", "confirmed", "finding_washer", "support_escalated", "washer_assigned", "washer_on_the_way", "washer_arrived", "otp_verified"].includes(status);
 
   return (
@@ -114,9 +112,6 @@ function BookingHistoryCard({ booking, onDetails, onDelete, deleting, onCancel, 
             </button>}
             {booking.cancellation?.status === "refund_pending" && <button type="button" onClick={onCheckRefund} disabled={cancelling} className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 disabled:opacity-50">
               <RefreshCw size={15} className={cancelling ? "animate-spin" : ""} />Check refund
-            </button>}
-            {removable && <button type="button" onClick={onDelete} disabled={deleting} className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50">
-              <Trash2 size={15} />{deleting ? "Removing…" : "Remove"}
             </button>}
             <button
               type="button"
